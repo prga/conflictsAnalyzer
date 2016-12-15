@@ -29,6 +29,18 @@ public class ConflictPrinter {
 		this.conflictReportHeader = this.conflictReportHeader + 'PossibleRenamings, EditSameMCWithoutConflicts, EditSameMCWithoutConflictsDS'
 	}
 	
+	public static void printMergeCommitsList(String projectName, ArrayList<MergeCommit> mergeCommits){
+		String filePath = 'ResultData' + File.separator + projectName + File.separator + 'mergeCommits.csv'
+		File file = new File(filePath)
+		file.delete()
+		file = new File(filePath)
+		file.append('Merge,Parent1,Parent2,Date\n')
+		for(MergeCommit mc in mergeCommits){
+			String commit = mc.sha + ',' + mc.parent1 + ',' + mc.parent2 + ',' + mc.date + '\n'
+			file.append(commit)
+		}
+	}
+	
 	public static String getConflictReportHeader(){
 		return this.conflictReportHeader
 	}
