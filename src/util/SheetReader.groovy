@@ -64,8 +64,8 @@ public class SheetReader {
 				"/Users/paolaaccioly/Documents/testeConflictsAnalyzer/conflictsAnalyzer/projectsPatternData.csv")*/
 		/*/Users/paolaaccioly/Documents/Doutorado/workspace_empirical/conflictsAnalyzer/projectsChanges.csv*/
 		//SheetReader.doubleInputs("/Users/paolaaccioly/Documents/testeConflictsAnalyzer/conflictsAnalyzer/projectsPatternData.csv")
-		SheetReader.AMinusB("/Users/paolaaccioly/Documents/testeConflictsAnalyzer/conflictsAnalyzer/projectsPatternData.csv",
-			"/Users/paolaaccioly/Documents/Doutorado/workspace_empirical/conflictsAnalyzer/projectsChanges.csv")
+		SheetReader.AMinusB("/Users/paolaaccioly/Documents/Doutorado/workspace_empirical/conflictsAnalyzer/projectsPatternData.csv",
+			"/Users/paolaaccioly/Documents/Doutorado/workspace_empirical/conflictsAnalyzer/projectsChanges.csv",)
 	}
 }
  

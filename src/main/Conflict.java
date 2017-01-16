@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import de.ovgu.cide.fstgen.ast.FSTNode;
 import de.ovgu.cide.fstgen.ast.FSTTerminal;
 import merger.FSTGenMerger;
+import util.ExtractMethodBody;
 import util.StringSimilarity;
 
 
@@ -47,12 +48,19 @@ public  class Conflict {
 	private double similarityThreshold;
 
 	private String nodeName;
+	
+	private String editSameMCType;
 
 
 	public Conflict(FSTTerminal node, String path){
 		this.body = node.getBody();
 		this.nodeName = node.getName();
 		this.nodeType = node.getType();
+		if(this.isMethodOrConstructor()){
+			this.setEditSameMCType();
+		}else{
+			this.editSameMCType = "";
+		}
 		this.conflicts = splitConflictsInsideMethods();
 		this.countConflictsInsideMethods();
 		this.matchPattern();
@@ -61,6 +69,12 @@ public  class Conflict {
 		this.causeSameSignatureCM = "";
 		this.similarityThreshold = 0.7;
 
+	}
+	
+	public void setEditSameMCType(){
+		String[] mergeResult = ExtractMethodBody.getEditSameMCType(this.body);
+		this.editSameMCType = mergeResult[0];
+		this.body = mergeResult[1];				
 	}
 
 	public Conflict (String type){

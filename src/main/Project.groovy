@@ -20,6 +20,8 @@ class Project {
 	
 	private Map<String, Integer> sameSignatureCMSummary
 	
+	private Map<String, Integer> editSameMCTypeSummary
+	
 	private int possibleRenamings;
 
 	public Project(String projectName){
@@ -28,12 +30,17 @@ class Project {
 		initializeProjectSummary()
 		initializeProjectMetrics()
 		this.createSameSignatureCMSummary()
+		this.createEditSameMCTypeSummary()
 		this.createProjectDir()
 	}
 	
 	
 	public void createSameSignatureCMSummary(){
 		this.sameSignatureCMSummary = ConflictSummary.initializeSameSignatureCMSummary()
+	}
+	
+	public void createEditSameMCTypeSummary(){
+		this.editSameMCTypeSummary = ConflictSummary.initializeEditSameMCTypeSummary()
 	}
 
 	private void createProjectDir(){
@@ -99,6 +106,7 @@ class Project {
 		if(ms.hasConflicts){
 			updateProjectSummary(ms)
 			updateSameSignatureCMSummary(ms)
+			this.updateEditSameMCTypeSummary(ms)
 		}
 		printResults(ms)
 	}
@@ -135,6 +143,15 @@ class Project {
 		this.possibleRenamings = this.possibleRenamings + ms.getPossibleRenamings()
 	}
 	
+	private void updateEditSameMCTypeSummary(MergeScenario ms){
+		for(EditSameMCTypes e : EditSameMCTypes.values){
+			String type = e.toString()
+			int quantity = ms.editSameMCTypeSummary.get(type)
+			quantity = quantity + this.editSameMCTypeSummary.get(type)
+			this.editSameMCTypeSummary.put(type, quantity)
+		}
+	}
+	
 	private void updateSameSignatureCMSummary(MergeScenario ms){
 		for(PatternSameSignatureCM p : PatternSameSignatureCM.values()){
 			//update cause
@@ -156,7 +173,7 @@ class Project {
 		this.conflictingMergeScenarios + ', ' +
 		ConflictSummary.printConflictsSummary(this.projectSummary) + ', ' +
 		ConflictSummary.printSameSignatureCMSummary(this.sameSignatureCMSummary) + ', ' +
-		this.possibleRenamings
+		this.possibleRenamings + ', ' + ConflictSummary.printEditSameMCTypeSummary(this.editSameMCTypeSummary)
 
 		return result
 	}	

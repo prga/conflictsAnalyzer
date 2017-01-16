@@ -304,14 +304,14 @@ class EvoScenario implements Observer{
 
 	public static void main (String[] args){
 		MergeCommit mc = new MergeCommit()
-		mc.sha = 'a2ac73ff7af23fb23c86b0cd18e1337d2feb1122'
-		mc.parent1 = '935c895593495ede2e0298f8e59a6cfad2a05502'
+		mc.sha = 'fc65e9a291c831848d115b73e92c92e1495563f7'
+		mc.parent1 = '53a115d06bf1c1c5056b8f34d22d81a0c96512a6'
 		mc.parent2 = ''
 		/*mc.sha = '3ba28a912a763ff973e3d5ab63ac35a64462c117'
 		mc.parent1 = '448259185594ed4f0b9ea2c6be9197ca3f5573db'
 		mc.parent2 = 'c0c6d0e7b0f175b800925472be4c550e5a39567d'*/
 		ExtractorResult er = new ExtractorResult()
-		er.revisionFile = '/Users/paolaaccioly/Desktop/Teste/jdimeTests/rev_935c8-none.revisions'
+		er.revisionFile = '/Users/paolaaccioly/Documents/Doutorado/workspace_empirical/downloads/TGM/revisions/rev_53a11/rev_35322-none.revisions'
 		//er.revisionFile = '/Users/paolaaccioly/Documents/Doutorado/workspace_fse/downloads/TGM/revisions/rev_3ba28/rev_44825-c0c6d.revisions'
 		EvoScenario evo = new EvoScenario(mc, er)
 		evo.analyseChanges()

@@ -28,6 +28,8 @@ class MergedFile {
 	private Map<String,Conflict> mergedFileSummary
 	
 	private Map<String, Integer> sameSignatureCMSummary
+	
+	private Map<String, Integer> editSameMCTypeSummary
 
 	public MergedFile(String path){
 		addedByOneDev = false;
@@ -35,10 +37,15 @@ class MergedFile {
 		this.conflicts = new ArrayList<Conflict>()
 		this.createMergedFileSummary()
 		this.createSameSignatureCMSummary()
+		this.createEditSameMCTypeSummary()
 	}
 	
 	public void createSameSignatureCMSummary(){
 		this.sameSignatureCMSummary = ConflictSummary.initializeSameSignatureCMSummary()
+	}
+	
+	public void createEditSameMCTypeSummary(){
+		this.editSameMCTypeSummary = ConflictSummary.initializeEditSameMCTypeSummary()
 	}
 	
 	public void createMergedFileSummary(){
@@ -73,11 +80,20 @@ class MergedFile {
 			this.updateSameSignatureCMSummary(c.getCauseSameSignatureCM(), c.getDifferentSpacing())
 		}
 		
+		if(c.getType().equals(SSMergeConflicts.EditSameMC.toString())){
+			this.updateEditSameMCTypeSummary(c.editSameMCType)
+		}
+		
 	}
 	
 	private void updateSameSignatureCMSummary(String cause, int ds){
 		this.sameSignatureCMSummary = ConflictSummary.
 		updateSameSignatureCMSummary(this.sameSignatureCMSummary, cause, ds)
+	}
+	
+	private void updateEditSameMCTypeSummary(String type){
+		this.editSameMCTypeSummary = ConflictSummary.
+		updateEditSameMCTypeSummary(this.editSameMCTypeSummary, type)
 	}
 
 	public String getPath(){
@@ -126,8 +142,8 @@ class MergedFile {
 				', ' + this.getConflictsOutsideMethods() + ', ' +
 				ConflictSummary.printConflictsSummary(this.mergedFileSummary) + ', ' +
 				ConflictSummary.printSameSignatureCMSummary(this.sameSignatureCMSummary) + ', ' +
-				this.possibleRenamings + '\n'
-
+				this.possibleRenamings + ', ' + 
+				ConflictSummary.printEditSameMCTypeSummary(this.editSameMCTypeSummary) + '\n'
 		return result
 	}
 

@@ -5,6 +5,7 @@ import main.ExtractorResult
 import main.GremlinProject
 import main.GremlinQueryApp
 import main.MergeCommit
+import main.MergeCommitsRetriever;
 import main.SSMergeNode
 
 class NormalizedProject {
@@ -34,11 +35,20 @@ class NormalizedProject {
 
 	public void computeNumberOfChanges(String projectRepo, String gitMinerDir, String downloadDir){
 		//get commits list
-		ArrayList<MergeCommit> temp = this.runGremLinQuery(projectRepo, gitMinerDir)
-		ArrayList<MergeCommit> commits = this.filterMergeCommits(temp)
-
+		//ArrayList<MergeCommit> temp = this.runGremLinQuery(projectRepo, gitMinerDir)
+		//ArrayList<MergeCommit> commits = this.filterMergeCommits(temp)
+		
 		//create extractor
 		Extractor extractor = this.createExtractor(this.name, projectRepo, downloadDir)
+		
+		//get commits list
+		String clonePath = downloadDir + File.separator + this.name + File.separator +
+		'git'
+		println 'retrieving commit list of project ' + this.name
+		MergeCommitsRetriever m = new MergeCommitsRetriever(clonePath, '')
+		ArrayList<MergeCommit> commits = m.retrieveNonMergeCommits(projectRepo)
+		NormalizedConflictPrinter.printCommitList(this.name, commits)
+		println 'commit list retrieved. Starting to analyse commits changes'
 
 		//analyse commit scenarios
 		this.analyseEvoScenarios(commits, extractor)
@@ -57,13 +67,13 @@ class NormalizedProject {
 
 	public void analyseEvoScenarios(ArrayList<MergeCommit> commits, Extractor extractor ){
 
-		int current = 1; //jumps the first project commit
+		int current = 0 //jumps the first project commit
 		int end = commits.size()
 
 		//if project execution breaks, update current with next merge scenario number
 		while(current < end){
-
-			println 'Analyzing merge scenario [' + current + '] from a total of [' + end +
+			int index = current + 1
+			println 'Analyzing commit [' + index + '] from a total of [' + end +
 					'] merge scenarios\n'
 
 			MergeCommit mc = commits.get(current)

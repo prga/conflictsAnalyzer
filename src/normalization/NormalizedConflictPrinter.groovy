@@ -1,5 +1,6 @@
 package normalization
 
+import main.MergeCommit
 import main.SSMergeNode;
 
 class NormalizedConflictPrinter {
@@ -62,5 +63,19 @@ class NormalizedConflictPrinter {
 		
 		out.append(evo.rev_file + '\n')
 		
+	}
+	
+	public static void printCommitList(String projectName, ArrayList<MergeCommit> commits){
+		String filePath = 'ResultData' + File.separator + projectName + File.separator + 'commits.csv'
+		File file = new File(filePath)
+		file.delete()
+		file = new File(filePath)
+		if(!file.exists()){
+			file.getParentFile().mkdirs()
+		}
+		file.append('Commit,Parent,Date\n')
+		for(MergeCommit commit in commits){
+			file.append(commit.sha + ',' + commit.parent1 + ',' + commit.date + '\n')
+		}
 	}
 }

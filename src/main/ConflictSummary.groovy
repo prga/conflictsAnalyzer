@@ -80,15 +80,46 @@ public class ConflictSummary {
 		return summary
 
 	}
-	
+
 	public static String printSameSignatureCMSummary(HashMap<String, Integer> summary){
 		String result = ''
 		for(PatternSameSignatureCM p : PatternSameSignatureCM.values()){
 			String cause = p.toString()
 			String diffSpacing = cause + 'DS'
 			result = result + summary.get(cause) + ', ' + summary.get(diffSpacing) + ', '
-			
-			
+
+
+		}
+		result = result.subSequence(0, result.length()-2)
+		return result
+	}
+
+	public static HashMap<String, Integer> initializeEditSameMCTypeSummary(){
+		HashMap<String, Integer> editSameMCTypeSummary = new HashMap<String, Integer>()
+		for(EditSameMCTypes p : EditSameMCTypes.values()){
+			String type = p.toString();
+			editSameMCTypeSummary.put(type, 0)
+
+		}
+
+		return editSameMCTypeSummary
+	}
+
+	public static HashMap<String, Conflict> updateEditSameMCTypeSummary(HashMap<String, Conflict> editSameMCTypeSummary, String type){
+		String conflictType = type
+		int quantity = editSameMCTypeSummary.get(conflictType)
+		quantity++
+		editSameMCTypeSummary.put(conflictType, quantity)
+
+		return editSameMCTypeSummary
+	}
+
+	public static String printEditSameMCTypeSummary(HashMap<String, Integer> summary){
+		String result = ''
+		for(EditSameMCTypes c : EditSameMCTypes.values()){
+			String type = c.toString()
+			Conflict conflict = summary.get(type)
+			result = result + conflict.getNumberOfConflicts() + ', '
 		}
 		result = result.subSequence(0, result.length()-2)
 		return result

@@ -8,6 +8,8 @@ class ProjectSummary {
 	List totalMergeCommits
 	List mergeCommitsConflictsJavaFiles
 	List mergeCommitsConflictsJavaFilesWFP
+	List mergeCommitsConflictsJavaFilesWDS
+	List mergeCommitsConflictsJavaFilesWCL
 	List mergeCommitsConflictsNonJavaFiles
 
 	public ProjectSummary(String name){
@@ -15,6 +17,8 @@ class ProjectSummary {
 		totalMergeCommits = new ArrayList<String>()
 		mergeCommitsConflictsJavaFiles = new ArrayList<String>()
 		mergeCommitsConflictsJavaFilesWFP = new ArrayList<String>()
+		mergeCommitsConflictsJavaFilesWDS = new ArrayList<String>()
+		mergeCommitsConflictsJavaFilesWCL = new ArrayList<String>()
 		mergeCommitsConflictsNonJavaFiles = new ArrayList<String>()
 	}
 	
@@ -27,12 +31,14 @@ class ProjectSummary {
 		String result = ''
 		ArrayList<String> NonJavaMinusJava = this.removeOneListFromTheOther(this.mergeCommitsConflictsNonJavaFiles, this.mergeCommitsConflictsJavaFiles)
 		ArrayList<String> NonJavaMinusJavaWFP = this.removeOneListFromTheOther(this.mergeCommitsConflictsNonJavaFiles, this.mergeCommitsConflictsJavaFilesWFP)
-		
+		ArrayList<String> NonJavaMinusJavaWDS  = this.removeOneListFromTheOther(this.mergeCommitsConflictsNonJavaFiles,this.mergeCommitsConflictsJavaFilesWDS)
+		ArrayList<String> NonJavaMinusJavaWCL  = this.removeOneListFromTheOther(this.mergeCommitsConflictsNonJavaFiles,this.mergeCommitsConflictsJavaFilesWCL)
 
-		result = this.name + ', ' + this.totalMergeCommits.size() + ', ' +
-				this.mergeCommitsConflictsJavaFiles.size() + ', ' + this.mergeCommitsConflictsJavaFilesWFP.size() +
-				', ' + this.mergeCommitsConflictsNonJavaFiles.size() + ', '+ NonJavaMinusJava.size() + ', ' +
-				NonJavaMinusJavaWFP.size()
+		result = this.name + ';' + this.totalMergeCommits.size() + ';' +
+				this.mergeCommitsConflictsJavaFiles.size() + ';' + this.mergeCommitsConflictsJavaFilesWFP.size() +
+				';' + this.mergeCommitsConflictsJavaFilesWDS.size() + ';' + this.mergeCommitsConflictsJavaFilesWCL.size() +
+				';' + this.mergeCommitsConflictsNonJavaFiles.size() + ';'+ NonJavaMinusJava.size() + ';' +
+				NonJavaMinusJavaWFP.size() + ';' + NonJavaMinusJavaWDS.size() + ';' + NonJavaMinusJavaWCL.size()
 
 		return result
 	}

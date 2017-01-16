@@ -41,7 +41,7 @@ class RunStudy {
 			//ArrayList<MergeCommit> listMergeCommits = runGremlinQuery(graphBase)
 			/*3 read mergeCommits.csv sheets*/ 
 			//String graphBase = this.gitminerLocation + File.separator + this.projectName + 'graph.db'
-			//ArrayList<MergeCommit> listMergeCommits = this.readMergeCommitsSheets(projectsDatesFolder)
+			//ArrayList<MergeCommit> listMergeCommits = this.readMergeCommitsSheets(this.gitminerLocation)
 			
 			//set listMergeCommits with commits that i want to analyze separately
 			/*MergeCommit mc = new MergeCommit()
@@ -85,6 +85,7 @@ class RunStudy {
 	private ArrayList<MergeCommit> readMergeCommitsSheets(String resultDataFolder){
 		ArrayList<MergeCommit> result = new ArrayList<MergeCommit>()
 		String filePath = resultDataFolder + File.separator + this.projectName + File.separator + 'mergeCommits.csv'
+		println 'reading commits file: ' + filePath
 		File mergeCommitsFile = new File(filePath)
 		if(mergeCommitsFile.exists()){
 			mergeCommitsFile.eachLine {

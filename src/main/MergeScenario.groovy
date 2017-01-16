@@ -33,6 +33,8 @@ class MergeScenario implements Observer {
 	
 	private Map<String, Integer> sameSignatureCMSummary
 	
+	private Map<String, Integer> editSameMCTypeSummary
+	
 	private int possibleRenamings
 
 	private int filesAddedByBothDevs
@@ -48,6 +50,7 @@ class MergeScenario implements Observer {
 		this.hasConflicts = false
 		this.createMergeScenarioSummary()
 		this.createSameSignatureCMSummary()
+		this.createEditSameMCTypeSummary()
 		this.setMergedFiles()
 	}
 	
@@ -59,6 +62,10 @@ class MergeScenario implements Observer {
 	
 	public void createSameSignatureCMSummary(){
 		this.sameSignatureCMSummary = ConflictSummary.initializeSameSignatureCMSummary()
+	}
+	
+	public void createEditSameMCTypeSummary(){
+		this.editSameMCTypeSummary = ConflictSummary.initializeEditSameMCTypeSummary()
 	}
 	
 	public void setMergedFiles(){
@@ -204,6 +211,11 @@ class MergeScenario implements Observer {
 		updateSameSignatureCMSummary(this.sameSignatureCMSummary, cause, ds)
 	}
 	
+	private void updateEditSameMCTypeSummary(String type){
+		this.editSameMCTypeSummary = ConflictSummary.
+		updateEditSameMCTypeSummary(this.editSameMCTypeSummary, type)
+	}
+	
 	private void matchConflictWithFile(Conflict conflict){
 		String rev_base = this.compareFiles.baseRevName
 		String conflictPath = conflict.filePath
@@ -272,7 +284,7 @@ class MergeScenario implements Observer {
 				', ' + this.getNumberOfFilesWithConflicts() + ', ' + 
 				ConflictSummary.printConflictsSummary(this.mergeScenarioSummary) + ', ' +
 				ConflictSummary.printSameSignatureCMSummary(this.sameSignatureCMSummary) + ', ' +
-				this.possibleRenamings
+				this.possibleRenamings + ', ' + ConflictSummary.printEditSameMCTypeSummary(this.editSameMCTypeSummary)
 
 		return report
 	}
@@ -299,9 +311,10 @@ class MergeScenario implements Observer {
 		er.revisionFile = '/Users/paolaaccioly/Desktop/Teste/jdimeTests/rev.revisions'
 		MergeScenario ms = new MergeScenario(er)
 		ms.analyzeConflicts()
-		Conflict test = ms.mergeScenarioSummary.get(SSMergeConflicts.EditSameEnumConst.toString())
-		//ConflictPrinter.printBadParsedNodes(ms, 'TGM')
 		println 'hello'
+		//Conflict test = ms.mergeScenarioSummary.get(SSMergeConflicts.EditSameEnumConst.toString())
+		//ConflictPrinter.printBadParsedNodes(ms, 'TGM')
+		//println 'hello'
 		/*Map <String,Conflict> mergeScenarioSummary = new HashMap<String, Conflict>()
 		 String type = SSMergeConflicts.EditSameMC.toString()
 		 mergeScenarioSummary.put(type, new Conflict(type))

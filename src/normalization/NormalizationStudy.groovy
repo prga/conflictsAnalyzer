@@ -48,6 +48,6 @@ class NormalizationStudy {
 			'/media/ines/b9d638e1-93ee-435a-af41-80d544917e00/gitClones/workspace_normalization/downloads')*/
 		normalization.normalizeData('projectsList', 'Optional',
 			'/Users/paolaaccioly/Documents/testeConflictsAnalyzer/gitminer',
-			'/Users/paolaaccioly/Documents/Doutorado/workspace_empirical/downloads')
+			'/media/ines/b9d638e1-93ee-435a-af41-80d544917e00/gitClones/workspace_norm/downloads')
 	} 
 }

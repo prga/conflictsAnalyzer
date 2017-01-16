@@ -34,7 +34,7 @@ class ComputeNormTable {
 	
 	private Map<String, Integer> processTotalConflicts(HashMap<String, Map<String, Integer>> conflicts){
 		Map<String, Integer> result = new HashMap<String, Integer>()
-		int modifierList, implementList, editSameMC, addSameFd, editSameFd, sameSignatureCM, extendsList = 0
+		int modifierList, implementList, editSameMC, addSameFd, editSameFd, sameSignatureCM, extendsList, editSameEnumConst = 0
 		for(String s in conflicts.keySet()){
 			Map<String, Integer> project = conflicts.get(s)
 			modifierList = modifierList + project.get("ModifierList")
@@ -44,6 +44,7 @@ class ComputeNormTable {
 			editSameFd = editSameFd + project.get("EditSameFd")
 			sameSignatureCM = sameSignatureCM + project.get("SameSignatureCM")
 			extendsList = extendsList + project.get("ExtendsList")
+			editSameEnumConst = editSameEnumConst + project.get("EditSameEnumConst")
 		}
 		result.put("ModifierList", modifierList)
 		result.put("ImplementList", implementList)
@@ -52,6 +53,7 @@ class ComputeNormTable {
 		result.put("EditSameFd", editSameFd)
 		result.put("SameSignatureCM", sameSignatureCM)
 		result.put("ExtendsList", extendsList)
+		result.put("EditSameEnumConst", editSameEnumConst)
 		
 		return result
 	} 
@@ -71,6 +73,7 @@ class ComputeNormTable {
 		result.put("EditSameFd", values[22])
 		result.put("SameSignatureCM", values[26])
 		result.put("ExtendsList", values[30])
+		result.put("EditSameEnumConst", values[34])
 		return result
 	}
 
@@ -82,6 +85,7 @@ class ComputeNormTable {
 			if(!it.contains("NumberOfScenarios")){
 				String[] tokens = it.split(", ")
 				String name = tokens[0]
+				println name
 				Map<String, Integer> data = this.processChangesRow(tokens)
 				this.changes.put(name, data)
 			}
@@ -93,7 +97,7 @@ class ComputeNormTable {
 	
 	private Map<String, Integer> processTotalChanges( HashMap<String, Map<String, Integer>> changes){
 		Map<String, Integer> result = new HashMap<String, Integer>()
-		int modifiers, implementsList, fieldDecl, extendsList, methodDecl, constructorDecl,  
+		int modifiers, implementsList, fieldDecl, extendsList, enumConstant, methodDecl, constructorDecl,  
 		changesInsideMethodsChunk, changesInsideMethodsLines = 0
 		for(String s in changes.keySet()){
 			Map<String, Integer> project = changes.get(s)
@@ -101,6 +105,7 @@ class ComputeNormTable {
 			implementsList = implementsList + project.get("ImplementsList")
 			fieldDecl = fieldDecl + project.get("FieldDecl")
 			extendsList = extendsList + project.get("ExtendsList")
+			enumConstant = enumConstant + project.get("EnumConstant")
 			methodDecl = methodDecl + project.get("MethodDecl")
 			constructorDecl = constructorDecl + project.get("ConstructorDecl")
 			changesInsideMethodsChunk = changesInsideMethodsChunk + project.get("ChangesInsideMethodsChunk")
@@ -110,6 +115,7 @@ class ComputeNormTable {
 		result.put("ImplementsList",implementsList )
 		result.put("FieldDecl", fieldDecl)
 		result.put("ExtendsList", extendsList)
+		result.put("EnumConstant", enumConstant)
 		result.put("MethodDecl", methodDecl)
 		result.put("ConstructorDecl", constructorDecl)
 		result.put("ChangesInsideMethodsChunk", changesInsideMethodsChunk)
@@ -129,10 +135,11 @@ class ComputeNormTable {
 		result.put("ImplementsList", values.get(3))
 		result.put("FieldDecl", values.get(4))
 		result.put("ExtendsList", values.get(5))
-		result.put("MethodDecl", values.get(6))
-		result.put("ConstructorDecl", values.get(7))
-		result.put("ChangesInsideMethodsChunk", values.get(9))
-		result.put("ChangesInsideMethodsLines", values.get(10))
+		result.put("EnumConstant", values.get(6))
+		result.put("MethodDecl", values.get(7))
+		result.put("ConstructorDecl", values.get(8))
+		result.put("ChangesInsideMethodsChunk", values.get(10))
+		result.put("ChangesInsideMethodsLines", values.get(11))
 
 		return result
 	}
@@ -160,7 +167,8 @@ class ComputeNormTable {
 		result.put("nEditSameMC", nEditSameMC)
 		
 		//sum changes outside methods
-		double sumOM = changes.get("Modifiers") + changes.get("ImplementsList") + changes.get("FieldDecl") + changes.get("ExtendsList")
+		double sumOM = changes.get("Modifiers") + changes.get("ImplementsList") + changes.get("FieldDecl") + changes.get("ExtendsList") + 
+		changes.get("EnumConstant")
 		
 		//ModifierList
 		double nModifierList = conflicts.get("ModifierList")/changes.get("Modifiers")
@@ -196,6 +204,15 @@ class ComputeNormTable {
 		result.put("nExtendsList",nExtendsList )
 		result.put("nExtendsListOM",nExtendsListOM )
 		
+		//EnumConstant
+		double nEditSameEnumConst = 0
+		if(changes.get("EnumConstant")>0){
+			nEditSameEnumConst = conflicts.get("EditSameEnumConst")/changes.get("EnumConstant")
+		}
+		double nEditSameEnumConstOM = conflicts.get("EditSameEnumConst")/sumOM
+		result.put("nEditSameEnumConst", nEditSameEnumConst)
+		result.put("nEditSameEnumConstOM", nEditSameEnumConstOM)
+		
 		return result
 	}
 
@@ -204,7 +221,7 @@ class ComputeNormTable {
 		file.delete()
 		String header = "Project, nEditSameMCChunks, nEditSameMCLines, nEditSameMC, nModifierList, nModifierListOM, " +
 		"nImplementList, nImplementListOM, nAddSameFd, nAddSameFdOM, nEditSameFd, nEditSameFdOM, " +
-		"nSameSignatureCM, nExtendsList, nExtendsListOM\n"
+		"nSameSignatureCM, nExtendsList, nExtendsListOM, nEditSameEnumConst, nEditSameEnumConstOM\n"
 		
 		file.append(header)
 		for(String projectName in this.normalizedData.keySet()){
@@ -214,7 +231,9 @@ class ComputeNormTable {
 			projectData.get("nEditSameMC") + ", " + projectData.get("nModifierList") + ", "  + projectData.get("nModifierListOM") + ", " +
 			projectData.get("nImplementList") + ", " + projectData.get("nImplementListOM") + ", " + projectData.get("nAddSameFd") + ", "+ 
 			projectData.get("nAddSameFdOM") + ", " + projectData.get("nEditSameFd") + ", " + projectData.get("nEditSameFdOM") + ", " +
-			projectData.get("nSameSignatureCM") + ", " + projectData.get("nExtendsList") + ", " + projectData.get("nExtendsListOM") + "\n"
+			projectData.get("nSameSignatureCM") + ", " + projectData.get("nExtendsList") + ", " + projectData.get("nExtendsListOM") + ", " +
+			projectData.get("nEditSameEnumConst") + ", " + projectData.get("nEditSameEnumConstOM") + "\n"
+			
 			file.append(line)
 		}
 		
@@ -222,7 +241,9 @@ class ComputeNormTable {
 			this.total.get("nEditSameMC") + ", " + this.total.get("nModifierList") + ", "  + this.total.get("nModifierListOM") + ", " +
 			this.total.get("nImplementList") + ", " + this.total.get("nImplementListOM") + ", " + this.total.get("nAddSameFd") + ", "+ 
 			this.total.get("nAddSameFdOM") + ", " + this.total.get("nEditSameFd") + ", " + this.total.get("nEditSameFdOM") + ", " +
-			this.total.get("nSameSignatureCM") + ", " + this.total.get("nExtendsList") + ", " + this.total.get("nExtendsListOM") + "\n"
+			this.total.get("nSameSignatureCM") + ", " + this.total.get("nExtendsList") + ", " + this.total.get("nExtendsListOM") + ", " +
+			this.total.get("nEditSameEnumConst") + ", " + this.total.get("nEditSameEnumConstOM") + "\n"
+
 		file.append(total)
 	}
 

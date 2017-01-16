@@ -35,7 +35,7 @@ class CSVAnalyzer {
 		File out = new File('realConflictRate.csv')
 		out.delete()
 		out = new File('realConflictRate.csv')
-		String line = 'Project,Merge Scenarios,Conflicting Scenarios\n'
+		String line = 'Project,Merge Scenarios,Conflicting Scenarios,Conflicting_Scenarios_WDS,Conflicting_Scenarios_WCL\n'
 		out.append(line)
 
 		file.eachLine {
@@ -43,16 +43,25 @@ class CSVAnalyzer {
 			String projectName = data[0]
 			String analyzedMergeScenarios = data[1]
 			if(!projectName.equals("Project")){
-				int i = countMergeScenarioWithRealConflicts(projectName)
-				line = projectName + ',' + analyzedMergeScenarios + ',' + i + '\n'
+				ArrayList<Integer> i = countMergeScenarioWithRealConflicts(projectName)
+				line = projectName + ',' + analyzedMergeScenarios + ',' + i.get(0) + ',' + i.get(1) + ',' + i.get(2) + '\n'
 				//println line
 				out.append(line)
 			}
 		}
 	}
 
-	public static int countMergeScenarioWithRealConflicts(String projectName){
-		int result = 0
+	/**
+	 * @param projectName
+	 * @return array containing the following metrics for the report: the first integer represents
+	 *  the number of conflicting scenarios without spacing and consecutive lines edition conflicts, 
+	 *  the second integer represents the number of merge scenarios without spacing conflicts, and
+	 *  the third integer represents the number of merge scenarios without consecutive lines edition 
+	 *  conflicts
+	 */
+	public static ArrayList<Integer> countMergeScenarioWithRealConflicts(String projectName){
+		ArrayList<Integer> result = new ArrayList<Integer>()
+		int ms_wfp, ms_wds, ms_wcl = 0
 		String mergeScenarioFile = 'ResultData' + File.separator + projectName + File.separator +
 				'MergeScenariosReport.csv'
 		/*'ResultData' + File.separator + projectName + File.separator +
@@ -60,17 +69,28 @@ class CSVAnalyzer {
 		String msFile = new File(mergeScenarioFile).text
 		String [] lines = msFile.split('\n')
 		for(int i = 1; i< lines.length;  i++){
-
-			if(hasRealConflicts(lines[i])){
-				result++
+			ArrayList<Boolean> bools = hasRealConflicts(lines[i])
+			if(bools.get(0)){
+				ms_wfp++
+			}
+			if(bools.get(1)){
+				ms_wds++
+			}
+			if(bools.get(2)){
+				ms_wcl++
 			}
 
 		}
+		result.add(new Integer(ms_wfp))
+		result.add(new Integer(ms_wds))
+		result.add(new Integer(ms_wcl))
 		return result
 	}
 
-	public static boolean hasRealConflicts(String line){
-		boolean hasRealConflicts = false
+	public static ArrayList<Boolean> hasRealConflicts(String line){
+		ArrayList<Boolean> result = new ArrayList<Boolean>()
+		boolean hasRealConflicts, ms_wds, ms_wcl = false
+		
 		String[] data = line.split(',')
 		int i = 7
 		for(SSMergeConflicts c : SSMergeConflicts.values()){
@@ -83,15 +103,26 @@ class CSVAnalyzer {
 				i++
 				int ifp = Integer.parseInt(data[i].trim())
 				int realConflicts = total - ds - cl + ifp
+				int hasNonDSConflicts = total - ds
+				int hasNonCLConflicts = total - cl
 				if(realConflicts > 0){
 					hasRealConflicts = true
 				}
+				if(hasNonDSConflicts > 0){
+					ms_wds = true
+				}
+				if(hasNonCLConflicts > 0){
+					ms_wcl = true
+				}
+				
 				i++
 			}
 
 		}
-
-		return hasRealConflicts
+		result.add(new Boolean(hasRealConflicts))
+		result.add(new Boolean(ms_wds))
+		result.add(new Boolean(ms_wcl))
+		return result
 	}
 
 
