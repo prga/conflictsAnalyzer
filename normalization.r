@@ -37,10 +37,10 @@ main<-function(){
     normalizationTableWT <- head(normalizationTable, -1)
     tableNodes <- data.frame(normalizationTableWT$nEditSameMC, normalizationTableWT$nSameSignatureCM, normalizationTableWT$nEditSameFd,
                              normalizationTableWT$nAddSameFd, normalizationTableWT$nModifierList, normalizationTableWT$nExtendsList, 
-                             normalizationTableWT$nImplementList)
-    colnames(tableNodes) <- c("EditSameMC","SameSignatureMC", "EditSameFd",  "AddSameFd", "ModifierList", "ExtendsList", "ImplementList")
+                             normalizationTableWT$nEditSameEnumConst, normalizationTableWT$nImplementList)
+    colnames(tableNodes) <- c("EditSameMC","SameSignatureMC", "EditSameFd",  "AddSameFd", "ModifierList", "ExtendsList", "EditSameEnumConst", "ImplementList")
     op <- par(mar = c(2, 9, 1, 1) + 0.1) #adjust margins, default is c(5, 4, 4, 2) + 0.1
-    boxplot(tableNodes, col="green", horizontal = TRUE, las=1, cex.axis=1.1, bw="nrd0")
+    boxplot(tableNodes, col="green", horizontal = TRUE, las=1, cex.axis=1.1, bw="nrd0",  outline = FALSE)
     par(op)
     dev.off()
     
@@ -50,10 +50,10 @@ main<-function(){
     normalizationTableWT <- head(normalizationTable, -1)
     tableNodes <- data.frame(normalizationTableWT$nEditSameMCChunks, normalizationTableWT$nSameSignatureCM, normalizationTableWT$nEditSameFd,
                              normalizationTableWT$nAddSameFd, normalizationTableWT$nModifierList, normalizationTableWT$nExtendsList, 
-                             normalizationTableWT$nImplementList)
-    colnames(tableNodes) <- c("EditSameMC","SameSignatureMC", "EditSameFd",  "AddSameFd", "ModifierList", "ExtendsList", "ImplementsList")
+                             normalizationTableWT$nEditSameEnumConst, normalizationTableWT$nImplementList)
+    colnames(tableNodes) <- c("EditSameMC","SameSignatureMC", "EditSameFd",  "AddSameFd", "ModifierList", "ExtendsList", "EditSameEnumConst", "ImplementsList")
     op <- par(mar = c(2, 9, 1, 1) + 0.1) #adjust margins, default is c(5, 4, 4, 2) + 0.1
-    boxplot(tableNodes, col="green", horizontal = TRUE, las=1, cex.axis=1.1, bw="nrd0")
+    boxplot(tableNodes, col="green", horizontal = TRUE, las=1, cex.axis=1.1, bw="nrd0",  outline = FALSE)
     par(op)
     dev.off()
     
@@ -62,10 +62,10 @@ main<-function(){
     png(paste(exportPath, boxplotNodesLines, sep=""))
     tableLines <- data.frame(normalizationTableWT$nEditSameMCLines, normalizationTableWT$nSameSignatureCM, normalizationTableWT$nEditSameFd,
                              normalizationTableWT$nAddSameFd, normalizationTableWT$nModifierList, normalizationTableWT$nExtendsList, 
-                             normalizationTableWT$nImplementList)
-    colnames(tableLines) <- c("EditSameMC","SameSignatureMC", "EditSameFd",  "AddSameFd", "ModifiersList", "ExtendsList", "ImplementsList")
+                             normalizationTableWT$nEditSameEnumConst, normalizationTableWT$nImplementList)
+    colnames(tableLines) <- c("EditSameMC","SameSignatureMC", "EditSameFd",  "AddSameFd", "ModifiersList", "ExtendsList", "EditSameEnumConst", "ImplementsList")
     op <- par(mar = c(2, 9, 1, 1) + 0.1) #adjust margins, default is c(5, 4, 4, 2) + 0.1
-    boxplot(tableLines, col="green", horizontal = TRUE, las=1, cex.axis=1.1, bw="nrd0")
+    boxplot(tableLines, col="green", horizontal = TRUE, las=1, cex.axis=1.1, bw="nrd0",  outline = FALSE)
     par(op)
     dev.off()
     
@@ -75,7 +75,7 @@ main<-function(){
     tableNodes <- data.frame(normalizationTableWT$nEditSameMCLines, normalizationTableWT$nEditSameMCChunks, normalizationTableWT$nEditSameMC)
     colnames(tableNodes) <- c("EditSameMCLine","EditSameMCChunk", "EditSameMCNode")
     op <- par(mar = c(2, 9, 1, 1) + 0.1) #adjust margins, default is c(5, 4, 4, 2) + 0.1
-    boxplot(tableNodes, col="green", horizontal = TRUE, las=1, cex.axis=1.1, bw="nrd0")
+    boxplot(tableNodes, col="green", horizontal = TRUE, las=1, cex.axis=1.1, bw="nrd0",  outline = FALSE)
     par(op)
     dev.off()
     
@@ -84,12 +84,12 @@ main<-function(){
     png(paste(exportPath, boxplotsConfNorm, sep=""))
     conflictsTable <- data.frame(projectPatterns$EditSameMC, projectPatterns$SameSignatureCM, projectPatterns$EditSameFd, 
                                  projectPatterns$AddSameFd, projectPatterns$ModifierList, projectPatterns$ExtendsList,
-                                 projectPatterns$ImplementList)
-    colnames(conflictsTable) <- c("EditSameMC","SameSignatureMC", "EditSameFd",  "AddSameFd", "ModifiersList", "ExtendsList", "ImplementsList")
-    op <- par(mar = c(2, 12, 1, 3) + 0.1) #adjust margins, default is c(5, 4, 4, 2) + 0.1 bottom, left, top, right
+                                 projectPatterns$EditSameEnumConst, projectPatterns$ImplementList)
+    colnames(conflictsTable) <- c("EditSameMC","SameSignatureMC", "EditSameFd",  "AddSameFd", "ModifiersList", "ExtendsList", "EditSameEnumConst", "ImplementsList")
+    op <- par(mar = c(4, 9, 1, 2) + 0.1) #adjust margins, default is c(5, 4, 4, 2) + 0.1 bottom, left, top, right
     par(mfrow=c(2,1))
-    boxplot(tableLines, col="green", horizontal = TRUE, las=1, cex.axis=1.4, bw="nrd0", outline=FALSE)
-    boxplot(conflictsTable, col="green", horizontal = TRUE, las=1, cex.axis=1.4, bw="nrd0", outline=FALSE)
+    boxplot(tableLines, col="gray", xlab="Normalized number of conflicts", horizontal = TRUE, las=1, cex.axis=1.0, bw="nrd0", outline=FALSE)
+    boxplot(conflictsTable, col="gray",  xlab="Number of conflicts", horizontal = TRUE, las=1, cex.axis=1.0, bw="nrd0", outline=FALSE)
     par(op)
     dev.off()
     
