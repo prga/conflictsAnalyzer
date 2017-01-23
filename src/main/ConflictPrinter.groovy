@@ -26,7 +26,13 @@ public class ConflictPrinter {
 			String diffSpacing = cause + 'DS'
 			this.conflictReportHeader = this.conflictReportHeader + cause + ', ' + diffSpacing + ', '
 		}
-		this.conflictReportHeader = this.conflictReportHeader + 'PossibleRenamings, EditSameMCWithoutConflicts, EditSameMCWithoutConflictsDS'
+		this.conflictReportHeader = this.conflictReportHeader + 'PossibleRenamings, EditSameMCWithoutConflicts, EditSameMCWithoutConflictsDS, '
+		for(EditSameMCTypes e : EditSameMCTypes.values()){
+			String type = e.toString()
+			this.conflictReportHeader = this.conflictReportHeader + type + ', '
+		}
+
+		this.conflictReportHeader = this.conflictReportHeader.substring(0, this.conflictReportHeader.length() - 2)
 	}
 	
 	public static void printMergeCommitsList(String projectName, ArrayList<MergeCommit> mergeCommits){
@@ -155,6 +161,7 @@ public class ConflictPrinter {
 					'Intersection: ' + c.getFalsePositivesIntersection() + '\n' +
 					'Cause same signature: ' + c.getCauseSameSignatureCM() + '\n' +
 					'Possible renaming: ' + c.getPossibleRenaming() + '\n' +
+					'EditSameMCType: ' + c.getEditSameMCType() + '\n' +
 					'Conflict body: ' + '\n' + c.getBody() ]
 				out.append row.join(',')
 				out.append '\n'

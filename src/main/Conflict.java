@@ -10,6 +10,7 @@ import de.ovgu.cide.fstgen.ast.FSTNode;
 import de.ovgu.cide.fstgen.ast.FSTTerminal;
 import merger.FSTGenMerger;
 import util.StringSimilarity;
+import util.ExtractMethodBody;
 
 
 
@@ -50,12 +51,19 @@ public  class Conflict {
 	private String nodeName;
 	
 	String replacement;
+	
+	private String editSameMCType;
 
 	public Conflict(FSTTerminal node, String path){
 		this.replacement = "";
 		this.body = node.getBody();
 		this.nodeName = node.getName();
 		this.nodeType = node.getType();
+		if(this.isMethodOrConstructor()){
+			this.setEditSameMCType();
+		}else{
+			this.editSameMCType = "";
+		}
 		this.conflicts = splitConflictsInsideMethods();
 		this.countConflictsInsideMethods();
 		this.matchPattern();
@@ -74,7 +82,15 @@ public  class Conflict {
 		return causeSameSignatureCM;
 	}
 
-
+	public void setEditSameMCType(){
+		String[] mergeResult = ExtractMethodBody.getEditSameMCType(this.body);
+		this.editSameMCType = mergeResult[0];
+		this.body = mergeResult[1];				
+	}
+	
+	public String getEditSameMCType(){
+		return this.editSameMCType;
+	}
 
 	public void setCauseSameSignatureCM(LinkedList<FSTNode> baseNodes, boolean fileAddedByOneDev) {
 		if(!fileAddedByOneDev){

@@ -33,6 +33,8 @@ class Project {
 	private int possibleRenamings
 
 	private List<ProjectPeriod> periods
+	
+	private Map<String, Integer> editSameMCTypeSummary
 
 	public Project(String projectName, List<ProjectPeriod> periods = null){
 		this.mergeScenarios = new ArrayList<MergeScenario>()
@@ -40,6 +42,7 @@ class Project {
 		initializeProjectSummary()
 		initializeProjectMetrics()
 		this.createSameSignatureCMSummary()
+		this.createEditSameMCTypeSummary()
 		this.createProjectDir()
 		this.periods = periods
 
@@ -48,6 +51,10 @@ class Project {
 
 	public void createSameSignatureCMSummary(){
 		this.sameSignatureCMSummary = ConflictSummary.initializeSameSignatureCMSummary()
+	}
+	
+	public void createEditSameMCTypeSummary(){
+		this.editSameMCTypeSummary = ConflictSummary.initializeEditSameMCTypeSummary()
 	}
 
 	private void createProjectDir(){
@@ -123,9 +130,19 @@ class Project {
 
 		if(ms.hasConflicts){
 			updateProjectSummary(ms)
-			//updateSameSignatureCMSummary(ms)
+			updateSameSignatureCMSummary(ms)
+			this.updateEditSameMCTypeSummary(ms)
 		}
 		printResults(ms, ms_summary)
+	}
+	
+	private void updateEditSameMCTypeSummary(MergeScenario ms){
+		for(EditSameMCTypes e : EditSameMCTypes.values){
+			String type = e.toString()
+			int quantity = ms.editSameMCTypeSummary.get(type)
+			quantity = quantity + this.editSameMCTypeSummary.get(type)
+			this.editSameMCTypeSummary.put(type, quantity)
+		}
 	}
 	
 	private String updateConflictPredictorSummary(MergeScenario ms){
@@ -220,7 +237,8 @@ class Project {
 				this.conflictingMergeScenarios + ', ' +
 				ConflictSummary.printConflictsSummary(this.projectSummary) + ', ' +
 				ConflictSummary.printSameSignatureCMSummary(this.sameSignatureCMSummary) + ', ' +
-				this.possibleRenamings
+				this.possibleRenamings  + ', ' + 
+				ConflictSummary.printEditSameMCTypeSummary(this.editSameMCTypeSummary)
 
 		return result
 	}

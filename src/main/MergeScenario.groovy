@@ -51,6 +51,8 @@ class MergeScenario implements Observer {
 	private ConflictPredictorFactory predictorFactory
 	
 	private int methodsWithConflicts
+	
+	private Map<String, Integer> editSameMCTypeSummary
 
 	public MergeScenario(String path, boolean resultGitMerge){
 
@@ -62,6 +64,7 @@ class MergeScenario implements Observer {
 		this.hasPredictors = false
 		this.createMergeScenarioSummary()
 		this.createSameSignatureCMSummary()
+		this.createEditSameMCTypeSummary()
 		this.setMergedFiles()
 		this.filesWithConflictPredictors = new HashMap<String, ArrayList<ConflictPredictor>>()
 		this.predictorFactory = new ConflictPredictorFactory()
@@ -69,6 +72,10 @@ class MergeScenario implements Observer {
 
 	public void createSameSignatureCMSummary(){
 		this.sameSignatureCMSummary = ConflictSummary.initializeSameSignatureCMSummary()
+	}
+	
+	public void createEditSameMCTypeSummary(){
+		this.editSameMCTypeSummary = ConflictSummary.initializeEditSameMCTypeSummary()
 	}
 
 	public void setMergedFiles(){
@@ -323,6 +330,11 @@ class MergeScenario implements Observer {
 		this.sameSignatureCMSummary = ConflictSummary.
 				updateSameSignatureCMSummary(this.sameSignatureCMSummary, cause, ds)
 	}
+	
+	private void updateEditSameMCTypeSummary(String type){
+		this.editSameMCTypeSummary = ConflictSummary.
+				updateEditSameMCTypeSummary(this.editSameMCTypeSummary, type)
+	}
 
 	private void matchConflictWithFile(Conflict conflict){
 		String rev_base = this.compareFiles.baseRevName
@@ -361,7 +373,11 @@ class MergeScenario implements Observer {
 			//use the code below to skip the samesignaturemc analysis
 			/*this.updateSameSignatureCMSummary(PatternSameSignatureCM.noPattern.toString(),
 					conflict.getDifferentSpacing())*/
-
+		}
+		
+		if(conflict.getType().equals(SSMergeConflicts.EditSameMC.toString())){
+			String type = conflict.editSameMCType
+			this.updateEditSameMCTypeSummary(type)
 		}
 
 		this.mergedFiles.elementData(index).conflicts.add(conflict)
@@ -398,7 +414,9 @@ class MergeScenario implements Observer {
 				', ' + this.getNumberOfFilesWithConflicts() + ', ' +
 				ConflictSummary.printConflictsSummary(this.mergeScenarioSummary) + ', ' +
 				ConflictSummary.printSameSignatureCMSummary(this.sameSignatureCMSummary) + ', ' +
-				this.possibleRenamings
+				this.possibleRenamings + ', ' + 
+				ConflictSummary.printEditSameMCTypeSummary(this.editSameMCTypeSummary)
+  
 
 		return report
 	}
