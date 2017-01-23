@@ -11,6 +11,7 @@ import de.ovgu.cide.fstgen.ast.FSTTerminal;
 import merger.FSTGenMerger;
 import util.StringSimilarity;
 import util.ExtractMethodBody;
+import util.Spacing;
 
 
 
@@ -261,7 +262,10 @@ public  class Conflict {
 		boolean falsePositive = false;
 
 		String[] temp = splitConflictBody.clone();
-		String[] threeWay = this.removeInvisibleChars(temp);
+		String[] threeWay = new String[3];
+		threeWay[0] = Spacing.removeSpacing(temp[0]);
+		threeWay[1] = Spacing.removeSpacing(temp[1]);
+		threeWay[2] = Spacing.removeSpacing(temp[2]);
 		if(!threeWay[1].equals("")){
 			if(threeWay[0].equals(threeWay[1]) || threeWay[2].equals(threeWay[1])){
 				this.differentSpacing++;
