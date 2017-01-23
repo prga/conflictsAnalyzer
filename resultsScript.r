@@ -232,12 +232,25 @@ deleteAllFiles <- function(exportPath) {
 
 }
 
+updateColumn <- function(row1, row2) {
+  result <- c()
+  nrows <- length(row1)
+  
+  for(i in 1:nrows){
+    sum = row1[i] + row2[i]
+    result <- append(result, sum)
+  }
+  
+  return (result)
+}
+
 main<-function(){
-importPath = "/Users/paolaaccioly/Documents/Doutorado/workspace_CASM/conflictsAnalyzer/"
-exportPath = "/Users/paolaaccioly/Documents/Doutorado/workspace_CASM/graphs/"
+importPath = "/Users/paolaaccioly/Documents/Doutorado/workspace_empirical/conflictsAnalyzer/"
+exportPath = "/Users/paolaaccioly/Documents/Doutorado/workspace_empirical/graphs/"
 
 conflictRateFile="projectsPatternData.csv"
 realConflictRateFile = "realConflictRate.csv"
+conflictRateNonJavaFiles = "ConflictingScenarios.csv"
 
 
 #HTML file
@@ -245,6 +258,58 @@ htmlFile = paste(exportPath, "conflictResults.html", sep="")
 
 #delete previous files
 deleteAllFiles(exportPath)
+
+#read conflictRateNonJava table
+conflictRateNonJava = read.table(file=paste(importPath, conflictRateNonJavaFiles, sep=""), header=T, sep=";")
+sumNonJavaJava <- updateColumn(conflictRateNonJava$MCNonJavaMinusMCJava, conflictRateNonJava$MCJava)
+sumNonJavaJavaWFP <- updateColumn(conflictRateNonJava$MCNonJavaMinusMCJavaWFP, conflictRateNonJava$MCJavaWFP)
+sumNonJavaJavaWDS <- updateColumn(conflictRateNonJava$MCNonJavaMinusMCJavaWDS, conflictRateNonJava$MCJavaWDS)
+sumNonJavaJavaWCL <- updateColumn(conflictRateNonJava$MCNonJavaMinusMCJavaWCL, conflictRateNonJava$MCJavaWCL)
+a <- data.frame(conflictRateNonJava$ProjectName, conflictRateNonJava$TotalMC, sumNonJavaJava, sumNonJavaJavaWFP,sumNonJavaJavaWDS,sumNonJavaJavaWCL)
+colnames(a) <- c("Project", "Merge_Scenarios", "Conflicting_Scenarios", "Conflicting_Scenarios_WFP", "Conflicting_Scenarios_WDS", "Conflicting_Scenarios_WCL")
+sumMerge <- sum(a$Merge_Scenarios)
+sumConflict <- sum(a$Conflicting_Scenarios)
+sumConflictWFP <- sum (a$Conflicting_Scenarios_WFP)
+sumConflictWDS <- sum (a$Conflicting_Scenarios_WDS)
+sumConflictWCL <- sum (a$Conflicting_Scenarios_WCL)
+geral <-data.frame(Project="TOTAL", Merge_Scenarios=sumMerge, 
+                   Conflicting_Scenarios=sumConflict, Conflicting_Scenarios_WFP=sumConflictWFP,
+                   Conflicting_Scenarios_WDS=sumConflictWDS, Conflicting_Scenarios_WCL=sumConflictWCL)
+cRNonJavaTable <- rbind(a, geral)
+cRNonJavaTable["Conflict_Rate"] <- (cRNonJavaTable$Conflicting_Scenarios/cRNonJavaTable$Merge_Scenarios)*100
+cRNonJavaTable["Conflict_Rate_WFP"] <- (cRNonJavaTable$Conflicting_Scenarios_WFP/cRNonJavaTable$Merge_Scenarios)*100
+cRNonJavaTable["Conflict_Rate_WDS"] <- (cRNonJavaTable$Conflicting_Scenarios_WDS/cRNonJavaTable$Merge_Scenarios)*100
+cRNonJavaTable["Conflict_Rate_WCL"] <- (cRNonJavaTable$Conflicting_Scenarios_WCL/cRNonJavaTable$Merge_Scenarios)*100
+attach(cRNonJavaTable)
+
+#tables
+tableNonJava <- head(cRNonJavaTable, -1)
+MeanNonJava <- mean(tableNonJava$Conflict_Rate)
+Standard.deviationNonJava <- sd(tableNonJava$Conflict_Rate)
+metricsNonJava <- data.frame(MeanNonJava, Standard.deviationNonJava)
+
+
+MeanNonJavaWFP <- mean(tableNonJava$Conflict_Rate_WFP)
+Standard.deviationNonJavaWFP <- sd(tableNonJava$Conflict_Rate_WFP)
+metricsNonJavaWFP <- data.frame(MeanNonJavaWFP, Standard.deviationNonJavaWFP)
+
+MeanNonJavaWDS <- mean(tableNonJava$Conflict_Rate_WDS)
+Standard.deviationNonJavaWDS <- sd(tableNonJava$Conflict_Rate_WDS)
+metricsNonJavaWDS <- data.frame(MeanNonJavaWDS, Standard.deviationNonJavaWDS)
+
+MeanNonJavaWCL <- mean(tableNonJava$Conflict_Rate_WCL)
+Standard.deviationNonJavaWCL <- sd(tableNonJava$Conflict_Rate_WCL)
+metricsNonJavaWCL <- data.frame(MeanNonJavaWCL, Standard.deviationNonJavaWCL)
+
+library(beanplot)
+
+#beanplots nonJava e nonJavaWFP
+dataConflictNonJava <-data.frame(tableNonJava$Conflict_Rate, tableNonJava$Conflict_Rate_WFP)
+colnames(dataConflictNonJava) <- c("Conflict_Rate", "Conflict_Rate_WFP")
+beanPlotCRNonJavaFileName = paste("beanPlotCRNonJava.png")
+png(paste(exportPath, beanPlotCRNonJavaFileName, sep=""))
+beanplot(dataConflictNonJava,  ylab="Conflicting Scenarios %",col="green", cex=1.5,  bw="nrd0")
+dev.off()
 
 #read and edit conflict rate table
 conflictRateTemp = read.table(file=paste(importPath, conflictRateFile, sep=""), header=T, sep=",")
@@ -286,7 +351,7 @@ Standard.deviation <- sd(realNewTable$Conflict.Rate)
 realMetrics <- data.frame(Mean, Standard.deviation)
 
 #beanplot conflicting rate
-library(beanplot)
+
 
 #boxplot conflicting rate with and without false positives
 boxplotCRFileName = paste("BoxplotCR.png")
@@ -301,7 +366,7 @@ dev.off()
 
 realbeanplotCRFileName = paste("realBeanplotCR.png")
 png(paste(exportPath, realbeanplotCRFileName, sep=""))
-beanplot(dataConflict,  ylab="Conflicting Scenarios %",col="green", cex=1.5, bw="nrd0")
+beanplot(dataConflict,  ylab="Conflicting Scenarios %",col="green", cex=1.5,  bw="nrd0")
 dev.off()
 
 
@@ -330,28 +395,28 @@ SameSignatureCM <- sum(conflictRateTemp$SameSignatureCM)
 AddSameFd <- sum(conflictRateTemp$AddSameFd)
 EditSameFd <- sum(conflictRateTemp$EditSameFd)
 ExtendsList <- sum(conflictRateTemp$ExtendsList)
-
+EditSameEnumConst <- sum(conflictRateTemp$EditSameEnumConst)
 # bar plot all conflicts
 
 slices <- c(DefaultValueAnnotation, ImplementList, ModifierList, EditSameMC, SameSignatureCM, AddSameFd, 
-            EditSameFd, ExtendsList)
+            EditSameFd, ExtendsList, EditSameEnumConst)
 labels <- c("DefaultValueA", "ImplementsList", "ModifierList", "EditSameMC", "SameSignatureMC", "AddSameFd", 
-            "EditSameFd", "ExtendsList") 
+            "EditSameFd", "ExtendsList", "EditSameEnumConst")
 dat <- data.frame(Frequency = slices,Conflicts = labels)
 dat$Conflicts <- reorder(dat$Conflicts, dat$Frequency)
 library(ggplot2)
 fstMerge <- ggplot(dat, aes(y = Frequency)) +
-  geom_bar(aes(x = Conflicts),stat = "identity",fill="green", colour="black") +
+  geom_bar(aes(x = Conflicts),stat = "identity",fill="black", colour="black") +
   geom_text(aes(x = Conflicts, label = sprintf("%.2f%%", Frequency/sum(Frequency) * 100)), hjust = -.1) + coord_flip() +
-  theme_grey(base_size = 10) + labs(x=NULL, y=NULL)  + ylim(c(0,26000)) + ggtitle("FSTMerge")
+  theme_grey(base_size = 15) + labs(x=NULL, y=NULL)  + ylim(c(0,27000)) + ggtitle("FSTMerge") +  labs(y="Number of occurrences")
 
 #conflicts table
 Conflicts_Patterns <- c("DefaultValueAnnotation", "ImplementList", "ModifierList", "EditSameMC", 
-                        "SameSignatureCM", "AddSameFd", "EditSameFd", "ExtendsList", "TOTAL")
+                        "SameSignatureCM", "AddSameFd", "EditSameFd", "ExtendsList", "EditSameEnumConst", "TOTAL")
 conflictsSum <- sum(DefaultValueAnnotation, ImplementList, ModifierList, EditSameMC, SameSignatureCM,
-                    AddSameFd, EditSameFd, ExtendsList)
+                    AddSameFd, EditSameFd, ExtendsList, EditSameEnumConst)
 Occurrences <- c(DefaultValueAnnotation, ImplementList, ModifierList, EditSameMC, SameSignatureCM,
-                 AddSameFd, EditSameFd, ExtendsList, conflictsSum)
+                 AddSameFd, EditSameFd, ExtendsList, EditSameEnumConst, conflictsSum)
 conflictsTable <- data.frame(Conflicts_Patterns, Occurrences)
 
 #boxplot for each conflict pattern percentages along all projects
@@ -436,20 +501,22 @@ realEditSameFd <- sum(conflictRateTemp$EditSameFd) - sum(conflictRateTemp$EditSa
   sum(conflictRateTemp$EditSameFdCL) + sum(conflictRateTemp$EditSameFdIFP)
 realExtendsList <- sum(conflictRateTemp$ExtendsList) - sum(conflictRateTemp$ExtendsListDS) - 
   sum(conflictRateTemp$ExtendsListCL) + sum(conflictRateTemp$ExtendsListIFP)
+  realEditSameEnumConst <- sum(conflictRateTemp$EditSameEnumConst) - sum(conflictRateTemp$EditSameEnumConstDS) -
+  sum(conflictRateTemp$EditSameEnumConstCL) + sum(conflictRateTemp$EditSameEnumConstIFP)
 
 barChartFP = paste("barChartFP.png")
 png(paste(exportPath, barChartFP, sep=""))
 slices <- c(realDefaultValueAnnotation, realImplementList, realModifierList, realEditSameMC, 
-            realSameSignatureMC, realAddSameFd, realEditSameFd, realExtendsList)
+            realSameSignatureMC, realAddSameFd, realEditSameFd, realExtendsList, realEditSameEnumConst)
 labels <- c("DefaultValueA", "ImplementsList", "ModifierList", "EditSameMC", "SameSignatureMC", 
-            "AddSameFd", "EditSameFd", "ExtendsList") 
+            "AddSameFd", "EditSameFd", "ExtendsList", "EditSameEnumConst")
 dat2 <- data.frame(Conflicts = labels, Frequency = slices)
 dat2$Conflicts <- reorder(dat2$Conflicts, dat2$Frequency)
 fstMergeWFP <- ggplot(dat2, aes(y = Frequency)) +
-  geom_bar(aes(x = Conflicts),stat = "identity", fill="green", colour="black") +
+  geom_bar(aes(x = Conflicts),stat = "identity", fill="black", colour="black") +
   geom_text(aes(x = Conflicts, label = sprintf("%.2f%%", Frequency/sum(Frequency) * 100)), hjust = -.1) +
-  coord_flip() + theme_grey(base_size = 10) + labs(x=NULL, y=NULL) + ylim(c(0,26000)) + 
-  ggtitle("FSTMerge without spacing and consecutive lines conflicts")
+  coord_flip() + theme_grey(base_size = 15) + labs(x=NULL, y=NULL) + ylim(c(0,27000)) + 
+  ggtitle("FSTMerge without potential false positives") +  labs(y="Number of occurrences")
 
 p3 <- multiplot(fstMerge,fstMergeWFP)
 print(p3)
@@ -457,11 +524,11 @@ dev.off()
 
 #conflicts table
 Conflicts_Patterns <- c("DefaultValueAnnotation", "ImplementList", "ModifierList", "EditSameMC", 
-                        "SameSignatureCM", "AddSameFd", "EditSameFd", "ExtendsList", "TOTAL")
+                        "SameSignatureCM", "AddSameFd", "EditSameFd", "ExtendsList", "EditSameEnumConst", "TOTAL")
 conflictsSum <- sum(realDefaultValueAnnotation, realImplementList, realModifierList, realEditSameMC, 
-                    realSameSignatureMC, realAddSameFd, realEditSameFd, realExtendsList)
+                    realSameSignatureMC, realAddSameFd, realEditSameFd, realExtendsList, realEditSameEnumConst)
 Occurrences <- c(realDefaultValueAnnotation, realImplementList, realModifierList, realEditSameMC, 
-                 realSameSignatureMC, realAddSameFd, realEditSameFd, realExtendsList, conflictsSum)
+                 realSameSignatureMC, realAddSameFd, realEditSameFd, realExtendsList, realEditSameEnumConst, conflictsSum)
 realconflictsTable <- data.frame(Conflicts_Patterns, Occurrences)
 
 #causes for SameSignatureCM
@@ -485,13 +552,14 @@ sumNoPattern = round(((sum(conflictRateTemp$noPattern) - sum(conflictRateTemp$no
 
 Frequency <- c(sumSmallMethod, sumRenamedMethod, sumCopiedMethod, sumCopiedFile, sumNoPattern)
 Causes <- c("Small methods", "Renamed Methods", "Copied Methods", "Copied Files",
-            "No Pattern")
+            "Others")
 df <- data.frame(Frequency, Causes)
 df$Causes <- reorder(df$Causes, df$Frequency)
 p <- ggplot(df, aes(y = Frequency)) +
-  geom_bar(aes(x = Causes),stat = "identity",fill="green", colour="black", width=.8) +
+  geom_bar(aes(x = Causes),stat = "identity",fill="black", colour="black") +
   geom_text(aes(x = Causes, label = sprintf("%.2f%%", Frequency/sum(Frequency) * 100)), hjust = -.1) + coord_flip() +
-  theme_grey(base_size = 13) + labs(x=NULL, y=NULL) + ylim(c(0,70))
+  theme_grey(base_size = 15) + ylim(c(0,100)) + labs(x="Causes", y="Aggregated percentages (%)") 
+  
 
 print(p)
 dev.off()
@@ -523,6 +591,8 @@ DefaultValueAnnotationpercentages <- computePatternPercentages(conflictRateTemp,
 
 ExtendsListpercentages <- computePatternPercentages(conflictRateTemp, "ExtendsList")
 
+EditSameEnumConstpercentages <- computePatternPercentages(conflictRateTemp, "EditSameEnumConst")
+
 #all conflicts percentages beanplot
 BeanplotAllConflicts = paste("BeanplotAllConflicts.png")
 png(paste(exportPath, BeanplotAllConflicts, sep=""))
@@ -534,12 +604,13 @@ AddSameFd <- AddSameFdpercentages
 EditSameFd <- EditSameFdpercentages
 DefaultValueA <- DefaultValueAnnotationpercentages
 ExtendsList <- ExtendsListpercentages
+EditSameEnumConst <- EditSameEnumConstpercentages
 allConflictsPercentage <- data.frame(EditSameMC, SameSignatureCM, 
                                      ImplementList, ModifierList, 
                                      AddSameFd, EditSameFd, 
-                                     DefaultValueA, ExtendsList)
+                                     DefaultValueA, ExtendsList, EditSameEnumConst)
 colnames(allConflictsPercentage) <- c("EditSameMC","SameSignatureMC", "ImplementsList", "ModifierList", 
-                                      "AddSameFd", "EditSameFd", "DefaultValueA", "ExtendsList")
+                                      "AddSameFd", "EditSameFd", "DefaultValueA", "ExtendsList", "EditSameEnumConst")
 op <- par(mar = c(2, 9, 1, 1) + 0.1) #adjust margins, default is c(5, 4, 4, 2) + 0.1
 beanplot(allConflictsPercentage, col="green", horizontal = TRUE, las=1, cex.axis=1.1, bw="nrd0")
 par(op)
@@ -548,8 +619,8 @@ dev.off()
 #all conflicts percentages boxplot
 BoxplotAllConflicts = paste("BoxplotAllConflicts.png")
 png(paste(exportPath, BoxplotAllConflicts, sep=""))
-op <- par(mar = c(2, 8, 1, 1) + 0.1) #adjust margins, default is c(5, 4, 4, 2) + 0.1
-boxplot(allConflictsPercentage, col="green", horizontal = TRUE, las=1, cex.axis=1)
+op <- par(mar = c(4, 9, 1, 1) + 0.1) #adjust margins, default is c(5, 4, 4, 2) + 0.1
+boxplot(allConflictsPercentage, col="gray", xlab="Percentages(%) for each project", horizontal = TRUE, las=1, cex.axis=1)
 par(op)
 dev.off()
 
@@ -565,12 +636,13 @@ SameSignatureCM <- lastProject$SameSignatureCM
 AddSameFd <- lastProject$AddSameFd
 EditSameFd <- lastProject$EditSameFd
 ExtendsList <- lastProject$ExtendsList
+EditSameEnumConst <- lastProject$EditSameEnumConst
 barPlotFileName = paste(name, "BarPlot.png", sep="")
 png(paste(exportPath, barPlotFileName, sep=""))
 slices <- c(DefaultValueAnnotation, ImplementList, ModifierList, EditSameMC, SameSignatureCM, AddSameFd, 
-            EditSameFd, ExtendsList)
+            EditSameFd, ExtendsList, EditSameEnumConst)
 labels <- c("DefaultValueAnnotation", "ImplementList", "ModifierList", "EditSameMC", "SameSignatureCM", 
-            "AddSameFd", "EditSameFd", "ExtendsList") 
+            "AddSameFd", "EditSameFd", "ExtendsList", "EditSameEnumConst")
 par(las=2)
 par(mar=c(5,8,4,2))
 barplot(slices, main=name, horiz=TRUE, names.arg=labels, cex.names=0.8, col=c("darkviolet","chocolate4", 
@@ -585,19 +657,30 @@ title = paste("<hr><h1>Results for Conflicting Scenarios Rate and Conflict Patte
 HTML("<link rel=stylesheet type=text/css href=R2HTML.css>", file=htmlFile, append=TRUE)
 HTML.title(title, file=htmlFile, append=TRUE)
 
-HTML("<hr><h2>Conflicting Scenarios Rate</h2>", file=htmlFile, append=TRUE)
+HTML("<hr><h2>Conflicting Scenarios Rate With and Without Spacing and Consecutive Lines Edition Conflicts</h2>", file=htmlFile, append=TRUE)
+HTML(cRNonJavaTable, file=htmlFile, append=TRUE)
+HTML(metricsNonJava, file=htmlFile, append=TRUE)
+HTML(metricsNonJavaWFP, file=htmlFile, append=TRUE)
+HTML(metricsNonJavaWDS, file=htmlFile, append=TRUE)
+HTML(metricsNonJavaWCL, file=htmlFile, append=TRUE)
+
+HTML("<hr><h2>Conflicting Scenarios Rate Beanplot and Boxplot with and without spacing and consecutive lines conflicts</h2>", file=htmlFile, 
+     append=TRUE)
+HTMLInsertGraph(file=htmlFile, GraphFileName=beanPlotCRNonJavaFileName, Align="center", append=TRUE)
+
+HTML("<hr><h2>Conflicting Scenarios Rate - Just Java Files</h2>", file=htmlFile, append=TRUE)
 HTML(conflictRate, file=htmlFile, append=TRUE)
 HTML(metrics, file=htmlFile, append=TRUE)
-HTML("<hr><h2>Conflicting Scenarios Rate Without Spacing and Consecutive Lines Conflicts</h2>", file=htmlFile, append=TRUE)
+HTML("<hr><h2>Conflicting Scenarios Rate Without Spacing and Consecutive Lines Conflicts - Just Java Files</h2>", file=htmlFile, append=TRUE)
 HTML(realconflictRate, file=htmlFile, append=TRUE)
 HTML(realMetrics, file=htmlFile, append=TRUE)
 
-HTML("<hr><h2>Conflicting Scenarios Rate Beanplot and Boxplot with and without spacing and consecutive lines conflicts</h2>", file=htmlFile, 
+HTML("<hr><h2>Conflicting Scenarios Rate Beanplot and Boxplot with and without spacing and consecutive lines conflicts - Just Java Files</h2>", file=htmlFile, 
      append=TRUE)
 HTMLInsertGraph(file=htmlFile, GraphFileName=realbeanplotCRFileName, Align="center", append=TRUE)
 HTMLInsertGraph(file=htmlFile, GraphFileName=boxplotCRFileName, Align="center", append=TRUE)
 
-HTML("<hr><h2>Difference of Conflicting Scenarios Rates with and without spacing and consecutive lines conflicts</h2>", file=htmlFile, append=TRUE)
+HTML("<hr><h2>Difference of Conflicting Scenarios Rates with and without spacing and consecutive lines conflicts - Just Java Files</h2>", file=htmlFile, append=TRUE)
 HTMLInsertGraph(file=htmlFile, GraphFileName=boxplotDiffCR, Align="center", append=TRUE)
 HTMLInsertGraph(file=htmlFile, GraphFileName=beanplotDiffCR, Align="center", append=TRUE)
 HTML(diffConflictRatesTable, file=htmlFile, append=TRUE)

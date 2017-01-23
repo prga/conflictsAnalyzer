@@ -439,6 +439,8 @@ public  class Conflict {
 		}else if(nodeType.equals("ExtendsList")){
 
 			conflictType = SSMergeConflicts.ExtendsList.toString();
+		}else if(nodeType.equals("EnumConstant")){
+			conflictType = SSMergeConflicts.EditSameEnumConst.toString();
 		}
 
 		if (conflictType.equals("")){
@@ -656,7 +658,7 @@ public  class Conflict {
 	}
 
 	public static void main(String[] args) {
-	
+		String x = "\" ";
 	}
 
 }
