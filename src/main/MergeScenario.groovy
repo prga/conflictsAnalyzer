@@ -314,7 +314,7 @@ class MergeScenario implements Observer {
 			this.updateMergeScenarioSummary(conflict)
 			if(!this.hasConflicts){
 				this.hasConflicts = true
-				//this.removeNonMCBaseNodes(fstGenMerge.baseNodes)
+				this.removeNonMCBaseNodes(fstGenMerge.baseNodes)
 			}
 		}
 	}
@@ -354,13 +354,13 @@ class MergeScenario implements Observer {
 
 		if(conflict.getType().equals(SSMergeConflicts.SameSignatureCM.toString())){
 
-			/*conflict.setCauseSameSignatureCM(fstGenMerge.baseNodes, matched)
+			conflict.setCauseSameSignatureCM(fstGenMerge.baseNodes, matched)
 			 String cause = conflict.getCauseSameSignatureCM()
-			 this.updateSameSignatureCMSummary(cause, conflict.getDifferentSpacing())*/
+			 this.updateSameSignatureCMSummary(cause, conflict.getDifferentSpacing())
 
 			//use the code below to skip the samesignaturemc analysis
-			this.updateSameSignatureCMSummary(PatternSameSignatureCM.noPattern.toString(),
-					conflict.getDifferentSpacing())
+			/*this.updateSameSignatureCMSummary(PatternSameSignatureCM.noPattern.toString(),
+					conflict.getDifferentSpacing())*/
 
 		}
 
