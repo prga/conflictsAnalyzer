@@ -66,11 +66,11 @@ public  class Conflict {
 		}else{
 			this.editSameMCType = "";
 		}
+		this.matchPattern();
 		this.conflicts = splitConflictsInsideMethods();
 		this.countConflictsInsideMethods();
-		this.matchPattern();
 		this.retrieveFilePath(node, path);
-		this.checkFalsePositives(node);
+		this.checkFalsePositives();
 		this.causeSameSignatureCM = "";
 		this.similarityThreshold = 0.7;
 
@@ -191,19 +191,19 @@ public  class Conflict {
 		this.falsePositivesIntersection = falsePositivesIntersection;
 	}
 
-	public void checkFalsePositives(FSTTerminal node){
+	public void checkFalsePositives(){
 
 		if(conflicts.size() > 1){	
 			for(String s : conflicts){
-				this.auxCheckFalsePositives(s, node);
+				this.auxCheckFalsePositives(s);
 			}
 		} else{
-			this.auxCheckFalsePositives(conflicts.get(0), node);
+			this.auxCheckFalsePositives(conflicts.get(0));
 
 		}	
 	}
 
-	private void auxCheckFalsePositives(String s, FSTTerminal node) {
+	private void auxCheckFalsePositives(String s) {
 		String [] splitConflictBody = this.splitConflictBody(s);
 		boolean diffSpacing = this.checkDifferentSpacing(splitConflictBody);
 		boolean consecLines = false;
@@ -211,7 +211,7 @@ public  class Conflict {
 		if(this.type.equals(SSMergeConflicts.EditSameMC.toString())){
 			
 			if(this.possibleRenaming == 0){
-				consecLines = this.checkConsecutiveLines(splitConflictBody, node, s);
+				consecLines = this.checkConsecutiveLines(splitConflictBody, s);
 			}
 
 		}
@@ -227,7 +227,7 @@ public  class Conflict {
 		}
 		
 		if(consecLines && !diffSpacing){
-			this.removeConsecLines(splitConflictBody, node,s);
+			this.removeConsecLines(splitConflictBody,s);
 		}
 
 	}
@@ -329,7 +329,7 @@ public  class Conflict {
 		return input;
 	}
 
-	public boolean checkConsecutiveLines(String[] splitConflictBody, FSTTerminal node, String originalConflict){
+	public boolean checkConsecutiveLines(String[] splitConflictBody, String originalConflict){
 		boolean falsePositive = false;
 
 		if(!splitConflictBody[0].equals("") && 
@@ -360,7 +360,7 @@ public  class Conflict {
 		return falsePositive;
 	}
 	
-	private void removeConsecLines(String [] splitConflictBody, FSTTerminal node, String originalConflict){
+	private void removeConsecLines(String [] splitConflictBody, String originalConflict){
 		//TODO
 		
 		
@@ -481,7 +481,8 @@ public  class Conflict {
 	public String setFieldDeclPattern(){
 
 		String type = "";
-
+		String [] tokens = ExtractMethodBody.getMethods(this.body);
+		this.body = ExtractMethodBody.getMergeResult(tokens);
 		String [] p1 = this.body.split("\\|\\|\\|\\|\\|\\|\\|");
 		String [] p2 = p1[1].split("=======");
 		String [] a = p2[0].split("\n");
