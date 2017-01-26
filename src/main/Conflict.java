@@ -57,6 +57,7 @@ public  class Conflict {
 
 	public Conflict(FSTTerminal node, String path){
 		this.replacement = "";
+		node.setBody(node.getBody().replace(FSTGenMerger.HAS_CONFLICTS, ""));
 		this.body = node.getBody();
 		this.nodeName = node.getName();
 		this.nodeType = node.getType();
