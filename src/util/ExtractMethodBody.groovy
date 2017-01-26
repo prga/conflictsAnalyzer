@@ -40,7 +40,6 @@ class ExtractMethodBody {
 	public static String[] getMethods(String nodeBody){
 
 		String[] tokens = nodeBody.split(FSTGenMerger.MERGE_SEPARATOR)
-		tokens[0] = tokens[0].replace(FSTGenMerger.HAS_CONFLICTS, '').trim()
 		tokens[0] = tokens[0].replace(FSTGenMerger.SEMANTIC_MERGE_MARKER, '').trim()
 		tokens[1] = tokens[1].trim()
 		tokens[2] = tokens[2].trim()
@@ -56,10 +55,24 @@ class ExtractMethodBody {
 		File left = File.createTempFile("left", "", tmpDir);
 		File base = File.createTempFile("base", "", tmpDir);
 		File right = File.createTempFile("right", "", tmpDir);
-
-		left.append(methods[0] + '\n')
-		base.append(methods[1] + '\n')
-		right.append(methods[2] + '\n')
+		
+		if(methods[0].length()==0){
+			left.append(methods[0])
+		}else{
+			left.append(methods[0] + '\n')
+		}
+		
+		if(methods[1].length()==0){
+			base.append(methods[1])
+		}else{
+			base.append(methods[1] + '\n')
+		}
+		
+		if(methods[2].length()==0){
+			right.append(methods[2])
+		}else{
+			right.append(methods[2] + '\n')
+		}
 
 		String mergeCmd = "diff3 --merge " + left.getPath() + " " + base.getPath() + " " + right.getPath()
 
