@@ -61,11 +61,7 @@ public  class Conflict {
 		this.body = node.getBody();
 		this.nodeName = node.getName();
 		this.nodeType = node.getType();
-		if(this.isMethodOrConstructor()){
-			this.setEditSameMCType(node);
-		}else{
-			this.editSameMCType = "";
-		}
+		this.setNodeBodyAfterDiff3(node);
 		this.matchPattern();
 		this.conflicts = splitConflictsInsideMethods();
 		this.countConflictsInsideMethods();
@@ -75,7 +71,20 @@ public  class Conflict {
 		this.similarityThreshold = 0.7;
 
 	}
-
+	
+	public void setNodeBodyAfterDiff3(FSTTerminal node){
+		if(this.isMethodOrConstructor()){
+			this.setEditSameMCType(node);
+		}else{
+			this.editSameMCType = "";
+		}
+		
+		if(node.getType().equals("FieldDecl")){
+			String [] tokens = ExtractMethodBody.getMethods(this.body);
+			this.body = ExtractMethodBody.getMergeResult(tokens);
+			node.setBody(this.body);
+		}
+	}
 	public Conflict (String type){
 		this.type = type;
 	}
@@ -481,8 +490,6 @@ public  class Conflict {
 	public String setFieldDeclPattern(){
 
 		String type = "";
-		String [] tokens = ExtractMethodBody.getMethods(this.body);
-		this.body = ExtractMethodBody.getMergeResult(tokens);
 		String [] p1 = this.body.split("\\|\\|\\|\\|\\|\\|\\|");
 		String [] p2 = p1[1].split("=======");
 		String [] a = p2[0].split("\n");
@@ -681,7 +688,7 @@ public  class Conflict {
 	}
 
 	public static void main(String[] args) {
-		String x = "\" ";
+		
 	}
 
 }
