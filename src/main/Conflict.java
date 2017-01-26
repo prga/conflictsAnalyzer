@@ -62,7 +62,7 @@ public  class Conflict {
 		this.nodeName = node.getName();
 		this.nodeType = node.getType();
 		if(this.isMethodOrConstructor()){
-			this.setEditSameMCType();
+			this.setEditSameMCType(node);
 		}else{
 			this.editSameMCType = "";
 		}
@@ -84,10 +84,11 @@ public  class Conflict {
 		return causeSameSignatureCM;
 	}
 
-	public void setEditSameMCType(){
-		String[] mergeResult = ExtractMethodBody.getEditSameMCType(this.body);
+	public void setEditSameMCType(FSTTerminal node){
+		String[] mergeResult = ExtractMethodBody.getEditSameMCType(node.getBody());
 		this.editSameMCType = mergeResult[0];
-		this.body = mergeResult[1];				
+		this.body = mergeResult[1];			
+		node.setBody(this.body);
 	}
 	
 	public String getEditSameMCType(){
