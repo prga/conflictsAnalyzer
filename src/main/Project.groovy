@@ -137,7 +137,7 @@ class Project {
 	}
 	
 	private void updateEditSameMCTypeSummary(MergeScenario ms){
-		for(EditSameMCTypes e : EditSameMCTypes.values){
+		for(EditSameMCTypes e : EditSameMCTypes.values()){
 			String type = e.toString()
 			int quantity = ms.editSameMCTypeSummary.get(type)
 			quantity = quantity + this.editSameMCTypeSummary.get(type)

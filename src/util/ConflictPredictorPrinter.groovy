@@ -26,7 +26,7 @@ class ConflictPredictorPrinter {
 		}
 		String projectSummary = project.getProjectCSSummary()
 		file.append(projectSummary + '\n')
-		EmailSender.sendEmail(projectSummary)
+		//EmailSender.sendEmail(projectSummary)
 	}
 
 	public static void updateProjectData(Project project){

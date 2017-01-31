@@ -26,7 +26,7 @@ public class ConflictPrinter {
 			String diffSpacing = cause + 'DS'
 			this.conflictReportHeader = this.conflictReportHeader + cause + ', ' + diffSpacing + ', '
 		}
-		this.conflictReportHeader = this.conflictReportHeader + 'PossibleRenamings, EditSameMCWithoutConflicts, EditSameMCWithoutConflictsDS, '
+		this.conflictReportHeader = this.conflictReportHeader + 'PossibleRenamings, '
 		for(EditSameMCTypes e : EditSameMCTypes.values()){
 			String type = e.toString()
 			this.conflictReportHeader = this.conflictReportHeader + type + ', '

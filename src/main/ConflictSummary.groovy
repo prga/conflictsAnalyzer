@@ -119,8 +119,8 @@ public class ConflictSummary {
 		String result = ''
 		for(EditSameMCTypes c : EditSameMCTypes.values()){
 			String type = c.toString()
-			Conflict conflict = summary.get(type)
-			result = result + conflict.getNumberOfConflicts() + ', '
+			int quantity = summary.get(type)
+			result = result + quantity + ', '
 		}
 		result = result.subSequence(0, result.length()-2)
 		return result

@@ -144,7 +144,7 @@ class MergedFile {
 				ConflictSummary.printConflictsSummary(this.mergedFileSummary) + ', ' +
 				ConflictSummary.printSameSignatureCMSummary(this.sameSignatureCMSummary) + ', ' +
 				this.possibleRenamings + ', ' +
-				+ ConflictSummary.printEditSameMCTypeSummary(this.editSameMCTypeSummary) + '\n'
+				ConflictSummary.printEditSameMCTypeSummary(this.editSameMCTypeSummary) + '\n'
 
 		return result
 	}
