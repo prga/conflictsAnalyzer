@@ -38,12 +38,16 @@ class ExtractMethodBody {
 	}
 
 	public static String[] getMethods(String nodeBody){
-
+		String[] result = ['','','']
 		String[] tokens = nodeBody.split(FSTGenMerger.MERGE_SEPARATOR)
-		tokens[0] = tokens[0].replace(FSTGenMerger.SEMANTIC_MERGE_MARKER, '').trim()
-		tokens[1] = tokens[1].trim()
-		tokens[2] = tokens[2].trim()
-		return tokens
+		result[0] = tokens[0].replace(FSTGenMerger.SEMANTIC_MERGE_MARKER, '').trim()
+		result[1] = tokens[1].trim()
+		if(tokens.length > 2){
+			result[2] = tokens[2].trim()
+		}else{
+			result[2] = ''
+		}
+		return result
 	}
 
 	public static String getMergeResult(String[] methods){
@@ -121,16 +125,18 @@ class ExtractMethodBody {
 		}
 
 		//get substring
-		if(method.length()>1){
+		if(method.length()>1 && lastBracket >0){
 			methodBody = method.substring(firstBracket + 1, lastBracket)
 		}
+
+
 
 		return methodBody
 	}
 
 	public static void main(String[] args){
 		String a = ''
-		a = "public void m(int y){/*comment*/\n String x = \"a\";\n y++;\n \n/*comment*/}//comment";
+		a = "@Deprecated\n  TaskInputs source(Object... paths);";
 		println a
 		println '---'
 		String str = ExtractMethodBody.extractMethodBody(a)
