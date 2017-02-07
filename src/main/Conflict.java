@@ -61,6 +61,7 @@ public  class Conflict {
 		this.body = node.getBody();
 		this.nodeName = node.getName();
 		this.nodeType = node.getType();
+		this.createEditSameMCTypeSummary();
 		this.matchPattern();
 		this.conflicts = splitConflictsInsideMethods();
 		this.countConflictsInsideMethods();
@@ -71,6 +72,9 @@ public  class Conflict {
 
 	}
 	
+	public void createEditSameMCTypeSummary(){
+		this.editSameMCTypeSummary = ConflictSummary.initializeEditSameMCTypeSummary();
+	}
 	public Conflict (String type){
 		this.type = type;
 	}
@@ -366,7 +370,8 @@ public  class Conflict {
 
 	public String [] splitConflictBody(String s){
 		String [] splitBody = {"", "", ""};
-		if(this.isMethodOrConstructor() || this.nodeType.equals("FieldDecl")){
+		if(this.isMethodOrConstructor() || this.nodeType.equals("FieldDecl") 
+				|| this.nodeType.equals("EnumConstant")){
 			if(s.contains("|||||||")){
 				String[] temp = s.split("\\|\\|\\|\\|\\|\\|\\|");
 
@@ -382,13 +387,13 @@ public  class Conflict {
 				splitBody[1] = "";
 				splitBody[0] = extractLines(s.split("=======")[0].split("\n"));
 				splitBody[2] = extractLines(s.split("=======")[1].split("\n"));
-				
-				
+
+
 			}
 
 		}else{
 			String[] tokens = body.split(FSTGenMerger.MERGE_SEPARATOR);
-			splitBody[0] = tokens[0].replace(FSTGenMerger.SEMANTIC_MERGE_MARKER, "").trim();
+			splitBody[0] = tokens[0].replace(FSTGenMerger.SEMANTIC_MERGE_MARKER, "").trim();	
 			splitBody[1] = tokens[1].trim();
 			if(tokens.length == 3){
 				splitBody[2] = tokens[2].trim();

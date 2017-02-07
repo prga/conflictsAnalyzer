@@ -106,11 +106,12 @@ public class ConflictSummary {
 		return editSameMCTypeSummary
 	}
 	
-	public static HashMap<String, Conflict> updateEditSameMCTypeSummary(HashMap<String, Conflict> editSameMCTypeSummary, String type){
-		String conflictType = type
-		int quantity = editSameMCTypeSummary.get(conflictType)
-		quantity++
-		editSameMCTypeSummary.put(conflictType, quantity)
+	public static HashMap<String, Conflict> updateEditSameMCTypeSummary(HashMap<String, Conflict> editSameMCTypeSummary, HashMap<String, Conflict> confSummary){
+		for(EditSameMCTypes p : EditSameMCTypes.values()){
+			String type = p.toString()
+			int newQuantity = editSameMCTypeSummary.get(type) + confSummary.get(type)
+			editSameMCTypeSummary.put(type, newQuantity)
+		}
 
 		return editSameMCTypeSummary
 	}

@@ -82,7 +82,7 @@ class MergedFile {
 		}
 		
 		if(c.getType().equals(SSMergeConflicts.EditSameMC.toString())){
-			this.updateEditSameMCTypeSummary(c.editSameMCType)
+			this.updateEditSameMCTypeSummary(c.editSameMCTypeSummary)
 		}
 		
 	}
@@ -92,9 +92,9 @@ class MergedFile {
 		updateSameSignatureCMSummary(this.sameSignatureCMSummary, cause, ds)
 	}
 	
-	private void updateEditSameMCTypeSummary(String type){
+	private void updateEditSameMCTypeSummary(Map<String, Integer> confSummary){
 		this.editSameMCTypeSummary = ConflictSummary.
-				updateEditSameMCTypeSummary(this.editSameMCTypeSummary, type)
+				updateEditSameMCTypeSummary(this.editSameMCTypeSummary, confSummary)
 	}
 
 	public String getPath(){

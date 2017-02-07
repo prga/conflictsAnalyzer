@@ -64,7 +64,6 @@ class ExtractMethodBody {
 		//find method first bracket position
 		while(!foundFirstBracket && firstBracket < stringSize){
 			String c = method.charAt(firstBracket)
-			beforeFirstBrace = beforeFirstBrace + c
 			if(c.equals('{')){
 				foundFirstBracket = true
 			}else{
@@ -75,7 +74,6 @@ class ExtractMethodBody {
 		//find method last bracket position
 		while(!foundLastBracket && lastBracket > 0){
 			String c = method.charAt(lastBracket)
-			afterLastBrace = afterLastBrace + c
 			if(c.equals('}')){
 				foundLastBracket = true
 			}else{
@@ -85,7 +83,11 @@ class ExtractMethodBody {
 
 		//get substring
 		if(method.length()>1 && lastBracket >0){
+			beforeFirstBrace = method.substring(0, firstBracket + 1)
 			insideBraces = method.substring(firstBracket + 1, lastBracket)
+			afterLastBrace = method.substring(lastBracket, method.length()-1)
+		}else{
+			beforeFirstBrace = method
 		}
 		methodParts[0] = beforeFirstBrace
 		methodParts[1] = insideBraces
@@ -96,7 +98,8 @@ class ExtractMethodBody {
 
 	public static void main(String[] args){
 		String a = ''
-		a = "@Deprecated\n  TaskInputs source(Object... paths);";
+		//a = "antes{dentro}<<<<<<< depois >>>>>>>"
+		a = 'antes {\ndentro\n}<<<<<<< depois >>>>>>>'
 		println a
 		println '---'
 		String[] str = ExtractMethodBody.extractMethodBody(a)

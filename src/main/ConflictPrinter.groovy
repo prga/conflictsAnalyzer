@@ -161,7 +161,7 @@ public class ConflictPrinter {
 					'Intersection: ' + c.getFalsePositivesIntersection() + '\n' +
 					'Cause same signature: ' + c.getCauseSameSignatureCM() + '\n' +
 					'Possible renaming: ' + c.getPossibleRenaming() + '\n' +
-					'EditSameMCType: ' + c.getEditSameMCType() + '\n' +
+					'EditSameMCType: ' + ConflictSummary.printEditSameMCTypeSummary(c.editSameMCTypeSummary) + '\n' +
 					'Conflict body: ' + '\n' + c.getBody() ]
 				out.append row.join(',')
 				out.append '\n'

@@ -331,9 +331,9 @@ class MergeScenario implements Observer {
 				updateSameSignatureCMSummary(this.sameSignatureCMSummary, cause, ds)
 	}
 	
-	private void updateEditSameMCTypeSummary(String type){
+	private void updateEditSameMCTypeSummary(Map<String, Integer> confSummary){
 		this.editSameMCTypeSummary = ConflictSummary.
-				updateEditSameMCTypeSummary(this.editSameMCTypeSummary, type)
+				updateEditSameMCTypeSummary(this.editSameMCTypeSummary, confSummary)
 	}
 
 	private void matchConflictWithFile(Conflict conflict){
@@ -376,8 +376,7 @@ class MergeScenario implements Observer {
 		}
 		
 		if(conflict.getType().equals(SSMergeConflicts.EditSameMC.toString())){
-			String type = conflict.editSameMCType
-			this.updateEditSameMCTypeSummary(type)
+			this.updateEditSameMCTypeSummary(conflict.editSameMCTypeSummary)
 		}
 
 		this.mergedFiles.elementData(index).conflicts.add(conflict)
