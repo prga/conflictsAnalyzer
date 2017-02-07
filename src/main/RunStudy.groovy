@@ -65,8 +65,8 @@ class RunStudy {
 			
 			/*3 read mergeCommits.csv sheets*/ 
 			/*String graphBase = this.gitminerLocation + File.separator + this.projectName + 'graph.db'
-			ArrayList<MergeCommit> listMergeCommits = this.readMergeCommitsSheets(projectsDatesFolder)
-			*/
+			ArrayList<MergeCommit> listMergeCommits = this.readMergeCommitsSheets(projectsDatesFolder)*/
+	
 			/*4 set listMergeCommits with commits that i want to analyze separately*/
 			/*MergeCommit mc = new MergeCommit()
 			mc.setSha('02e79d6b153d1356bc0323084846be12980a810e')
@@ -530,7 +530,7 @@ class RunStudy {
 			'/home/ines/Dropbox/experiment/ResultData']
 		*/	
 		String[] files= ['projectsList', 'configuration.properties',
-			'/Users/paolaaccioly/Dropbox/experiment/ResultData']
+			'/Users/paolaaccioly/Desktop/conflictPredictor/ResultData']
 			
 		study.run(files)
 		//println study.build("/usr/local/bin/ant", "/Users/Roberto/Documents/UFPE/Msc/Projeto/projects/temp/voldemort", new File("/Users/Roberto/Documents/UFPE/Msc/Projeto/projects/temp/report.txt"))

@@ -3,44 +3,41 @@ package util
 import java.io.BufferedReader
 import java.io.File
 import java.io.InputStreamReader
-
+import java.util.Map
+import main.ConflictSummary
+import main.EditSameMC;
 import main.EditSameMCTypes
 import merger.FSTGenMerger
 
 class ExtractMethodBody {
 
-	public static String[] getEditSameMCType(String nodeBody){
-		String type = ''
-		String mergeResult = ''
-		String[] result = ['', '']
-		String[] methods = this.getMethods(nodeBody)
-		if(methods[0].equals('') || methods[2].equals('')){
-			type = EditSameMCTypes.RenamingOrDeletion.toString()
-		}
-		else if(methods[1].equals('')){
-			type = ''
-		}
-		else{
-			String[] statements = ['', '', '']
-			statements[0] = this.extractMethodBody(methods[0])
-			statements[1] = this.extractMethodBody(methods[1])
-			statements[2] = this.extractMethodBody(methods[2])
-			mergeResult = this.getMergeResult(statements)
-			if(mergeResult.contains(FSTGenMerger.DIFF3MERGE_SEPARATOR) &&
-			mergeResult.contains(FSTGenMerger.DIFF3MERGE_END)){
-				type = EditSameMCTypes.InsideMethod.toString()
-			}else{
-				type = EditSameMCTypes.OutsideMethod.toString()
+	public static Map<String, Integer> getEditSameMCType(String nodeBody, int possibleRenaming){
+		Map<String, Integer> summary = ConflictSummary.initializeEditSameMCTypeSummary()
+		if(possibleRenaming > 0){
+			summary.put(EditSameMCTypes.RenamingOrDeletion.toString(), 1)
+		}else{
+			String[] methodParts = this.extractMethodBody(nodeBody)
+
+			int conflictsOutsideMethods = 0
+			int conflictsInsideMethods = 0
+
+			int conflictEndings = methodParts[0].split(FSTGenMerger.DIFF3MERGE_END).length - 1
+			int conflictStarters = methodParts[2].split(FSTGenMerger.DIFF3MERGE_SEPARATOR).length - 1
+			conflictsOutsideMethods = conflictEndings + conflictStarters
+			if(conflictsOutsideMethods > 0){
+				summary.put(EditSameMCTypes.OutsideMethod.toString(), conflictsOutsideMethods)
+			}
+			
+			conflictStarters = nodeBody.split(FSTGenMerger.DIFF3MERGE_SEPARATOR).length - 1
+			conflictsInsideMethods = conflictStarters - conflictsOutsideMethods
+			if(conflictsInsideMethods > 0){
+				summary.put(EditSameMCTypes.InsideMethod.toString(), conflictsInsideMethods)
 			}
 		}
-		
-		if(!type.equals('')){
-			result[0] = type
-			result[1] = this.getMergeResult(methods)
-		}
-		return result
-	}
 
+		return summary
+	}
+	
 	public static String[] getMethods(String nodeBody){
 		String[] result = ['','','']
 		String[] tokens = nodeBody.split(FSTGenMerger.MERGE_SEPARATOR)
@@ -54,55 +51,11 @@ class ExtractMethodBody {
 		return result
 	}
 
-	public static String getMergeResult(String[] methods){
-		String result = ''
-		long time = System.currentTimeMillis()
-		File tmpDir = new File(System.getProperty("user.dir") + File.separator + "fstmerge_tmp"+time)
-		tmpDir.mkdir()
-
-		File left = File.createTempFile("left", "", tmpDir);
-		File base = File.createTempFile("base", "", tmpDir);
-		File right = File.createTempFile("right", "", tmpDir);
-		
-		if(methods[0].length()==0){
-			left.append(methods[0])
-		}else{
-			left.append(methods[0] + '\n')
-		}
-		
-		if(methods[1].length()==0){
-			base.append(methods[1])
-		}else{
-			base.append(methods[1] + '\n')
-		}
-		
-		if(methods[2].length()==0){
-			right.append(methods[2])
-		}else{
-			right.append(methods[2] + '\n')
-		}
-
-		String mergeCmd = "diff3 --merge " + left.getPath() + " " + base.getPath() + " " + right.getPath()
-
-		Runtime run = Runtime.getRuntime()
-		Process pr = run.exec(mergeCmd)
-		BufferedReader buf = new BufferedReader(new InputStreamReader(pr.getInputStream()))
-		String line = ''
-		while ((line=buf.readLine())!=null) {
-			result += line + "\n"
-		}
-		pr.getInputStream().close()
-		
-		left.delete();
-		base.delete();
-		right.delete();
-		tmpDir.delete();
-
-		return result
-	}
-
-	public static String extractMethodBody(String method){
-		String methodBody = ''
+	public static String[] extractMethodBody(String method){
+		String[] methodParts = ['', '', '']
+		String beforeFirstBrace = ''
+		String insideBraces = ''
+		String afterLastBrace = ''
 		int firstBracket = 0;
 		int stringSize = method.length()
 		int lastBracket = stringSize -1;
@@ -111,6 +64,7 @@ class ExtractMethodBody {
 		//find method first bracket position
 		while(!foundFirstBracket && firstBracket < stringSize){
 			String c = method.charAt(firstBracket)
+			beforeFirstBrace = beforeFirstBrace + c
 			if(c.equals('{')){
 				foundFirstBracket = true
 			}else{
@@ -121,6 +75,7 @@ class ExtractMethodBody {
 		//find method last bracket position
 		while(!foundLastBracket && lastBracket > 0){
 			String c = method.charAt(lastBracket)
+			afterLastBrace = afterLastBrace + c
 			if(c.equals('}')){
 				foundLastBracket = true
 			}else{
@@ -130,12 +85,13 @@ class ExtractMethodBody {
 
 		//get substring
 		if(method.length()>1 && lastBracket >0){
-			methodBody = method.substring(firstBracket + 1, lastBracket)
+			insideBraces = method.substring(firstBracket + 1, lastBracket)
 		}
+		methodParts[0] = beforeFirstBrace
+		methodParts[1] = insideBraces
+		methodParts[2] = afterLastBrace
 
-
-
-		return methodBody
+		return methodParts
 	}
 
 	public static void main(String[] args){
@@ -143,7 +99,7 @@ class ExtractMethodBody {
 		a = "@Deprecated\n  TaskInputs source(Object... paths);";
 		println a
 		println '---'
-		String str = ExtractMethodBody.extractMethodBody(a)
-		println str
+		String[] str = ExtractMethodBody.extractMethodBody(a)
+		println str[0] + ', ' + str[1] + ', ' + str[2]
 	}
 }

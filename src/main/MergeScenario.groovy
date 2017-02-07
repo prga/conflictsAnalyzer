@@ -567,12 +567,12 @@ class MergeScenario implements Observer {
 
 		if(node.getType().equals("MethodDecl") || node.getType().equals("ConstructorDecl")){
 			String nodeBody = node.getBody()
-			if(!nodeBody.contains(FSTGenMerger.HAS_CONFLICTS)){
+			if(nodeBody.contains(FSTGenMerger.MERGE_SEPARATOR) && nodeBody.contains(FSTGenMerger.SEMANTIC_MERGE_MARKER)){
 				result = true
 			}
 		}
 
-		if(node.getType().equals('FieldDecl') && !(node.getBody().contains(FSTGenMerger.HAS_CONFLICTS))){
+		if(node.getType().equals('FieldDecl') && node.getBody().contains(FSTGenMerger.MERGE_SEPARATOR)){
 			result = true
 		}
 
@@ -582,7 +582,7 @@ class MergeScenario implements Observer {
 	
 	public static void main(String[] args){
 		Project project = new Project('Teste')
-		MergeScenario ms = new MergeScenario('/Users/paolaaccioly/Desktop/Teste/tests/tc10/rev.revisions', true)
+		MergeScenario ms = new MergeScenario('/Users/paolaaccioly/Desktop/Teste/jdimeTests/rev.revisions', true)
 		ms.analyzeConflicts()
 		String ms_summary = ms.computeMSSummary()
 		ConflictPredictorPrinter.printMergeScenarioReport(project, ms,ms_summary)

@@ -4,6 +4,7 @@ package main;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 import de.ovgu.cide.fstgen.ast.FSTNode;
@@ -53,15 +54,13 @@ public  class Conflict {
 	
 	String replacement;
 	
-	private String editSameMCType;
+	private Map<String, Integer> editSameMCTypeSummary;
 
 	public Conflict(FSTTerminal node, String path){
 		this.replacement = "";
-		node.setBody(node.getBody().replace(FSTGenMerger.HAS_CONFLICTS, ""));
 		this.body = node.getBody();
 		this.nodeName = node.getName();
 		this.nodeType = node.getType();
-		this.setNodeBodyAfterDiff3(node);
 		this.matchPattern();
 		this.conflicts = splitConflictsInsideMethods();
 		this.countConflictsInsideMethods();
@@ -72,36 +71,12 @@ public  class Conflict {
 
 	}
 	
-	public void setNodeBodyAfterDiff3(FSTTerminal node){
-		if(this.isMethodOrConstructor()){
-			this.setEditSameMCType(node);
-		}else{
-			this.editSameMCType = "";
-		}
-		
-		if(node.getType().equals("FieldDecl")){
-			String [] tokens = ExtractMethodBody.getMethods(this.body);
-			this.body = ExtractMethodBody.getMergeResult(tokens);
-			node.setBody(this.body);
-		}
-	}
 	public Conflict (String type){
 		this.type = type;
 	}
 
 	public String getCauseSameSignatureCM() {
 		return causeSameSignatureCM;
-	}
-
-	public void setEditSameMCType(FSTTerminal node){
-		String[] mergeResult = ExtractMethodBody.getEditSameMCType(node.getBody());
-		this.editSameMCType = mergeResult[0];
-		this.body = mergeResult[1];			
-		node.setBody(this.body);
-	}
-	
-	public String getEditSameMCType(){
-		return this.editSameMCType;
 	}
 
 	public void setCauseSameSignatureCM(LinkedList<FSTNode> baseNodes, boolean fileAddedByOneDev) {
@@ -466,6 +441,10 @@ public  class Conflict {
 		}else if(isMethodOrConstructor()){
 
 			conflictType = this.setMethodPattern();
+			
+			if(conflictType.equals(SSMergeConflicts.EditSameMC.toString())){
+				this.setEditSameMCTypeSummary();
+			}
 
 		}else if(nodeType.equals("ExtendsList")){
 
@@ -481,7 +460,11 @@ public  class Conflict {
 		this.setType(conflictType);
 
 	}
-
+	
+	public void setEditSameMCTypeSummary(){
+		this.editSameMCTypeSummary = ExtractMethodBody.getEditSameMCType(this.body, this.possibleRenaming);
+	}
+	
 	public boolean isMethodOrConstructor(){
 		boolean result = nodeType.equals("MethodDecl") || nodeType.equals("ConstructorDecl");	
 		return result;
