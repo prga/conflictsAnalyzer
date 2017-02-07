@@ -16,7 +16,11 @@ class ExtractMethodBody {
 		String[] methods = this.getMethods(nodeBody)
 		if(methods[0].equals('') || methods[2].equals('')){
 			type = EditSameMCTypes.RenamingOrDeletion.toString()
-		}else{
+		}
+		else if(methods[1].equals('')){
+			type = ''
+		}
+		else{
 			String[] statements = ['', '', '']
 			statements[0] = this.extractMethodBody(methods[0])
 			statements[1] = this.extractMethodBody(methods[1])

@@ -558,7 +558,7 @@ public  class Conflict {
 			}else{
 
 				type = SSMergeConflicts.SameSignatureCM.toString();
-
+				
 			}
 		}else{
 			String [] a1 = this.body.split("=======");
@@ -567,6 +567,7 @@ public  class Conflict {
 				type = SSMergeConflicts.EditSameMC.toString();
 			}else{
 				type = SSMergeConflicts.SameSignatureCM.toString();
+				
 			}
 		}
 		
