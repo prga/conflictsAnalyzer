@@ -62,9 +62,9 @@ public  class Conflict {
 		this.nodeName = node.getName();
 		this.nodeType = node.getType();
 		this.createEditSameMCTypeSummary();
-		this.matchPattern();
 		this.conflicts = splitConflictsInsideMethods();
 		this.countConflictsInsideMethods();
+		this.matchPattern();
 		this.retrieveFilePath(node, path);
 		this.checkFalsePositives();
 		this.causeSameSignatureCM = "";
