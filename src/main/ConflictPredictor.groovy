@@ -100,9 +100,8 @@ public abstract class ConflictPredictor {
 			File[] files = this.createTempFiles()
 			Blame blame = new Blame()
 			String result = blame.annotateBlame(files[0], files[1], files[2])
-			if(!result.equals('')){
-				this.node.setBody(result)
-			}else{
+			this.node.setBody(result)
+			if(result.equals('')){
 				this.gitBlameProblem = true
 			}
 			

@@ -295,21 +295,23 @@ class MergeScenario implements Observer {
 	private void identifyConflictPredictor(FSTTerminal arg, String mergeScenarioPath) {
 		ConflictPredictor predictor = this.predictorFactory.createConflictPredictor(arg, mergeScenarioPath)
 
-		/*if this predictor belongs to type EditDiffMC and it is a
+		/*if this predictor is not null or belongs to type EditDiffMC and it is a
 		 * different spacing conflict predictor do not add it to the list
 		 * of conflict predictors*/	
-		if(!(predictor instanceof EditDiffMC && predictor.diffSpacing)){
-
-			String predictorFilePath = predictor.getFilePath()
-			ArrayList<ConflictPredictor> file = this.filesWithConflictPredictors.get(predictorFilePath)
-
-			if(file == null){
-				file = new ArrayList<ConflictPredictor>()
-
-			}
-
-			file.add(predictor)
-			this.filesWithConflictPredictors.put(predictorFilePath, file)
+		if(predictor != null){
+			if(!(predictor instanceof EditDiffMC && predictor.diffSpacing)){
+				
+							String predictorFilePath = predictor.getFilePath()
+							ArrayList<ConflictPredictor> file = this.filesWithConflictPredictors.get(predictorFilePath)
+				
+							if(file == null){
+								file = new ArrayList<ConflictPredictor>()
+				
+							}
+				
+							file.add(predictor)
+							this.filesWithConflictPredictors.put(predictorFilePath, file)
+						}
 		}
 
 	}

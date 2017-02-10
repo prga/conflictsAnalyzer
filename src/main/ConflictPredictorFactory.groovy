@@ -14,7 +14,9 @@ class ConflictPredictorFactory {
 		}else{
 			result = new EditDiffMC(node, mergeScenarioPath)
 		}
-		
+		if(result.gitBlameProblem || result.node.getBody().contains(Blame.NOT_A_PREDICTOR)){
+			result = null
+		}
 		return result
 	}
 	
