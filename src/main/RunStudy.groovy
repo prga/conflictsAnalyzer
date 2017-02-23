@@ -189,9 +189,6 @@ class RunStudy {
 		int current = 0;
 		int end = listMergeCommits.size()
 
-		//List<ProjectPeriod> periods = project.getProjectPeriods()
-		//String reportsPath = new File(downloadPath).getParent() + File.separator + "reports" + File.separator + project.name
-
 		//for each merge scenario analyze it
 		while(current < end){
 
@@ -200,76 +197,29 @@ class RunStudy {
 					'] merge scenarios\n'
 
 			MergeCommit mc = listMergeCommits.get(current)
+			println 'Analyzing merge scenario...'
 
-			//MatchingProjectPeriod p = this.getPeriodMatch(periods, mc)
+			/*download left, right, and base revisions, performs the merge and saves in a
+			 separate file*/
+			ExtractorResult mergeResult = extractor.extractCommit(mc)
 
+			String revisionFile = mergeResult.getRevisionFile()
 
-			//if(p.periodMatch){
-				println 'Analyzing merge scenario...'
+			if(!revisionFile.equals("")){
 
-				/*download left, right, and base revisions, performs the merge and saves in a
-				 separate file*/
-				ExtractorResult mergeResult = extractor.extractCommit(mc)
+				//run ssmerge and conflict analysis
+				SSMergeResult ssMergeResult = runConflictsAnalyzer(project, revisionFile,
+						mergeResult.getNonJavaFilesWithConflict().isEmpty())
 
-				String revisionFile = mergeResult.getRevisionFile()
-
-				if(!revisionFile.equals("")){
-
-					//run ssmerge and conflict analysis
-					SSMergeResult ssMergeResult = runConflictsAnalyzer(project, revisionFile,
-							mergeResult.getNonJavaFilesWithConflict().isEmpty())
-
-					boolean hasConflicts = ssMergeResult.getHasConflicts()
-					println hasConflicts
-					/*if(!hasConflicts){*/
-						//get line of the files containing methods for joana analysis
-						Map<String, ArrayList<EditSameMC>> filesWithMethodsToJoana =
-								ssMergeResult.getFilesWithMethodsToJoana()
-						/*if(filesWithMethodsToJoana.size() > 0)
-						{*/
-							/*println index + ", " + filesWithMethodsToJoana.keySet()
-							String revPath = revisionFile.replace(".revisions", "")
-							String reportsFilePath = reportsPath + File.separator + (new File(revPath).getName())
-							File reportsRevDir = new File(reportsFilePath)
-							reportsRevDir.deleteDir()
-							reportsRevDir.mkdirs()
-							File emptyContribs = new File(reportsFilePath + File.separator + "emptyContributions.txt")
-							emptyContribs.createNewFile()
-							//Map ssmerge objects to joana objects
-							Map<String, ModifiedMethod> methods = getJoanaMap(emptyContribs, filesWithMethodsToJoana)
-							if(emptyContribs.length() == 0)
-							{
-								emptyContribs.delete()
-							}*/
-							/*if(methods.size() > 0)
-							{*/
-
-								/*String revGitPath = revPath + File.separator + "git"
-								File revGitFile = new File(revGitPath)
-
-								def repoDir = new File(downloadPath +File.separator+ projectName + File.separator + "git")
-								FileUtils.copyDirectory(new File(revPath), revGitFile)
-								copyGitFiles(repoDir, repoDir, revGitFile)
-
-								File buildResultFile = new File(reportsFilePath + File.separator + "build_report.txt")
-								buildResultFile.createNewFile()
-								boolean[] buildResult = build(p.period.getBuildSystem(),revGitPath, buildResultFile)
-								ConflictPrinter.printMergeScenariosBuildResult(ssMergeResult.mergeScenarioName, buildResult)*/
-								/*if(build(p.period.getBuildSystem(),revGitPath, buildResultFile))
-								{	
-									//run system tests
-									
-									//call joana analysis
-									/*println "Calling Joana"
-									JoanaInvocation joana = new JoanaInvocation(revGitPath, methods, p.period.getBinPath(),
-											p.period.getSrcPath(), p.period.getLibPaths(), reportsFilePath)
-									joana.run()
-								}*/
-							/*}*/
-						/*}*/
-					/*}*/
+				boolean hasConflicts = ssMergeResult.getHasConflicts()
+				println hasConflicts
+				if(!hasConflicts){
+					//get line of the files containing methods for joana analysis
+					Map<String, ArrayList<EditSameMC>> filesWithMethodsToJoana =
+							ssMergeResult.getFilesWithMethodsToJoana()
 				}
-			//}
+			}
+
 			//increment current
 			current++
 
