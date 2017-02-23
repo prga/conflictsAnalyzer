@@ -110,7 +110,7 @@ class Project {
 		ms.analyzeConflicts()
 		SSMergeResult result = new SSMergeResult(ms.name, ms.hasConflictsThatWereNotSolved(), ms.getFilesWithMethodsToJoana())
 		updateAndPrintSummary(ms)
-		ms.deleteMSDir()
+		//ms.deleteMSDir()
 
 		return result
 	}

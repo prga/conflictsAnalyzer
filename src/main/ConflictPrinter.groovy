@@ -35,6 +35,17 @@ public class ConflictPrinter {
 		this.conflictReportHeader = this.conflictReportHeader.substring(0, this.conflictReportHeader.length() - 2)
 	}
 	
+	public static void printDicardedMerges(String projectName, String ms, String cause){
+		String filepath = 'ResultData' + File.separator + projectName + File.separator + 'discardedMerges.csv'
+		File file = new File(filepath)
+		if(!file.exists()){
+			String header = "merge, cause\n"
+			file.append(header)
+		}
+		
+		file.append(ms + ', ' + cause + '\n')
+	}
+	
 	public static void printMergeCommitsList(String projectName, ArrayList<MergeCommit> mergeCommits){
 		String filePath = 'ResultData' + File.separator + projectName + File.separator + 'mergeCommits.csv'
 		File file = new File(filePath)

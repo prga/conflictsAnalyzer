@@ -204,8 +204,9 @@ class RunStudy {
 			ExtractorResult mergeResult = extractor.extractCommit(mc)
 
 			String revisionFile = mergeResult.getRevisionFile()
-
-			if(!revisionFile.equals("")){
+			ArrayList<String> nonJavaFilesConflict = mergeResult.getNonJavaFilesWithConflict()
+			//exclude merge scenarios with problem to extract the revisions, and with conflicts on non java files
+			if(!revisionFile.equals("") && nonJavaFilesConflict.isEmpty()){
 
 				//run ssmerge and conflict analysis
 				SSMergeResult ssMergeResult = runConflictsAnalyzer(project, revisionFile,
@@ -218,6 +219,10 @@ class RunStudy {
 					Map<String, ArrayList<EditSameMC>> filesWithMethodsToJoana =
 							ssMergeResult.getFilesWithMethodsToJoana()
 				}
+			}else{
+				String cause = (revisionFile.equals(''))?'problems_with_extraction':'conflicts_non_java_files'
+				String name = mc.parent1.substring(0, 5) + "_" + mc.parent2.substring(0, 5)
+				ConflictPrinter.printDicardedMerges(project.name, name , cause)
 			}
 
 			//increment current
