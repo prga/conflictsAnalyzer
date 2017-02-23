@@ -108,7 +108,9 @@ class Project {
 		MergeScenario ms = new MergeScenario(revisionFile, resultGitMerge)
 		this.mergeScenarios.add(ms)
 		ms.analyzeConflicts()
-		SSMergeResult result = new SSMergeResult(ms.name, ms.hasConflictsThatWereNotSolved(), ms.getFilesWithMethodsToJoana())
+		boolean hasPredictors = !ms.filesWithConflictPredictors.isEmpty()
+		SSMergeResult result = new SSMergeResult(ms.name, ms.hasConflictsThatWereNotSolved(),
+				ms.getFilesWithMethodsToJoana(), hasPredictors)
 		updateAndPrintSummary(ms)
 		//ms.deleteMSDir()
 

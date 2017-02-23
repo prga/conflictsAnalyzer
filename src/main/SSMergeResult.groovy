@@ -11,15 +11,32 @@ class SSMergeResult {
 	
 	private Map<String, ArrayList<EditSameMC>> filesWithMethodsToJoana
 	
+	private boolean hasPredictors
+	
 
-	public SSMergeResult(String mScenarioName, boolean hc, Map<String, ArrayList<EditSameMC>> fwmtj){
+	public SSMergeResult(String mScenarioName, boolean hc, Map<String, ArrayList<EditSameMC>> fwmtj, boolean hasPredictors){
 
 		this.mergeScenarioName = mScenarioName
 		this.hasConflicts = hc
 		this.filesWithMethodsToJoana = fwmtj
+		this.hasPredictors = hasPredictors
 		
 	}
 	
+	
+	
+	public boolean getHasPredictors() {
+		return hasPredictors;
+	}
+
+
+
+	public void setHasPredictors(boolean hasPredictors) {
+		this.hasPredictors = hasPredictors;
+	}
+
+
+
 	public boolean getHasConflicts() {
 		return hasConflicts;
 	}

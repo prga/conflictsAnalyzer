@@ -22,6 +22,8 @@ class RunStudy {
 	private String projectRepo
 	private String gitminerLocation
 	private String downloadPath
+	private String username
+	private String email
 	private Hashtable<String, Conflict> projectsSummary
 
 	public RunStudy(){
@@ -33,6 +35,7 @@ class RunStudy {
 		//read input files
 		def projectsList = new File(args[0])
 		updateGitMinerConfig(args[1])
+		this.setGitUser(args[1])
 		String projectsDatesFolder = ''
 		//read project results (if available)
 		try{
@@ -95,6 +98,25 @@ class RunStudy {
 		}
 
 	}
+	
+	private void setGitUser(String properties){
+		//read username and email and sets it globally
+		Properties configProps = new Properties()
+		File file = new File(properties)
+		configProps.load(file.newDataInputStream())
+		
+		this.username = configProps.getProperty('github.login')
+		this.email = configProps.getProperty('github.email')
+		
+		String cmd = "git config --global user.name " + this.username
+		Runtime run = Runtime.getRuntime()
+		Process pr = run.exec(cmd)
+		
+		cmd = "git config --global user.email " + this.email
+		run = Runtime.getRuntime()
+		pr = run.exec(cmd)
+	}
+	
 	
 	private ArrayList<MergeCommit> getListMergeCommit(String projectName){
 		ArrayList<MergeCommit> result = new ArrayList<MergeCommit>()
@@ -213,11 +235,11 @@ class RunStudy {
 						mergeResult.getNonJavaFilesWithConflict().isEmpty())
 
 				boolean hasConflicts = ssMergeResult.getHasConflicts()
-				println hasConflicts
-				if(!hasConflicts){
-					//get line of the files containing methods for joana analysis
-					Map<String, ArrayList<EditSameMC>> filesWithMethodsToJoana =
-							ssMergeResult.getFilesWithMethodsToJoana()
+				boolean hasPredictors = ssMergeResult.getHasPredictors()
+				//if the merge scenario has no conflicts and has at least one predictor
+				if(!hasConflicts && hasPredictors){
+					//run travis analysis
+					
 				}
 			}else{
 				String cause = (revisionFile.equals(''))?'problems_with_extraction':'conflicts_non_java_files'
