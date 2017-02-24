@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Hashtable
 
 import util.CSVAnalyzer
+import util.CompareFiles;
 import util.ConflictPredictorPrinter;
 
 import org.apache.commons.io.FileUtils
@@ -238,7 +239,10 @@ class RunStudy {
 				boolean hasPredictors = ssMergeResult.getHasPredictors()
 				//if the merge scenario has no conflicts and has at least one predictor
 				if(!hasConflicts && hasPredictors){
-					//run travis analysis
+					//merge directories -- git merge and fstmerge
+					
+					CompareFiles cp = new CompareFiles(revisionFile)
+					cp.replaceFilesAfterFSTMerge(cp.fstmergeDir)
 					
 				}
 			}else{

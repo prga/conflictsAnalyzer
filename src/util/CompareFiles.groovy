@@ -1,6 +1,9 @@
 package util
 
-import java.io.File;
+import java.io.File
+import java.nio.file.Files
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 
 import org.apache.commons.io.FileUtils
 
@@ -15,6 +18,10 @@ class CompareFiles {
 	private String rightRevName
 
 	private String revDir
+	
+	private String mergeDir
+	
+	private String fstmergeDir
 
 	private File tempDir
 
@@ -29,6 +36,8 @@ class CompareFiles {
 		this.setDirNames(revFile)
 		this.filesToBeMerged = new ArrayList<MergedFile>()
 	}
+	
+	
 
 	private void setDirNames(String revFile){
 		File file = new File(revFile)
@@ -37,6 +46,10 @@ class CompareFiles {
 		this.leftRevName = revs[0]
 		this.baseRevName = revs[1]
 		this.rightRevName = revs[2]
+		this.mergeDir = this.revDir + File.separator + 'rev_merged_git'
+		this.fstmergeDir = this.revDir + File.separator + 'rev_' + 
+		this.leftRevName.substring(this.leftRevName.length()-5, this.leftRevName.length()) + 
+		'-' + this.rightRevName.substring(this.rightRevName.length() - 5, this.rightRevName.length())
 		this.tempDir = new File(this.revDir + File.separator + 'temp')
 
 
@@ -125,7 +138,10 @@ class CompareFiles {
 		
 		//use the code bellow to remove only equal files
 		if(leftEqualsBase && rightEqualsBase){
-			this.moveAndDeleteFiles(this.baseRevName, base, left, right)
+			//this.moveAndDeleteFiles(this.baseRevName, base, left, right)
+			FileUtils.forceDelete(left)
+			FileUtils.forceDelete(base)
+			FileUtils.forceDelete(right)
 		}
 		
 		//use the code below to merge only files that differ in the three revisions
@@ -262,14 +278,32 @@ class CompareFiles {
 
 		}
 	}
-
+	
+	private void replaceFilesAfterFSTMerge(String f){
+		File file = new File(f)
+		if(file.isDirectory()){
+			this.replaceFilesAfterFSTMerge(file)
+		} else{
+			Path toBeMoved = file.toPath()
+			String fstmerge = 'rev_' + this.leftRevName.substring(this.leftRevName.length()-5, this.leftRevName.length()) +
+					'-' + this.rightRevName.substring(this.rightRevName.length() - 5, this.rightRevName.length())
+			String temp = file.getAbsolutePath().replaceFirst(fstmerge, 'rev_merged_git')
+			File temp2 = new File(temp)
+			Path toBeReplaced = temp2.toPath()
+			Files.move(toBeMoved, toBeReplaced, StandardCopyOption.REPLACE_EXISTING)
+		}
+	}
 
 	private void auxMoveNonJavaFiles(){
 
 	}
 
 	public static void main(String[] args){
-		CompareFiles cp = new CompareFiles("/Users/paolaaccioly/Documents/testeConflictsAnalyzer/testes/rev/rev.revisions")
-		cp.ignoreFilesWeDontMerge()
+		File temp = new File('/Users/paolaaccioly/Desktop/Teste/jdimeTests/base/Case.java')
+		Path toBeMoved = temp.toPath()
+		File temp2 = new File('/Users/paolaaccioly/Desktop/Teste/jdimeTests/left/Case.java')
+		Path toBeReplaced = temp2.toPath()
+		Files.move(toBeMoved, toBeReplaced, StandardCopyOption.REPLACE_EXISTING)
+		
 	}
 }
