@@ -25,6 +25,8 @@ class RunStudy {
 	private String downloadPath
 	private String username
 	private String email
+	private String password
+	
 	private Hashtable<String, Conflict> projectsSummary
 
 	public RunStudy(){
@@ -85,7 +87,7 @@ class RunStudy {
 			//create project and extractor
 			String graphBase = this.gitminerLocation + File.separator + this.projectName + 'graph.db'
 			Extractor extractor = this.createExtractor(this.projectName, graphBase)
-			Project project = new Project(this.projectName, null)
+			Project project = new Project(this.projectName,null)
 
 			//for each merge scenario, clone and run SSMerge on it
 			ArrayList<MergeCommit> listMergeCommits = this.getListMergeCommit(this.projectName)
@@ -108,6 +110,7 @@ class RunStudy {
 		
 		this.username = configProps.getProperty('github.login')
 		this.email = configProps.getProperty('github.email')
+		this.password = configProps.getProperty('github.password')
 		
 		String cmd = "git config --global user.name " + this.username
 		Runtime run = Runtime.getRuntime()
@@ -239,10 +242,17 @@ class RunStudy {
 				boolean hasPredictors = ssMergeResult.getHasPredictors()
 				//if the merge scenario has no conflicts and has at least one predictor
 				if(!hasConflicts && hasPredictors){
-					//merge directories -- git merge and fstmerge
 					
+					//merge directories -- git merge and fstmerge
 					CompareFiles cp = new CompareFiles(revisionFile)
 					cp.replaceFilesAfterFSTMerge(cp.getFstmergeDir())
+					
+					//create fork from orginal repo
+					if(!project.getForkCreated()){
+						this.createFork()
+						project.setForkCreated(true)
+					}
+					
 					
 				}
 			}else{
@@ -258,7 +268,21 @@ class RunStudy {
 		}
 
 	}
-
+	
+	private void createFork(){
+		String cmd = "curl -u " + this.username + ":" + this.password + 
+		" -X POST https://api.github.com/repos/" + this.projectRepo + "/forks"
+		Runtime run = Runtime.getRuntime()
+		Process pr = run.exec(cmd)
+		pr.waitFor()
+		String line
+		BufferedReader input = new BufferedReader(new InputStreamReader(pr.getInputStream()));
+		while ((line = input.readLine()) != null) {
+		  System.out.println(line);
+		}
+		input.close();
+	}
+	
 	private void deleteMSDir(String path){
 		String msPath = path.substring(0, (path.length()-26))
 		File dir = new File(msPath)

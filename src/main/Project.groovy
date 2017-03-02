@@ -35,6 +35,8 @@ class Project {
 	private List<ProjectPeriod> periods
 	
 	private Map<String, Integer> editSameMCTypeSummary
+	
+	private boolean forkCreated
 
 	public Project(String projectName, List<ProjectPeriod> periods = null){
 		this.mergeScenarios = new ArrayList<MergeScenario>()
@@ -45,9 +47,17 @@ class Project {
 		this.createEditSameMCTypeSummary()
 		this.createProjectDir()
 		this.periods = periods
+		this.forkCreated = false
 
 	}
-
+	
+	public boolean setForkCreated(boolean f){
+		this.forkCreated = f
+	}
+	
+	public boolean getForkCreated(){
+		return this.forkCreated
+	}
 
 	public void createSameSignatureCMSummary(){
 		this.sameSignatureCMSummary = ConflictSummary.initializeSameSignatureCMSummary()
