@@ -112,7 +112,13 @@ class Project {
 		SSMergeResult result = new SSMergeResult(ms.name, ms.hasConflictsThatWereNotSolved(),
 				ms.getFilesWithMethodsToJoana(), hasPredictors)
 		updateAndPrintSummary(ms)
-		//ms.deleteMSDir()
+		
+		boolean hasConflicts = result.getHasConflicts()
+		//if the merge scenario has conflicts or it does not have predictors
+		if(hasConflicts || !hasPredictors){
+			ms.deleteMSDir()
+		}
+		
 
 		return result
 	}

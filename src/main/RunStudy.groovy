@@ -242,13 +242,14 @@ class RunStudy {
 					//merge directories -- git merge and fstmerge
 					
 					CompareFiles cp = new CompareFiles(revisionFile)
-					cp.replaceFilesAfterFSTMerge(cp.fstmergeDir)
+					cp.replaceFilesAfterFSTMerge(cp.getFstmergeDir())
 					
 				}
 			}else{
 				String cause = (revisionFile.equals(''))?'problems_with_extraction':'conflicts_non_java_files'
 				String name = mc.parent1.substring(0, 5) + "_" + mc.parent2.substring(0, 5)
 				ConflictPrinter.printDicardedMerges(project.name, name , cause)
+				this.deleteMSDir(revisionFile)
 			}
 
 			//increment current
@@ -258,6 +259,18 @@ class RunStudy {
 
 	}
 
+	private void deleteMSDir(String path){
+		String msPath = path.substring(0, (path.length()-26))
+		File dir = new File(msPath)
+		boolean deleted = dir.deleteDir()
+		if(deleted){
+			println 'Merge scenario ' + path + ' deleted!'
+		}else{
+
+			println 'Merge scenario ' + path + ' not deleted!'
+		}
+	}
+	
 	private MatchingProjectPeriod getPeriodMatch(List<ProjectPeriod> periods, MergeCommit mc){
 		boolean periodMatch = false
 

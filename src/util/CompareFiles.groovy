@@ -54,7 +54,11 @@ class CompareFiles {
 
 
 	}
-
+	
+	public String getFstmergeDir(){
+		return this.fstmergeDir
+	}
+	
 	public ArrayList<MergedFile> getFilesToBeMerged(){
 		return this.filesToBeMerged
 	}
@@ -280,18 +284,23 @@ class CompareFiles {
 	}
 	
 	private void replaceFilesAfterFSTMerge(String f){
-		File file = new File(f)
-		if(file.isDirectory()){
-			this.replaceFilesAfterFSTMerge(file)
-		} else{
-			Path toBeMoved = file.toPath()
-			String fstmerge = 'rev_' + this.leftRevName.substring(this.leftRevName.length()-5, this.leftRevName.length()) +
-					'-' + this.rightRevName.substring(this.rightRevName.length() - 5, this.rightRevName.length())
-			String temp = file.getAbsolutePath().replaceFirst(fstmerge, 'rev_merged_git')
-			File temp2 = new File(temp)
-			Path toBeReplaced = temp2.toPath()
-			Files.move(toBeMoved, toBeReplaced, StandardCopyOption.REPLACE_EXISTING)
+		File first = new File(f)
+		File[] files = first.listFiles()
+
+		for(File file : files){
+			if(file.isDirectory()){
+				this.replaceFilesAfterFSTMerge(file.getAbsolutePath())
+			} else if (file.isFile() && !file.getAbsolutePath().contains('.java.merge')){
+				Path toBeMoved = file.toPath()
+				String fstmerge = 'rev_' + this.leftRevName.substring(this.leftRevName.length()-5, this.leftRevName.length()) +
+						'-' + this.rightRevName.substring(this.rightRevName.length() - 5, this.rightRevName.length())
+				String temp = file.getAbsolutePath().replaceFirst(fstmerge, 'rev_merged_git')
+				File temp2 = new File(temp)
+				Path toBeReplaced = temp2.toPath()
+				Files.move(toBeMoved, toBeReplaced, StandardCopyOption.REPLACE_EXISTING)
+			}
 		}
+
 	}
 
 	private void auxMoveNonJavaFiles(){
