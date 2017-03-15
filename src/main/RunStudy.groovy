@@ -26,6 +26,8 @@ class RunStudy {
 	private String username
 	private String email
 	private String password
+	private String token
+	private String travisLocation
 	
 	private Hashtable<String, Conflict> projectsSummary
 
@@ -111,6 +113,8 @@ class RunStudy {
 		this.username = configProps.getProperty('github.login')
 		this.email = configProps.getProperty('github.email')
 		this.password = configProps.getProperty('github.password')
+		this.token = configProps.getProperty('github.token')
+		this.travisLocation = configProps.getProperty('travis.location')
 		
 		String cmd = "git config --global user.name " + this.username
 		Runtime run = Runtime.getRuntime()
@@ -250,7 +254,12 @@ class RunStudy {
 					//create fork from orginal repo
 					if(!project.getForkCreated()){
 						this.createFork()
+						/*the activate travis method works on 
+						 * linux and windows, but I was not able
+						 * to make it work on mac osx sierra*/
+						this.activateTravis()
 						project.setForkCreated(true)
+						
 					}
 					
 					
@@ -267,6 +276,35 @@ class RunStudy {
 
 		}
 
+	}
+	
+	private void cloneProject(){
+		
+	}
+	private void activateTravis(){	
+
+		String cmd = this.travisLocation + " login --github-token " + this.token
+		String cmd2 = this.travisLocation + " enable -r " + this.username + "/" + this.projectName
+		Runtime run = Runtime.getRuntime();
+		Process pr;
+		try {
+			pr = run.exec(cmd);
+			pr.waitFor();
+			pr = run.exec(cmd2);
+			pr.waitFor();
+			String line;
+			BufferedReader input = new BufferedReader(new InputStreamReader(pr.getInputStream()));
+			while ((line = input.readLine()) != null) {
+				System.out.println(line);
+			}
+			input.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	private void createFork(){
