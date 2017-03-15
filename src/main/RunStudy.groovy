@@ -22,7 +22,8 @@ class RunStudy {
 	private String projectName
 	private String projectRepo
 	private String gitminerLocation
-	private String downloadPath
+	private String ssmergeDownloadPath
+	private String travisDownloadPath
 	private String username
 	private String email
 	private String password
@@ -128,7 +129,7 @@ class RunStudy {
 	
 	private ArrayList<MergeCommit> getListMergeCommit(String projectName){
 		ArrayList<MergeCommit> result = new ArrayList<MergeCommit>()
-		String projectClonePath = this.downloadPath + File.separator + this.projectName +
+		String projectClonePath = this.ssmergeDownloadPath + File.separator + this.projectName +
 		File.separator + 'git'
 		MergeCommitsRetriever m = new MergeCommitsRetriever(projectClonePath)
 		result = m.retrieveMergeCommits()
@@ -258,11 +259,10 @@ class RunStudy {
 						 * linux and windows, but I was not able
 						 * to make it work on mac osx sierra*/
 						this.activateTravis()
-						project.setForkCreated(true)
-						
-					}
+						project.setForkCreated(true)						
+					}	
 					
-					
+					this.replayBuildsOnTravis()					
 				}
 			}else{
 				String cause = (revisionFile.equals(''))?'problems_with_extraction':'conflicts_non_java_files'
@@ -278,9 +278,11 @@ class RunStudy {
 
 	}
 	
-	private void cloneProject(){
+	private void replayBuildsOnTravis(){
+		Extractor extractor = this.createExtractor(this.projectName, '')
 		
 	}
+	
 	private void activateTravis(){	
 
 		String cmd = this.travisLocation + " login --github-token " + this.token
@@ -458,7 +460,7 @@ class RunStudy {
 	private Extractor createExtractor(String projectName, String graphBase){
 		GremlinProject gProject = new GremlinProject(this.projectName,
 				this.projectRepo, graphBase)
-		Extractor extractor = new Extractor(gProject, this.downloadPath)
+		Extractor extractor = new Extractor(gProject, this.ssmergeDownloadPath)
 
 		return extractor
 	}
@@ -478,7 +480,9 @@ class RunStudy {
 		configProps.load(propsFile.newDataInputStream())
 
 		this.gitminerLocation = configProps.getProperty('gitminer.path')
-		this.downloadPath = configProps.getProperty('downloads.path')
+		String download = configProps.getProperty('downloads.path')
+		this.ssmergeDownloadPath = download + File.separator + 'ssmerge'
+		this.travisDownloadPath = download + File.separator + 'travis'
 		String graphDb = this.gitminerLocation + File.separator + 'graph.db'
 		String repo_Loader = this.gitminerLocation + File.separator + 'repo_loader'
 
