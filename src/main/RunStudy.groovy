@@ -262,7 +262,7 @@ class RunStudy {
 						project.setForkCreated(true)						
 					}	
 					
-					this.replayBuildsOnTravis()					
+					this.replayBuildsOnTravis(mc)					
 				}
 			}else{
 				String cause = (revisionFile.equals(''))?'problems_with_extraction':'conflicts_non_java_files'
@@ -278,9 +278,9 @@ class RunStudy {
 
 	}
 	
-	private void replayBuildsOnTravis(){
+	private void replayBuildsOnTravis(MergeCommit mc){
 		Extractor extractor = this.createExtractor(this.projectName, '')
-		
+		extractor.replayBuildsOnTravis(mc)
 	}
 	
 	private void activateTravis(){	
