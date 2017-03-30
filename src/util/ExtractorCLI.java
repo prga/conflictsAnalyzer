@@ -30,6 +30,8 @@ public class ExtractorCLI {
 		this.setFork();
 		this.setForkDir();
 		this.createFork();
+		this.activateTravis();
+		this.cloneForkLocally();
 		
 	}
 	
@@ -45,8 +47,10 @@ public class ExtractorCLI {
 		//o que fazer depois?
 	}
 	
-	public int cloneForkLocally(){
+	public void cloneForkLocally(){
 		int result = -1;
+		
+		//clone fork
 		String cloneFork = "git clone https://github.com/" + this.fork + ".git";
 		try {
 			Process p = Runtime.getRuntime().exec(cloneFork, null, new File(this.downloadDir));
@@ -58,7 +62,31 @@ public class ExtractorCLI {
 			
 			e.printStackTrace();
 		}
-		return result;
+		
+		//creates branch for merges and pushes it
+		this.createBranchAndPush();
+		
+	}
+	
+	private void createBranchAndPush(){
+		int result = -1;
+		String createBranch = "git checkout -b merges";
+		String pushBranch = "git push origin merges";
+		
+		Process p;
+		try {
+			p = Runtime.getRuntime().exec(createBranch, null, new File(this.forkDir));
+			result = p.waitFor();
+			p = Runtime.getRuntime().exec(pushBranch, null, new File(this.forkDir));
+			result = p.waitFor();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 	}
 	
 	private void commitEditedMergeAndPush(){
@@ -121,7 +149,7 @@ public class ExtractorCLI {
 	}
 	
 	public void setName() {
-		String[] parts = this.fork.split("/");
+		String[] parts = this.originalRepo.split("/");
 		this.name = parts[1];
 	}
 	
@@ -293,6 +321,10 @@ public class ExtractorCLI {
 				"conflictpredictor/TGM", "prga/TGM");
 				extractor.replayBuildsOnTravis(mc);
 				*/
+		/*ExtractorCLI extractor = new ExtractorCLI(username, password, token, travis, download, originalRepo);*/
+		ExtractorCLI extractor = new ExtractorCLI("conflictpredictor", "conflict1407", 
+				"d55a5163864b75744b59a705d446ecacd8f2adb2", "/Users/paolaaccioly/.rvm/gems/ruby-2.3.1/bin/travis",
+				"/Users/paolaaccioly/Documents/Doutorado/workspace_CASM/downloads", "prga/TGM");
 		
 		
 	}
