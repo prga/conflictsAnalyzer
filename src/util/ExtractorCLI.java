@@ -4,6 +4,9 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -135,7 +138,7 @@ public class ExtractorCLI {
 	
 	private void replaceFiles(String mergeDir){
 		this.removeFilesFromOriginalRepo();
-		this.copyFilesFromSSMerge(mergeDir);
+		this.copyFilesFromSSMerge(mergeDir, mergeDir);
 		
 	}
 	
@@ -156,8 +159,30 @@ public class ExtractorCLI {
 		}
 	}
 	
-	private void copyFilesFromSSMerge(String mergeDir){
-		
+	private void copyFilesFromSSMerge(String mergeDir, String newPath){
+		File temp = new File(newPath);
+		File [] list = temp.listFiles();
+		for(File file : list){
+			if(file.isDirectory()){
+				this.copyFilesFromSSMerge(mergeDir, file.getAbsolutePath());
+			}else if(file.isFile()){
+				moveFile(mergeDir, file);
+			}
+		}
+	}
+
+
+
+	private void moveFile(String mergeDir, File file) {
+		String path = file.getAbsolutePath().replaceFirst(mergeDir, this.forkDir);
+		File temp2 = new File(path);
+		Path toBeReplaced = temp2.toPath();
+		try {
+			Files.move(file.toPath(), toBeReplaced, StandardCopyOption.REPLACE_EXISTING);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	private void commitAndPushMerge(MergeCommit mc){
