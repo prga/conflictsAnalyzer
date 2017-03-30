@@ -309,24 +309,5 @@ public class ExtractorCLI {
 	}
 
 
-
-	public static void main(String[] args) {
-		/*ExtractorCLI extractor = new ExtractorCLI("/Users/paolaaccioly/Documents/Doutorado/workspace_CASM/downloads",
-				"prga/TGM");*/
-		MergeCommit mc = new MergeCommit();
-		mc.setSha("a8bc1ad6788a72f02ac30b500507cec74e719f53");
-		mc.setParent1("85dbaef");
-		mc.setParent2("f0bb5bb");
-		/*ExtractorCLI extractor = new ExtractorCLI("/Users/paolaaccioly/Documents/Doutorado/workspace_CASM/downloads", 
-				"conflictpredictor/TGM", "prga/TGM");
-				extractor.replayBuildsOnTravis(mc);
-				*/
-		/*ExtractorCLI extractor = new ExtractorCLI(username, password, token, travis, download, originalRepo);*/
-		ExtractorCLI extractor = new ExtractorCLI("conflictpredictor", "conflict1407", 
-				"d55a5163864b75744b59a705d446ecacd8f2adb2", "/Users/paolaaccioly/.rvm/gems/ruby-2.3.1/bin/travis",
-				"/Users/paolaaccioly/Documents/Doutorado/workspace_CASM/downloads", "prga/TGM");
-		
-		
-	}
 	
 }
