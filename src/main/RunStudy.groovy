@@ -5,7 +5,8 @@ import java.util.Hashtable
 
 import util.CSVAnalyzer
 import util.CompareFiles;
-import util.ConflictPredictorPrinter;
+import util.ConflictPredictorPrinter
+import util.ExtractorCLI;
 
 import org.apache.commons.io.FileUtils
 import util.Util
@@ -216,10 +217,11 @@ class RunStudy {
 
 	private void analyseMergeScenario(ArrayList listMergeCommits, Extractor extractor,
 			Project project) {
+		ExtractorCLI extractorCLI = null; 
 		//if project execution breaks, update current with next merge scenario number
 		int current = 0;
 		int end = listMergeCommits.size()
-
+		
 		//for each merge scenario analyze it
 		while(current < end){
 
@@ -252,17 +254,14 @@ class RunStudy {
 					CompareFiles cp = new CompareFiles(revisionFile)
 					cp.replaceFilesAfterFSTMerge(cp.getFstmergeDir())
 					
-					//create fork from orginal repo
-					if(!project.getForkCreated()){
-						this.createFork()
-						/*the activate travis method works on 
-						 * linux and windows, but I was not able
-						 * to make it work on mac osx sierra*/
-						this.activateTravis()
-						project.setForkCreated(true)						
-					}	
+					//creates new instance of extractorcli
+					if(extractorCLI == null){
+						extractorCLI = new ExtractorCLI(this.username, this.password,
+							this.token, this.travisLocation, this.travisDownloadPath, this.projectRepo);
+					}
 					
-					this.replayBuildsOnTravis(mc)					
+					//runs travis build routine
+					extractorCLI.replayBuildsOnTravis(mc);										
 				}
 			}else{
 				String cause = (revisionFile.equals(''))?'problems_with_extraction':'conflicts_non_java_files'
@@ -275,53 +274,14 @@ class RunStudy {
 			current++
 
 		}
+		
+		extractorCLI = null;
 
 	}
 	
-	private void replayBuildsOnTravis(MergeCommit mc){
-		Extractor extractor = this.createExtractor(this.projectName, '')
-		extractor.replayBuildsOnTravis(mc)
-	}
-	
-	private void activateTravis(){	
 
-		String cmd = this.travisLocation + " login --github-token " + this.token
-		String cmd2 = this.travisLocation + " enable -r " + this.username + "/" + this.projectName
-		Runtime run = Runtime.getRuntime();
-		Process pr;
-		try {
-			pr = run.exec(cmd);
-			pr.waitFor();
-			pr = run.exec(cmd2);
-			pr.waitFor();
-			String line;
-			BufferedReader input = new BufferedReader(new InputStreamReader(pr.getInputStream()));
-			while ((line = input.readLine()) != null) {
-				System.out.println(line);
-			}
-			input.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
 	
-	private void createFork(){
-		String cmd = "curl -u " + this.username + ":" + this.password + 
-		" -X POST https://api.github.com/repos/" + this.projectRepo + "/forks"
-		Runtime run = Runtime.getRuntime()
-		Process pr = run.exec(cmd)
-		pr.waitFor()
-		String line
-		BufferedReader input = new BufferedReader(new InputStreamReader(pr.getInputStream()));
-		while ((line = input.readLine()) != null) {
-		  System.out.println(line);
-		}
-		input.close();
-	}
+
 	
 	private void deleteMSDir(String path){
 		String msPath = path.substring(0, (path.length()-26))
