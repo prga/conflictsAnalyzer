@@ -4,6 +4,10 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.commons.io.FileUtils;
 
 import main.MergeCommit;
 
@@ -17,6 +21,7 @@ public class ExtractorCLI {
 	private String password;
 	private String token;
 	private String travisLocation;
+	private Map<String, MergeCommit> originalToReplayedMerge;
 	
 	public ExtractorCLI(String username, String password, String token, String travis, 
 			String download, String originalRepo){
@@ -32,18 +37,18 @@ public class ExtractorCLI {
 		this.createFork();
 		this.activateTravis();
 		this.cloneForkLocally();
+		this.originalToReplayedMerge = new HashMap<String, MergeCommit>();
 		
 	}
 	
 
 	
-	public void replayBuildsOnTravis(MergeCommit mc){
-		this.cloneForkLocally();
+	public void replayBuildsOnTravis(MergeCommit mc, String mergeDir){
 		this.resetToOldCommitAndPush(mc.getParent1());
 		this.pullFromOriginalRepo();
 		this.resetToOldCommitAndPush(mc.getParent2());
 		System.out.println("testar até aqui");
-		this.commitEditedMergeAndPush();
+		this.commitEditedMergeAndPush(mc, mergeDir);
 		//o que fazer depois?
 	}
 	
@@ -89,10 +94,6 @@ public class ExtractorCLI {
 		
 	}
 	
-	private void commitEditedMergeAndPush(){
-		this.replaceFiles();
-	}
-	
 	private void pullFromOriginalRepo(){
 		int result = -1;
 		String pull = "git pull --no-edit https://github.com/" + this.originalRepo;
@@ -109,8 +110,98 @@ public class ExtractorCLI {
 		
 	}
 	
-	private void replaceFiles(){
+	private void commitEditedMergeAndPush(MergeCommit mc, String mergeDir){
+		this.checkoutBranch("merges");
+		this.replaceFiles(mergeDir);
+		this.commitAndPushMerge(mc);
+		this.checkoutBranch("master");
+		this.pullFromOriginalRepo();
+	}
+	
+	private void checkoutBranch(String branch){
+		int result = -1;
+		String checkout = "git checkout " + branch;
+		try {
+			Process p = Runtime.getRuntime().exec(checkout, null, new File(this.forkDir));
+			result = p.waitFor();
+		} catch (IOException e) {
+			
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			
+			e.printStackTrace();
+		}
+	}
+	
+	private void replaceFiles(String mergeDir){
+		this.removeFilesFromOriginalRepo();
+		this.copyFilesFromSSMerge(mergeDir);
 		
+	}
+	
+	private void removeFilesFromOriginalRepo(){
+		File fork = new File(this.forkDir);
+		File[] files = fork.listFiles();
+		for(File f : files){
+			if(f.isFile()){
+				f.delete();
+			}else if(f.isDirectory() && !f.getName().equals(".git")){
+				try {
+					FileUtils.deleteDirectory(f);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+	
+	private void copyFilesFromSSMerge(String mergeDir){
+		
+	}
+	
+	private void commitAndPushMerge(MergeCommit mc){
+		int result = -1;
+		String add = "git add .";
+		String commit = "git commit -m \"merge "+ mc.getSha() + "\" ";
+		String push = "git push origin merges";
+		try {
+			Process p = Runtime.getRuntime().exec(add, null, new File(this.forkDir));
+			result = p.waitFor();
+			p = Runtime.getRuntime().exec(commit, null, new File(this.forkDir));
+			result = p.waitFor();
+			p = Runtime.getRuntime().exec(push, null, new File(this.forkDir));
+			result = p.waitFor();
+			
+			String newSha = this.getHead();
+			this.originalToReplayedMerge.put(newSha, mc);
+		} catch (IOException e) {
+			
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			
+			e.printStackTrace();
+		}
+	
+	}
+	
+	private String getHead(){
+		String sha = "";
+		ProcessBuilder pb = new ProcessBuilder("git", "rev-parse", "HEAD");
+		pb.directory(new File(this.forkDir));
+		try {
+			Process p = pb.start();
+			BufferedReader buf = new BufferedReader(new InputStreamReader(p.getInputStream()));
+			String line = "";
+			while ((line=buf.readLine())!=null) {
+				sha = line;
+			}
+
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return sha;
 	}
 	
 	private void resetToOldCommitAndPush(String sha){

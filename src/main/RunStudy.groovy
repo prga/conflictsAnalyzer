@@ -261,7 +261,9 @@ class RunStudy {
 					}
 					
 					//runs travis build routine
-					extractorCLI.replayBuildsOnTravis(mc);										
+					File m = new File(cp.getFstmergeDir())
+					String ssmergeDir = m.getParent() + File.separator + 'rev_merged_git'
+					extractorCLI.replayBuildsOnTravis(mc, ssmergeDir);										
 				}
 			}else{
 				String cause = (revisionFile.equals(''))?'problems_with_extraction':'conflicts_non_java_files'
