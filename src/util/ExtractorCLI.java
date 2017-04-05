@@ -33,6 +33,8 @@ public class ExtractorCLI {
 		this.token = token;
 		this.travisLocation = travis;
 		this.downloadDir = download;
+		File d = new File(this.downloadDir);
+		d.mkdir();
 		this.originalRepo = originalRepo;
 		this.setName();
 		this.setFork();
@@ -47,12 +49,14 @@ public class ExtractorCLI {
 
 	
 	public void replayBuildsOnTravis(MergeCommit mc, String mergeDir){
+		System.out.println("Reseting to parent 1 and pushing to master");
 		this.resetToOldCommitAndPush(mc.getParent1());
 		this.pullFromOriginalRepo();
+		System.out.println("Reseting to parent 2 and pushing to master");
 		this.resetToOldCommitAndPush(mc.getParent2());
-		System.out.println("testar até aqui");
+		System.out.println("Replacing files from original merge to "
+				+ "replayed merge and pushing to merges");
 		this.commitEditedMergeAndPush(mc, mergeDir);
-		//o que fazer depois?
 	}
 	
 	public void cloneForkLocally(){
@@ -87,6 +91,7 @@ public class ExtractorCLI {
 			result = p.waitFor();
 			p = Runtime.getRuntime().exec(pushBranch, null, new File(this.forkDir));
 			result = p.waitFor();
+			this.checkoutBranch("master");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -188,7 +193,7 @@ public class ExtractorCLI {
 	private void commitAndPushMerge(MergeCommit mc){
 		int result = -1;
 		String add = "git add .";
-		String commit = "git commit -m \"merge "+ mc.getSha() + "\" ";
+		String commit = "git commit -m \"merge\" ";
 		String push = "git push origin merges";
 		try {
 			Process p = Runtime.getRuntime().exec(add, null, new File(this.forkDir));
