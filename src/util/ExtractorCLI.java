@@ -54,6 +54,9 @@ public class ExtractorCLI {
 		this.pullFromOriginalRepo();
 		System.out.println("Reseting to parent 2 and pushing to master");
 		this.resetToOldCommitAndPush(mc.getParent2());
+		this.pullFromOriginalRepo();
+		System.out.println("Reseting to merge commit and pushing to master");
+		this.resetToOldCommitAndPush(mc.getSha());
 		System.out.println("Replacing files from original merge to "
 				+ "replayed merge and pushing to merges");
 		this.commitEditedMergeAndPush(mc, mergeDir);
