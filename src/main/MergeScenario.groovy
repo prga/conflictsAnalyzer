@@ -53,6 +53,10 @@ class MergeScenario implements Observer {
 	private int methodsWithConflicts
 	
 	private Map<String, Integer> editSameMCTypeSummary
+	
+	private MergeCommit mc;
+	
+	private String replayedMergeSha;
 
 	public MergeScenario(String path, boolean resultGitMerge){
 
@@ -581,6 +585,23 @@ class MergeScenario implements Observer {
 		return result
 	}
 	
+	
+	public MergeCommit getMc() {
+		return mc;
+	}
+
+	public void setMc(MergeCommit mc) {
+		this.mc = mc;
+	}
+
+	public String getReplayedMergeSha() {
+		return replayedMergeSha;
+	}
+
+	public void setReplayedMergeSha(String replayedMergeSha) {
+		this.replayedMergeSha = replayedMergeSha;
+	}
+
 	public static void main(String[] args){
 		Project project = new Project('Teste')
 		MergeScenario ms = new MergeScenario('/Users/paolaaccioly/Desktop/Teste/jdimeTests/rev.revisions', true)
