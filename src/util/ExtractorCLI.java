@@ -42,6 +42,7 @@ public class ExtractorCLI {
 		this.createFork();
 		this.activateTravis();
 		this.cloneForkLocally();
+		this.createBranches();
 		this.originalToReplayedMerge = new HashMap<String, MergeCommit>();
 		
 	}
@@ -51,15 +52,16 @@ public class ExtractorCLI {
 	public void replayBuildsOnTravis(MergeCommit mc, String mergeDir){
 		System.out.println("Reseting to parent 1 and pushing to master");
 		this.resetToOldCommitAndPush(mc.getParent1());
-		this.pullFromOriginalRepo();
+		this.mergeBranches("origHist");
 		System.out.println("Reseting to parent 2 and pushing to master");
 		this.resetToOldCommitAndPush(mc.getParent2());
-		this.pullFromOriginalRepo();
+		this.mergeBranches("origHist");
 		System.out.println("Reseting to merge commit and pushing to master");
 		this.resetToOldCommitAndPush(mc.getSha());
 		System.out.println("Replacing files from original merge to "
 				+ "replayed merge and pushing to merges");
 		this.commitEditedMergeAndPush(mc, mergeDir);
+		this.mergeBranches("origHist");
 	}
 	
 	public void cloneForkLocally(){
@@ -78,23 +80,27 @@ public class ExtractorCLI {
 			e.printStackTrace();
 		}
 		
-		//creates branch for merges and pushes it
-		this.createBranchAndPush();
-		
+	}
+
+
+
+	private void createBranches() {
+		this.createbranch("origHist");
+		this.checkoutBranch("master");
+		this.createbranch("merges");
+		this.pushBranchToRemote("merges");
+		this.checkoutBranch("master");
 	}
 	
-	private void createBranchAndPush(){
+	private void createbranch(String branchName){
 		int result = -1;
-		String createBranch = "git checkout -b merges";
-		String pushBranch = "git push origin merges";
+		String createBranch = "git checkout -b " + branchName;
 		
 		Process p;
 		try {
 			p = Runtime.getRuntime().exec(createBranch, null, new File(this.forkDir));
 			result = p.waitFor();
-			p = Runtime.getRuntime().exec(pushBranch, null, new File(this.forkDir));
-			result = p.waitFor();
-			this.checkoutBranch("master");
+			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -105,9 +111,28 @@ public class ExtractorCLI {
 		
 	}
 	
-	private void pullFromOriginalRepo(){
+	private void pushBranchToRemote(String branchName){
 		int result = -1;
-		String pull = "git pull --no-edit https://github.com/" + this.originalRepo;
+		
+		String pushBranch = "git push origin " + branchName;
+		
+		Process p;
+		try {
+			p = Runtime.getRuntime().exec(pushBranch, null, new File(this.forkDir));
+			result = p.waitFor();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+	
+	private void mergeBranches(String branchName){
+		int result = -1;
+		String pull = "git merge " + branchName;
 		try {
 			Process p = Runtime.getRuntime().exec(pull, null, new File(this.forkDir));
 			result = p.waitFor();
@@ -126,7 +151,6 @@ public class ExtractorCLI {
 		this.replaceFiles(mergeDir);
 		this.commitAndPushMerge(mc);
 		this.checkoutBranch("master");
-		this.pullFromOriginalRepo();
 	}
 	
 	private void checkoutBranch(String branch){
