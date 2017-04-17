@@ -1,7 +1,9 @@
 package util;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
@@ -49,7 +51,7 @@ public class ExtractorCLI {
 	
 
 	
-	public void replayBuildsOnTravis(MergeCommit mc, String mergeDir){
+	public void replayBuildsOnTravis(String projectName, MergeCommit mc, String mergeDir){
 		System.out.println("Reseting to parent 1 and pushing to master");
 		this.resetToOldCommitAndPush(mc.getParent1());
 		this.mergeBranches("origHist");
@@ -60,8 +62,10 @@ public class ExtractorCLI {
 		this.resetToOldCommitAndPush(mc.getSha());
 		System.out.println("Replacing files from original merge to "
 				+ "replayed merge and pushing to merges");
-		this.commitEditedMergeAndPush(mc, mergeDir);
+		String newsha = this.commitEditedMergeAndPush(mc, mergeDir);
 		this.mergeBranches("origHist");
+		System.out.println("printing results");
+		this.printMergeSHAS(projectName, newsha);
 	}
 	
 	public void cloneForkLocally(){
@@ -146,11 +150,13 @@ public class ExtractorCLI {
 		
 	}
 	
-	private void commitEditedMergeAndPush(MergeCommit mc, String mergeDir){
+	private String commitEditedMergeAndPush(MergeCommit mc, String mergeDir){
+		String newSha = "";
 		this.checkoutBranch("merges");
 		this.replaceFiles(mergeDir);
-		this.commitAndPushMerge(mc);
+		newSha = this.commitAndPushMerge(mc);
 		this.checkoutBranch("master");
+		return newSha;
 	}
 	
 	private void checkoutBranch(String branch){
@@ -217,7 +223,8 @@ public class ExtractorCLI {
 		}
 	}
 	
-	private void commitAndPushMerge(MergeCommit mc){
+	private String commitAndPushMerge(MergeCommit mc){
+		String newSha = "";
 		int result = -1;
 		String add = "git add .";
 		String commit = "git commit -m \"merge\" ";
@@ -230,7 +237,7 @@ public class ExtractorCLI {
 			p = Runtime.getRuntime().exec(push, null, new File(this.forkDir));
 			result = p.waitFor();
 			
-			String newSha = this.getHead();
+			newSha = this.getHead();
 			this.originalToReplayedMerge.put(newSha, mc);
 		} catch (IOException e) {
 			
@@ -239,6 +246,8 @@ public class ExtractorCLI {
 			
 			e.printStackTrace();
 		}
+		
+		return newSha;
 	
 	}
 	
@@ -456,6 +465,30 @@ public class ExtractorCLI {
 		this.travisLocation = travisLocation;
 	}
 
+	private void printMergeSHAS(String projectName, String sha){
+		String path = "ResultData" + File.separator + projectName + File.separator + "mergesOnTravis.csv";
+		File f = new File(path);
+		MergeCommit mc = this.originalToReplayedMerge.get(sha);
+		String content = "";
+		try {
+			if(!f.exists()){
 
+				f.createNewFile();
+				String header = "sha;parent1;parent2;new_sha\n";
+				content = header;
+
+			}
+			content = content + mc.getSha() + ";" + mc.getParent1() + ";" + mc.getParent2() + ";" + sha + "\n";
+			FileWriter fw= new FileWriter(f.getAbsoluteFile(), true);
+			BufferedWriter bw  = new BufferedWriter(fw);
+			bw.write(content);
+			bw.close();
+			fw.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
 	
 }
