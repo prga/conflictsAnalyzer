@@ -4,31 +4,7 @@
 	<classpathentry exported="true" kind="con" path="GROOVY_SUPPORT"/>
 	<classpathentry exported="true" kind="con" path="GROOVY_DSL_SUPPORT"/>
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/GremlinQuery"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/CIDE_generateAST"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/CIDE2_ast"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/fstcomp"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/fstgen"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/fstmerge"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/SemanticConflicts"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/joana.ifc.sdg.util"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/com.ibm.wala.core"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/com.ibm.wala.shrike"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/com.ibm.wala.util"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/joana.api"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/joana.api.annotations.passon"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/joana.contrib.lib"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/joana.ifc.sdg.core"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/joana.ifc.sdg.graph"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/joana.ifc.sdg.mhpoptimization"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/joana.ifc.wala.sdpn"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/joana.ui.annotations"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/joana.ui.ifc.wala.console"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/joana.util"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/joana.wala.core"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/joana.wala.flowless"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/joana.wala.summary"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/joana.wala.util"/>
 	<classpathentry kind="lib" path="/Users/paolaaccioly/Documents/Doutorado/workspace_CASM/conflictsAnalyzer/asm-3.1.jar"/>
 	<classpathentry kind="lib" path="/Users/paolaaccioly/Documents/Doutorado/workspace_CASM/conflictsAnalyzer/asm-commons-3.1.jar"/>
 	<classpathentry kind="lib" path="/Users/paolaaccioly/Documents/Doutorado/workspace_CASM/conflictsAnalyzer/commands-3.3.0-I20070605-0010.jar"/>
@@ -40,5 +16,6 @@
 	<classpathentry kind="lib" path="/Users/paolaaccioly/Documents/Doutorado/workspace_CASM/conflictsAnalyzer/org.eclipse.osgi_3.5.2.R35x_v20100126.jar"/>
 	<classpathentry kind="lib" path="/Users/paolaaccioly/Documents/Doutorado/workspace_CASM/conflictsAnalyzer/org.eclipse.text_3.5.0.jar"/>
 	<classpathentry kind="lib" path="/Users/paolaaccioly/Documents/Doutorado/workspace_CASM/conflictsAnalyzer/resources-3.3.0-v20070604.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jFSTMerge"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
