@@ -5,17 +5,17 @@
 	<classpathentry exported="true" kind="con" path="GROOVY_DSL_SUPPORT"/>
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/GremlinQuery"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="/Users/paolaaccioly/Documents/Doutorado/workspace_CASM/conflictsAnalyzer/asm-3.1.jar"/>
-	<classpathentry kind="lib" path="/Users/paolaaccioly/Documents/Doutorado/workspace_CASM/conflictsAnalyzer/asm-commons-3.1.jar"/>
-	<classpathentry kind="lib" path="/Users/paolaaccioly/Documents/Doutorado/workspace_CASM/conflictsAnalyzer/commands-3.3.0-I20070605-0010.jar"/>
-	<classpathentry kind="lib" path="/Users/paolaaccioly/Documents/Doutorado/workspace_CASM/conflictsAnalyzer/commons-io-2.4.jar"/>
-	<classpathentry kind="lib" path="/Users/paolaaccioly/Documents/Doutorado/workspace_CASM/conflictsAnalyzer/google-collections.jar"/>
-	<classpathentry kind="lib" path="/Users/paolaaccioly/Documents/Doutorado/workspace_CASM/conflictsAnalyzer/org.eclipse.core.runtime-3.1.0.jar"/>
-	<classpathentry kind="lib" path="/Users/paolaaccioly/Documents/Doutorado/workspace_CASM/conflictsAnalyzer/org.eclipse.jdt.core-3.10.0.v20140604-1726.jar"/>
-	<classpathentry kind="lib" path="/Users/paolaaccioly/Documents/Doutorado/workspace_CASM/conflictsAnalyzer/org.eclipse.jgit-4.0.1.201506240215-r.jar"/>
-	<classpathentry kind="lib" path="/Users/paolaaccioly/Documents/Doutorado/workspace_CASM/conflictsAnalyzer/org.eclipse.osgi_3.5.2.R35x_v20100126.jar"/>
-	<classpathentry kind="lib" path="/Users/paolaaccioly/Documents/Doutorado/workspace_CASM/conflictsAnalyzer/org.eclipse.text_3.5.0.jar"/>
-	<classpathentry kind="lib" path="/Users/paolaaccioly/Documents/Doutorado/workspace_CASM/conflictsAnalyzer/resources-3.3.0-v20070604.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jFSTMerge"/>
+	<classpathentry kind="lib" path="/Users/paolaaccioly/Documents/Doutorado/workspace_jfstmerge/conflictsAnalyzer/dependencies/asm-3.1.jar"/>
+	<classpathentry kind="lib" path="/Users/paolaaccioly/Documents/Doutorado/workspace_jfstmerge/conflictsAnalyzer/dependencies/asm-commons-3.1.jar"/>
+	<classpathentry kind="lib" path="/Users/paolaaccioly/Documents/Doutorado/workspace_jfstmerge/conflictsAnalyzer/dependencies/commands-3.3.0-I20070605-0010.jar"/>
+	<classpathentry kind="lib" path="/Users/paolaaccioly/Documents/Doutorado/workspace_jfstmerge/conflictsAnalyzer/dependencies/commons-io-2.4.jar"/>
+	<classpathentry kind="lib" path="/Users/paolaaccioly/Documents/Doutorado/workspace_jfstmerge/conflictsAnalyzer/dependencies/google-collections.jar"/>
+	<classpathentry kind="lib" path="/Users/paolaaccioly/Documents/Doutorado/workspace_jfstmerge/conflictsAnalyzer/dependencies/org.eclipse.core.runtime-3.1.0.jar"/>
+	<classpathentry kind="lib" path="/Users/paolaaccioly/Documents/Doutorado/workspace_jfstmerge/conflictsAnalyzer/dependencies/org.eclipse.jdt.core-3.10.0.v20140604-1726.jar"/>
+	<classpathentry kind="lib" path="/Users/paolaaccioly/Documents/Doutorado/workspace_jfstmerge/conflictsAnalyzer/dependencies/org.eclipse.jgit-4.0.1.201506240215-r.jar"/>
+	<classpathentry kind="lib" path="/Users/paolaaccioly/Documents/Doutorado/workspace_jfstmerge/conflictsAnalyzer/dependencies/org.eclipse.osgi_3.5.2.R35x_v20100126.jar"/>
+	<classpathentry kind="lib" path="/Users/paolaaccioly/Documents/Doutorado/workspace_jfstmerge/conflictsAnalyzer/dependencies/org.eclipse.text_3.5.0.jar"/>
+	<classpathentry kind="lib" path="/Users/paolaaccioly/Documents/Doutorado/workspace_jfstmerge/conflictsAnalyzer/dependencies/resources-3.3.0-v20070604.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
