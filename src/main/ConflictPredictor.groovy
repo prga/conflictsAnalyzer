@@ -15,12 +15,11 @@ import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.MethodDeclaration
 import org.eclipse.jdt.core.dom.MethodInvocation
 
-
+import br.ufpe.cin.mergers.SemistructuredMerge;
 import de.ovgu.cide.fstgen.ast.FSTNode;
 import de.ovgu.cide.fstgen.ast.FSTNonTerminal
 import de.ovgu.cide.fstgen.ast.FSTTerminal
 import jdk.internal.instrumentation.MethodCallInliner.CatchBlock;
-import merger.FSTGenMerger
 import util.ConflictPredictorPrinter;
 import util.Util
 
@@ -147,8 +146,8 @@ public abstract class ConflictPredictor {
 
 	public String[] splitNodeBody(){
 		String [] splitBody = ['', '', '']
-		String[] tokens = this.node.getBody().split(FSTGenMerger.MERGE_SEPARATOR)
-		splitBody[0] = tokens[0].replace(FSTGenMerger.SEMANTIC_MERGE_MARKER, "").trim()
+		String[] tokens = this.node.getBody().split(SemistructuredMerge.MERGE_SEPARATOR)
+		splitBody[0] = tokens[0].replace(SemistructuredMerge.SEMANTIC_MERGE_MARKER, "").trim()
 		splitBody[1] = tokens[1].trim()
 		splitBody[2] = tokens[2].trim()
 

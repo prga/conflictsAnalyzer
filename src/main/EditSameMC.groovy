@@ -8,7 +8,6 @@ import java.io.File
 import de.ovgu.cide.fstgen.ast.FSTNode
 import de.ovgu.cide.fstgen.ast.FSTNonTerminal
 import de.ovgu.cide.fstgen.ast.FSTTerminal
-import merger.FSTGenMerger
 import util.Util
 
 class EditSameMC extends ConflictPredictor{

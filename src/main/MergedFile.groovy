@@ -5,7 +5,7 @@ import de.ovgu.cide.fstgen.ast.FSTTerminal
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Observable;
-import merger.MergeVisitor
+
 
 class MergedFile {
 

@@ -6,11 +6,12 @@ import java.util.Map
 import java.util.Observable
 
 
-import merger.FSTGenMerger
-import merger.MergeVisitor
+
 import modification.traversalLanguageParser.addressManagement.DuplicateFreeLinkedList
 import util.CompareFiles
 import util.ConflictPredictorPrinter;
+import br.ufpe.cin.app.JFSTMerge
+import br.ufpe.cin.mergers.SemistructuredMerge
 import de.ovgu.cide.fstgen.ast.FSTNode
 import de.ovgu.cide.fstgen.ast.FSTNonTerminal
 import de.ovgu.cide.fstgen.ast.FSTTerminal
@@ -36,7 +37,7 @@ class MergeScenario implements Observer {
 
 	private CompareFiles compareFiles
 
-	private FSTGenMerger fstGenMerge
+	private JFSTMerge fstGenMerge
 
 	private Map<String, Integer> sameSignatureCMSummary
 
@@ -203,10 +204,12 @@ class MergeScenario implements Observer {
 	}
 
 	public void runSSMerge(){
-		this.fstGenMerge = new FSTGenMerger()
-		fstGenMerge.getMergeVisitor().addObserver(this)
+		this.fstGenMerge = new JFSTMerge()
+		/*fstGenMerge.getMergeVisitor().addObserver(this)
 		String[] files = ["--expression", this.path]
-		fstGenMerge.run(files)
+		fstGenMerge.run(files)*/
+		this.fstGenMerge.getSemistructuredMerge().addObserver(this)
+		
 
 	}
 
@@ -244,7 +247,7 @@ class MergeScenario implements Observer {
 	@Override
 	public void update(Observable o, Object arg) {
 
-		if(o instanceof MergeVisitor && arg instanceof FSTTerminal){
+		if(o instanceof SemistructuredMerge && arg instanceof FSTTerminal){
 
 			FSTTerminal node = (FSTTerminal) arg
 
@@ -572,12 +575,12 @@ class MergeScenario implements Observer {
 
 		if(node.getType().equals("MethodDecl") || node.getType().equals("ConstructorDecl")){
 			String nodeBody = node.getBody()
-			if(nodeBody.contains(FSTGenMerger.MERGE_SEPARATOR) && nodeBody.contains(FSTGenMerger.SEMANTIC_MERGE_MARKER)){
+			if(nodeBody.contains(SemistructuredMerge.MERGE_SEPARATOR) && nodeBody.contains(SemistructuredMerge.SEMANTIC_MERGE_MARKER)){
 				result = true
 			}
 		}
 
-		if(node.getType().equals('FieldDecl') && node.getBody().contains(FSTGenMerger.MERGE_SEPARATOR)){
+		if(node.getType().equals('FieldDecl') && node.getBody().contains(SemistructuredMerge.MERGE_SEPARATOR)){
 			result = true
 		}
 

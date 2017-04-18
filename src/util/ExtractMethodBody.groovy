@@ -7,7 +7,7 @@ import java.util.Map
 import main.ConflictSummary
 import main.EditSameMC;
 import main.EditSameMCTypes
-import merger.FSTGenMerger
+import br.ufpe.cin.mergers.SemistructuredMerge
 
 class ExtractMethodBody {
 
@@ -21,14 +21,14 @@ class ExtractMethodBody {
 			int conflictsOutsideMethods = 0
 			int conflictsInsideMethods = 0
 
-			int conflictEndings = methodParts[0].split(FSTGenMerger.DIFF3MERGE_END).length - 1
-			int conflictStarters = methodParts[2].split(FSTGenMerger.DIFF3MERGE_SEPARATOR).length - 1
+			int conflictEndings = methodParts[0].split(SemistructuredMerge.DIFF3MERGE_END).length - 1
+			int conflictStarters = methodParts[2].split(SemistructuredMerge.DIFF3MERGE_SEPARATOR).length - 1
 			conflictsOutsideMethods = conflictEndings + conflictStarters
 			if(conflictsOutsideMethods > 0){
 				summary.put(EditSameMCTypes.OutsideMethod.toString(), conflictsOutsideMethods)
 			}
 			
-			conflictStarters = nodeBody.split(FSTGenMerger.DIFF3MERGE_SEPARATOR).length - 1
+			conflictStarters = nodeBody.split(SemistructuredMerge.DIFF3MERGE_SEPARATOR).length - 1
 			conflictsInsideMethods = conflictStarters - conflictsOutsideMethods
 			if(conflictsInsideMethods > 0){
 				summary.put(EditSameMCTypes.InsideMethod.toString(), conflictsInsideMethods)
@@ -40,8 +40,8 @@ class ExtractMethodBody {
 	
 	public static String[] getMethods(String nodeBody){
 		String[] result = ['','','']
-		String[] tokens = nodeBody.split(FSTGenMerger.MERGE_SEPARATOR)
-		result[0] = tokens[0].replace(FSTGenMerger.SEMANTIC_MERGE_MARKER, '').trim()
+		String[] tokens = nodeBody.split(SemistructuredMerge.MERGE_SEPARATOR)
+		result[0] = tokens[0].replace(SemistructuredMerge.SEMANTIC_MERGE_MARKER, '').trim()
 		result[1] = tokens[1].trim()
 		if(tokens.length > 2){
 			result[2] = tokens[2].trim()

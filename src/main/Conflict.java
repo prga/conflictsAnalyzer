@@ -7,9 +7,9 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import br.ufpe.cin.mergers.SemistructuredMerge;
 import de.ovgu.cide.fstgen.ast.FSTNode;
 import de.ovgu.cide.fstgen.ast.FSTTerminal;
-import merger.FSTGenMerger;
 import util.StringSimilarity;
 import util.ExtractMethodBody;
 import util.Spacing;
@@ -392,8 +392,8 @@ public  class Conflict {
 			}
 
 		}else{
-			String[] tokens = body.split(FSTGenMerger.MERGE_SEPARATOR);
-			splitBody[0] = tokens[0].replace(FSTGenMerger.SEMANTIC_MERGE_MARKER, "").trim();	
+			String[] tokens = body.split(SemistructuredMerge.MERGE_SEPARATOR);
+			splitBody[0] = tokens[0].replace(SemistructuredMerge.SEMANTIC_MERGE_MARKER, "").trim();	
 			splitBody[1] = tokens[1].trim();
 			if(tokens.length == 3){
 				splitBody[2] = tokens[2].trim();

@@ -1,7 +1,9 @@
 package main
 
+
+import br.ufpe.cin.mergers.SemistructuredMerge;
 import de.ovgu.cide.fstgen.ast.FSTTerminal
-import merger.FSTGenMerger;;
+
 
 class ConflictPredictorFactory {
 	
@@ -34,8 +36,8 @@ class ConflictPredictorFactory {
 	
 	public String[] splitNodeBody(FSTTerminal node){
 		String [] splitBody = ['', '', '']
-		String[] tokens = node.getBody().split(FSTGenMerger.MERGE_SEPARATOR)
-		splitBody[0] = tokens[0].replace(FSTGenMerger.SEMANTIC_MERGE_MARKER, "").trim()
+		String[] tokens = node.getBody().split(SemistructuredMerge.MERGE_SEPARATOR)
+		splitBody[0] = tokens[0].replace(SemistructuredMerge.SEMANTIC_MERGE_MARKER, "").trim()
 		splitBody[1] = tokens[1].trim()
 		splitBody[2] = tokens[2].trim()
 
