@@ -1,4 +1,0 @@
-Start Date (optional), End Date (optional), Bin Path (optional), Src Path (optional), Jars Paths (optional), Build System
-20/05/2013, 23/04/2014, /dist/classes, /src/java, /lib/*, /usr/local/bin/ant
-24/04/2014, 19/06/2014, /dist/classes, /src/java, /lib/*, /usr/local/bin/gradle
-20/06/2014, , /dist/classes, /src/java, /lib/*, gradlew
