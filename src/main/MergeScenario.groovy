@@ -7,7 +7,7 @@ import java.util.Observable
 
 
 
-import modification.traversalLanguageParser.addressManagement.DuplicateFreeLinkedList
+
 import util.CompareFiles
 import util.ConflictPredictorPrinter;
 import br.ufpe.cin.app.JFSTMerge
@@ -204,13 +204,12 @@ class MergeScenario implements Observer {
 	}
 
 	public void runSSMerge(){
-		this.fstGenMerge = new JFSTMerge()
 		/*fstGenMerge.getMergeVisitor().addObserver(this)
 		String[] files = ["--expression", this.path]
 		fstGenMerge.run(files)*/
+		this.fstGenMerge = new JFSTMerge()
 		this.fstGenMerge.getSemistructuredMerge().addObserver(this)
-		
-
+		this.fstGenMerge.mergeRevisions(this.path)
 	}
 
 
@@ -269,16 +268,17 @@ class MergeScenario implements Observer {
 	}
 
 	private void collectConflictPredictor(FSTTerminal node){
-		if(!this.isABadParsedNode(node)){
+		//if(!this.isABadParsedNode(node)){
 			identifyConflictPredictor(node, this.path)
-		}
+		//}
 	}
 
 	private boolean isABadParsedNode(FSTTerminal node){
 		boolean isABadParsedNode = false
-		DuplicateFreeLinkedList<File> parsedErrors = this.fstGenMerge.parsedErrors
-		for(File f : parsedErrors){
+		ArrayList<String> parsedErrors = this.fstGenMerge.getSemistructuredMerge().getParserErrors()
+		for(String fPath : parsedErrors){
 			String classname = this.getClassName(node)
+			File f = new File(fPath)
 			String fileName = f.name
 			if(fileName.contains(classname)){
 				isABadParsedNode = true
@@ -292,7 +292,7 @@ class MergeScenario implements Observer {
 		
 		String type = node.getType()
 		if(type.equals('ClassDeclaration') || type.equals('EnumDecl') ||
-			type.equals('AnnotationTypeDeclaration')){
+			type.equals('AnnotationTypeDeclaration') || type.equals('ClassOrInterfaceDecl')){
 			return node.getName()
 		}else{
 			this.getClassName(node.getParent())
@@ -324,7 +324,7 @@ class MergeScenario implements Observer {
 	}
 
 	public void createConflict(FSTTerminal node){
-		if(!this.isABadParsedNode(node)){
+		//if(!this.isABadParsedNode(node)){
 			Conflict conflict = new Conflict(node, this.path);
 			this.matchConflictWithFile(conflict)
 			this.updateMergeScenarioSummary(conflict)
@@ -332,7 +332,7 @@ class MergeScenario implements Observer {
 				this.hasConflicts = true
 				this.removeNonMCBaseNodes(fstGenMerge.baseNodes)
 			}
-		}
+		//}
 	}
 
 	private void updateSameSignatureCMSummary(String cause, int ds){
