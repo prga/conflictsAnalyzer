@@ -47,9 +47,14 @@ class CompareFiles {
 		this.baseRevName = revs[1]
 		this.rightRevName = revs[2]
 		this.mergeDir = this.revDir + File.separator + 'rev_merged_git'
-		this.fstmergeDir = this.revDir + File.separator + 'rev_' + 
-		this.leftRevName.substring(this.leftRevName.length()-5, this.leftRevName.length()) + 
-		'-' + this.rightRevName.substring(this.rightRevName.length() - 5, this.rightRevName.length())
+		try{
+			this.fstmergeDir = this.revDir + File.separator + 'rev_' +
+			this.leftRevName.substring(this.leftRevName.length()-5, this.leftRevName.length()) +
+			'-' + this.rightRevName.substring(this.rightRevName.length() - 5, this.rightRevName.length())
+		}catch (StringIndexOutOfBoundsException e){
+			this.fstmergeDir = "rev"
+		}
+		
 		this.tempDir = new File(this.revDir + File.separator + 'temp')
 
 
@@ -139,13 +144,17 @@ class CompareFiles {
 
 		boolean leftEqualsBase = FileUtils.contentEquals(left, base)
 		boolean rightEqualsBase = FileUtils.contentEquals(right, base)
+		boolean leftEqualRight = FileUtils.contentEquals(left, right)
 		
 		//use the code bellow to remove only equal files
-		if(leftEqualsBase && rightEqualsBase){
+		if(leftEqualRight){
 			//this.moveAndDeleteFiles(this.baseRevName, base, left, right)
 			FileUtils.forceDelete(left)
 			FileUtils.forceDelete(base)
 			FileUtils.forceDelete(right)
+		}else{
+			MergedFile mf = new MergedFile(base.getAbsolutePath())
+			this.filesToBeMerged.add(mf)
 		}
 		
 		//use the code below to merge only files that differ in the three revisions
