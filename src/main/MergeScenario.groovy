@@ -2,6 +2,8 @@ package main
 
 
 import java.io.File
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map
 import java.util.Observable
 
@@ -12,6 +14,7 @@ import util.CompareFiles
 import util.ConflictPredictorPrinter;
 import br.ufpe.cin.app.JFSTMerge
 import br.ufpe.cin.mergers.SemistructuredMerge
+import br.ufpe.cin.mergers.util.MergeContext;
 import de.ovgu.cide.fstgen.ast.FSTNode
 import de.ovgu.cide.fstgen.ast.FSTNonTerminal
 import de.ovgu.cide.fstgen.ast.FSTTerminal
@@ -58,6 +61,8 @@ class MergeScenario implements Observer {
 	private MergeCommit mc;
 	
 	private String replayedMergeSha;
+	
+	public List<FSTNode> deletedBaseNodes;
 
 	public MergeScenario(String path, boolean resultGitMerge){
 
@@ -264,6 +269,8 @@ class MergeScenario implements Observer {
 
 
 			}
+		}else if(o instanceof SemistructuredMerge && arg instanceof MergeContext){
+			this.deletedBaseNodes = arg.deletedBaseNodes;
 		}
 	}
 
@@ -330,7 +337,7 @@ class MergeScenario implements Observer {
 			this.updateMergeScenarioSummary(conflict)
 			if(!this.hasConflicts){
 				this.hasConflicts = true
-				this.removeNonMCBaseNodes(fstGenMerge.getContext().deletedBaseNodes)
+				this.removeNonMCBaseNodes(this.deletedBaseNodes)
 			}
 		//}
 	}
@@ -375,7 +382,7 @@ class MergeScenario implements Observer {
 
 		if(conflict.getType().equals(SSMergeConflicts.SameSignatureCM.toString())){
 
-			conflict.setCauseSameSignatureCM(fstGenMerge.getContext().deletedBaseNodes, matched)
+			conflict.setCauseSameSignatureCM(this.deletedBaseNodes, matched)
 			 String cause = conflict.getCauseSameSignatureCM()
 			 this.updateSameSignatureCMSummary(cause, conflict.getDifferentSpacing())
 
@@ -513,7 +520,7 @@ class MergeScenario implements Observer {
 		return result
 	}
 
-	private void removeNonMCBaseNodes(LinkedList<FSTNode> bNodes){
+	private void removeNonMCBaseNodes(List<FSTNode> bNodes){
 		LinkedList<FSTNode> baseNodes = new LinkedList<FSTNode>(bNodes)
 		for(FSTNode baseNode: baseNodes){
 			if(!(baseNode.getType().equals("MethodDecl") || baseNode.getType().equals("ConstructorDecl"))){
