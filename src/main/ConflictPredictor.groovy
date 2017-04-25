@@ -54,7 +54,7 @@ public abstract class ConflictPredictor {
 	public String mergeScenarioPath
 	public boolean gitBlameProblem
 	
-	public ConflictPredictor(FSTTerminal node, String mergeScenarioPath){
+	public ConflictPredictor(FSTTerminal node, String mergeScenarioPath, String filePath){
 
 		this.gitBlameProblem = false
 		this.predictors = new Hashtable<ConflictPredictor, Integer>()
@@ -64,7 +64,8 @@ public abstract class ConflictPredictor {
 		this.callBlame()
 		this.setSeparatorStrings()
 		this.mergeScenarioPath = mergeScenarioPath
-		this.retrieveFilePath()
+		//this.retrieveFilePath()
+		this.setFilePath(filePath)
 		this.annotatePredictor()
 		this.setSignature()
 		if(this.gitBlameProblem){

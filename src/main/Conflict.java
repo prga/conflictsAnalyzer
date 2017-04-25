@@ -65,7 +65,8 @@ public  class Conflict {
 		this.conflicts = splitConflictsInsideMethods();
 		this.countConflictsInsideMethods();
 		this.matchPattern();
-		this.retrieveFilePath(node, path);
+		//this.retrieveFilePath(path);
+		this.setFilePath(path);
 		this.checkFalsePositives();
 		this.causeSameSignatureCM = "";
 		this.similarityThreshold = 0.7;
@@ -561,7 +562,7 @@ public  class Conflict {
 		
 		return type;
 	}
-
+	
 	public void retrieveFilePath(FSTNode node, String path){
 
 		int endIndex = path.length() - 10;
@@ -574,9 +575,9 @@ public  class Conflict {
 		String filePath = "";
 		String nodetype = node.getType();
 
-		if(nodetype.equals("Java-File") || nodetype.equals("Folder")){
+		if(nodetype.equals("ClassOrInterfaceDecl")){
 
-			filePath = this.retrieveFolderPath(node.getParent()) + File.separator + node.getName();
+			filePath = this.retrieveFolderPath(node.getParent()) + File.separator + node.getName() + ".java";
 
 			return filePath;
 

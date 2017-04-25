@@ -13,6 +13,7 @@ import java.util.Observable
 import util.CompareFiles
 import util.ConflictPredictorPrinter;
 import br.ufpe.cin.app.JFSTMerge
+import br.ufpe.cin.mergers.NodeAndPath;
 import br.ufpe.cin.mergers.SemistructuredMerge
 import br.ufpe.cin.mergers.util.MergeContext;
 import de.ovgu.cide.fstgen.ast.FSTNode
@@ -251,19 +252,20 @@ class MergeScenario implements Observer {
 	@Override
 	public void update(Observable o, Object arg) {
 
-		if(o instanceof SemistructuredMerge && arg instanceof FSTTerminal){
+		if(o instanceof SemistructuredMerge && arg instanceof NodeAndPath){
 
-			FSTTerminal node = (FSTTerminal) arg
+			FSTTerminal node = (FSTTerminal) arg.getNode();
+			String filePath = arg.getFilePath().replaceFirst("left", this.name)
 
 			if(!node.getType().contains("-Content")){
 
 				if(this.isAConflictPredictor(node)){
 
-					this.collectConflictPredictor(node)
+					this.collectConflictPredictor(node, filePath)
 
 				}else{
 
-					this.createConflict(node)
+					this.createConflict(node, filePath)
 
 				}
 
@@ -274,9 +276,9 @@ class MergeScenario implements Observer {
 		}
 	}
 
-	private void collectConflictPredictor(FSTTerminal node){
+	private void collectConflictPredictor(FSTTerminal node, String filePath){
 		//if(!this.isABadParsedNode(node)){
-			identifyConflictPredictor(node, this.path)
+			identifyConflictPredictor(node, this.path, filePath)
 		//}
 	}
 
@@ -306,8 +308,8 @@ class MergeScenario implements Observer {
 		}
 	}
 
-	private void identifyConflictPredictor(FSTTerminal arg, String mergeScenarioPath) {
-		ConflictPredictor predictor = this.predictorFactory.createConflictPredictor(arg, mergeScenarioPath)
+	private void identifyConflictPredictor(FSTTerminal arg, String mergeScenarioPath, String filePath) {
+		ConflictPredictor predictor = this.predictorFactory.createConflictPredictor(arg, mergeScenarioPath, filePath)
 
 		/*if this predictor is not null or belongs to type EditDiffMC and it is a
 		 * different spacing conflict predictor do not add it to the list
@@ -330,9 +332,9 @@ class MergeScenario implements Observer {
 
 	}
 
-	public void createConflict(FSTTerminal node){
+	public void createConflict(FSTTerminal node, String filePath){
 		//if(!this.isABadParsedNode(node)){
-			Conflict conflict = new Conflict(node, this.path);
+			Conflict conflict = new Conflict(node, filePath);
 			this.matchConflictWithFile(conflict)
 			this.updateMergeScenarioSummary(conflict)
 			if(!this.hasConflicts){
