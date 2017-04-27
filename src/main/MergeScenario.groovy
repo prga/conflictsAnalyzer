@@ -616,7 +616,7 @@ class MergeScenario implements Observer {
 
 	public static void main(String[] args){
 		Project project = new Project('Teste')
-		MergeScenario ms = new MergeScenario('/Users/paolaaccioly/Desktop/Teste/jdimeTests/rev.revisions', true)
+		MergeScenario ms = new MergeScenario('/Users/paolaaccioly/Desktop/Teste/interfaceParameters/rev.revisions', true)
 		ms.analyzeConflicts()
 		String ms_summary = ms.computeMSSummary()
 		ConflictPredictorPrinter.printMergeScenarioReport(project, ms,ms_summary)

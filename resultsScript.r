@@ -396,12 +396,13 @@ AddSameFd <- sum(conflictRateTemp$AddSameFd)
 EditSameFd <- sum(conflictRateTemp$EditSameFd)
 ExtendsList <- sum(conflictRateTemp$ExtendsList)
 EditSameEnumConst <- sum(conflictRateTemp$EditSameEnumConst)
+TypeParametersList <- sum(conflictRateTemp$TypeParametersList)
 # bar plot all conflicts
 
 slices <- c(DefaultValueAnnotation, ImplementList, ModifierList, EditSameMC, SameSignatureCM, AddSameFd, 
-            EditSameFd, ExtendsList, EditSameEnumConst)
+            EditSameFd, ExtendsList, EditSameEnumConst, TypeParametersList)
 labels <- c("DefaultValueA", "ImplementsList", "ModifierList", "EditSameMC", "SameSignatureMC", "AddSameFd", 
-            "EditSameFd", "ExtendsList", "EditSameEnumConst")
+            "EditSameFd", "ExtendsList", "EditSameEnumConst", "TypeParametersList")
 dat <- data.frame(Frequency = slices,Conflicts = labels)
 dat$Conflicts <- reorder(dat$Conflicts, dat$Frequency)
 library(ggplot2)
@@ -412,11 +413,11 @@ fstMerge <- ggplot(dat, aes(y = Frequency)) +
 
 #conflicts table
 Conflicts_Patterns <- c("DefaultValueAnnotation", "ImplementList", "ModifierList", "EditSameMC", 
-                        "SameSignatureCM", "AddSameFd", "EditSameFd", "ExtendsList", "EditSameEnumConst", "TOTAL")
+                        "SameSignatureCM", "AddSameFd", "EditSameFd", "ExtendsList", "EditSameEnumConst", "TypeParametersList" ,"TOTAL")
 conflictsSum <- sum(DefaultValueAnnotation, ImplementList, ModifierList, EditSameMC, SameSignatureCM,
-                    AddSameFd, EditSameFd, ExtendsList, EditSameEnumConst)
+                    AddSameFd, EditSameFd, ExtendsList, EditSameEnumConst, TypeParametersList)
 Occurrences <- c(DefaultValueAnnotation, ImplementList, ModifierList, EditSameMC, SameSignatureCM,
-                 AddSameFd, EditSameFd, ExtendsList, EditSameEnumConst, conflictsSum)
+                 AddSameFd, EditSameFd, ExtendsList, EditSameEnumConst, TypeParametersList,conflictsSum)
 conflictsTable <- data.frame(Conflicts_Patterns, Occurrences)
 
 #boxplot for each conflict pattern percentages along all projects
@@ -501,15 +502,17 @@ realEditSameFd <- sum(conflictRateTemp$EditSameFd) - sum(conflictRateTemp$EditSa
   sum(conflictRateTemp$EditSameFdCL) + sum(conflictRateTemp$EditSameFdIFP)
 realExtendsList <- sum(conflictRateTemp$ExtendsList) - sum(conflictRateTemp$ExtendsListDS) - 
   sum(conflictRateTemp$ExtendsListCL) + sum(conflictRateTemp$ExtendsListIFP)
-  realEditSameEnumConst <- sum(conflictRateTemp$EditSameEnumConst) - sum(conflictRateTemp$EditSameEnumConstDS) -
+realEditSameEnumConst <- sum(conflictRateTemp$EditSameEnumConst) - sum(conflictRateTemp$EditSameEnumConstDS) -
   sum(conflictRateTemp$EditSameEnumConstCL) + sum(conflictRateTemp$EditSameEnumConstIFP)
+realTypeParametersList <- sum(conflictRateTemp$TypeParametersList) - sum(conflictRateTemp$TypeParametersListDS) - 
+  sum(conflictRateTemp$TypeParametersListCL) + sum(conflictRateTemp$TypeParametersListIFP)
 
 barChartFP = paste("barChartFP.png")
 png(paste(exportPath, barChartFP, sep=""))
 slices <- c(realDefaultValueAnnotation, realImplementList, realModifierList, realEditSameMC, 
-            realSameSignatureMC, realAddSameFd, realEditSameFd, realExtendsList, realEditSameEnumConst)
+            realSameSignatureMC, realAddSameFd, realEditSameFd, realExtendsList, realEditSameEnumConst, realTypeParametersList)
 labels <- c("DefaultValueA", "ImplementsList", "ModifierList", "EditSameMC", "SameSignatureMC", 
-            "AddSameFd", "EditSameFd", "ExtendsList", "EditSameEnumConst")
+            "AddSameFd", "EditSameFd", "ExtendsList", "EditSameEnumConst", "TypeParametersList")
 dat2 <- data.frame(Conflicts = labels, Frequency = slices)
 dat2$Conflicts <- reorder(dat2$Conflicts, dat2$Frequency)
 fstMergeWFP <- ggplot(dat2, aes(y = Frequency)) +
@@ -524,11 +527,11 @@ dev.off()
 
 #conflicts table
 Conflicts_Patterns <- c("DefaultValueAnnotation", "ImplementList", "ModifierList", "EditSameMC", 
-                        "SameSignatureCM", "AddSameFd", "EditSameFd", "ExtendsList", "EditSameEnumConst", "TOTAL")
+                        "SameSignatureCM", "AddSameFd", "EditSameFd", "ExtendsList", "EditSameEnumConst","TypeParametersList" ,"TOTAL")
 conflictsSum <- sum(realDefaultValueAnnotation, realImplementList, realModifierList, realEditSameMC, 
-                    realSameSignatureMC, realAddSameFd, realEditSameFd, realExtendsList, realEditSameEnumConst)
+                    realSameSignatureMC, realAddSameFd, realEditSameFd, realExtendsList, realEditSameEnumConst, realTypeParametersList)
 Occurrences <- c(realDefaultValueAnnotation, realImplementList, realModifierList, realEditSameMC, 
-                 realSameSignatureMC, realAddSameFd, realEditSameFd, realExtendsList, realEditSameEnumConst, conflictsSum)
+                 realSameSignatureMC, realAddSameFd, realEditSameFd, realExtendsList, realEditSameEnumConst, realTypeParametersList, conflictsSum)
 realconflictsTable <- data.frame(Conflicts_Patterns, Occurrences)
 
 #causes for SameSignatureCM
@@ -593,6 +596,8 @@ ExtendsListpercentages <- computePatternPercentages(conflictRateTemp, "ExtendsLi
 
 EditSameEnumConstpercentages <- computePatternPercentages(conflictRateTemp, "EditSameEnumConst")
 
+TypeParametersListpercentages <- computePatternPercentages(conflictRateTemp, "TypeParametersList")
+
 #all conflicts percentages beanplot
 BeanplotAllConflicts = paste("BeanplotAllConflicts.png")
 png(paste(exportPath, BeanplotAllConflicts, sep=""))
@@ -605,12 +610,13 @@ EditSameFd <- EditSameFdpercentages
 DefaultValueA <- DefaultValueAnnotationpercentages
 ExtendsList <- ExtendsListpercentages
 EditSameEnumConst <- EditSameEnumConstpercentages
+TypeParametersList <- TypeParametersListpercentages
 allConflictsPercentage <- data.frame(EditSameMC, SameSignatureCM, 
                                      ImplementList, ModifierList, 
                                      AddSameFd, EditSameFd, 
-                                     DefaultValueA, ExtendsList, EditSameEnumConst)
+                                     DefaultValueA, ExtendsList, EditSameEnumConst, TypeParametersList)
 colnames(allConflictsPercentage) <- c("EditSameMC","SameSignatureMC", "ImplementsList", "ModifierList", 
-                                      "AddSameFd", "EditSameFd", "DefaultValueA", "ExtendsList", "EditSameEnumConst")
+                                      "AddSameFd", "EditSameFd", "DefaultValueA", "ExtendsList", "EditSameEnumConst", "TypeParametersList")
 op <- par(mar = c(2, 9, 1, 1) + 0.1) #adjust margins, default is c(5, 4, 4, 2) + 0.1
 beanplot(allConflictsPercentage, col="green", horizontal = TRUE, las=1, cex.axis=1.1, bw="nrd0")
 par(op)
@@ -637,12 +643,13 @@ AddSameFd <- lastProject$AddSameFd
 EditSameFd <- lastProject$EditSameFd
 ExtendsList <- lastProject$ExtendsList
 EditSameEnumConst <- lastProject$EditSameEnumConst
+TypeParametersListConst <- lastProject$TypeParametersList
 barPlotFileName = paste(name, "BarPlot.png", sep="")
 png(paste(exportPath, barPlotFileName, sep=""))
 slices <- c(DefaultValueAnnotation, ImplementList, ModifierList, EditSameMC, SameSignatureCM, AddSameFd, 
-            EditSameFd, ExtendsList, EditSameEnumConst)
+            EditSameFd, ExtendsList, EditSameEnumConst, TypeParametersList)
 labels <- c("DefaultValueAnnotation", "ImplementList", "ModifierList", "EditSameMC", "SameSignatureCM", 
-            "AddSameFd", "EditSameFd", "ExtendsList", "EditSameEnumConst")
+            "AddSameFd", "EditSameFd", "ExtendsList", "EditSameEnumConst", "TypeParametersList")
 par(las=2)
 par(mar=c(5,8,4,2))
 barplot(slices, main=name, horiz=TRUE, names.arg=labels, cex.names=0.8, col=c("darkviolet","chocolate4", 
