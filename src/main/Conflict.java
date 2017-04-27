@@ -418,7 +418,7 @@ public  class Conflict {
 
 			conflictType = SSMergeConflicts.ModifierList.toString();
 
-		}else if(nodeType.equals("AnnotationMethodDecl")){
+		}else if(nodeType.equals("AnnotationTypeMemberDeclaration1")){
 
 			conflictType = SSMergeConflicts.DefaultValueAnnotation.toString();
 
