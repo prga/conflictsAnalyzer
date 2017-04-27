@@ -3,11 +3,9 @@ package main;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
-
-import br.ufpe.cin.mergers.SemistructuredMerge;
 import de.ovgu.cide.fstgen.ast.FSTNode;
 import de.ovgu.cide.fstgen.ast.FSTTerminal;
 import util.StringSimilarity;
@@ -84,7 +82,7 @@ public  class Conflict {
 		return causeSameSignatureCM;
 	}
 
-	public void setCauseSameSignatureCM(LinkedList<FSTNode> baseNodes, boolean fileAddedByOneDev) {
+	public void setCauseSameSignatureCM(List<FSTNode> baseNodes, boolean fileAddedByOneDev) {
 		if(!fileAddedByOneDev){
 			String [] splitConflictBody = this.splitConflictBody(this.conflicts.get(0));
 			boolean isSmallMethod = this.isSmallMethod(splitConflictBody);
@@ -128,7 +126,7 @@ public  class Conflict {
 		return result;
 	}
 
-	private void isRenamedOrCopiedMethod(LinkedList<FSTNode> baseNodes, String [] splitConflict){
+	private void isRenamedOrCopiedMethod(List<FSTNode> baseNodes, String [] splitConflict){
 
 		double similarity = this.getSimilarity(splitConflict);
 
@@ -151,7 +149,7 @@ public  class Conflict {
 		return similarity;
 	}
 
-	private boolean checkBaseNodes(LinkedList<FSTNode> baseNodes, String right){
+	private boolean checkBaseNodes(List<FSTNode> baseNodes, String right){
 		boolean found = false;
 		int i = 0;
 		right = right.replaceAll("\\s+","");
@@ -371,8 +369,7 @@ public  class Conflict {
 
 	public String [] splitConflictBody(String s){
 		String [] splitBody = {"", "", ""};
-		if(this.isMethodOrConstructor() || this.nodeType.equals("FieldDecl") 
-				|| this.nodeType.equals("EnumConstant")){
+
 			if(s.contains("|||||||")){
 				String[] temp = s.split("\\|\\|\\|\\|\\|\\|\\|");
 
@@ -391,17 +388,6 @@ public  class Conflict {
 
 
 			}
-
-		}else{
-			String[] tokens = body.split(SemistructuredMerge.MERGE_SEPARATOR);
-			splitBody[0] = tokens[0].replace(SemistructuredMerge.SEMANTIC_MERGE_MARKER, "").trim();	
-			splitBody[1] = tokens[1].trim();
-			if(tokens.length == 3){
-				splitBody[2] = tokens[2].trim();
-			}
-
-
-		}
 
 		return splitBody;
 	}
