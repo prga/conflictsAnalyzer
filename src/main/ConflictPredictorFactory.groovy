@@ -7,14 +7,14 @@ import de.ovgu.cide.fstgen.ast.FSTTerminal
 
 class ConflictPredictorFactory {
 	
-	public ConflictPredictor createConflictPredictor(FSTTerminal node, String mergeScenarioPath){
+	public ConflictPredictor createConflictPredictor(FSTTerminal node, String mergeScenarioPath, String filePath){
 		ConflictPredictor result= null
 		if(node.getType().equals('FieldDecl')){
-			result = new EditSameFD(node, mergeScenarioPath)
+			result = new EditSameFD(node, mergeScenarioPath, filePath)
 		}else if(this.bothVersionsWereEdited(node)){
-			result = new EditSameMC(node, mergeScenarioPath)
+			result = new EditSameMC(node, mergeScenarioPath, filePath)
 		}else{
-			result = new EditDiffMC(node, mergeScenarioPath)
+			result = new EditDiffMC(node, mergeScenarioPath, filePath)
 		}
 		if(result.gitBlameProblem || result.node.getBody().contains(Blame.NOT_A_PREDICTOR)){
 			result = null

@@ -4,8 +4,8 @@ import de.ovgu.cide.fstgen.ast.FSTTerminal;
 
 class EditSameFD extends ConflictPredictor{
 	
-	public EditSameFD(FSTTerminal node, String mergeScenarioPath){
-		super(node, mergeScenarioPath)
+	public EditSameFD(FSTTerminal node, String mergeScenarioPath, String filePath){
+		super(node, mergeScenarioPath, filePath)
 	}
 	
 	@Override

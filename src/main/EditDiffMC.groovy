@@ -10,9 +10,9 @@ import de.ovgu.cide.fstgen.ast.FSTTerminal
 
 class EditDiffMC extends ConflictPredictor{
 
-	public EditDiffMC(FSTTerminal n, String msp){
+	public EditDiffMC(FSTTerminal n, String msp, String filePath){
 
-		super(n, msp)
+		super(n, msp, filePath)
 	}
 
 	@Override

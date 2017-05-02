@@ -12,8 +12,8 @@ import util.Util
 
 class EditSameMC extends ConflictPredictor{
 	
-	public EditSameMC(FSTTerminal n, String path){
-		super(n, path)
+	public EditSameMC(FSTTerminal n, String path, String filePath){
+		super(n, path, filePath)
 		
 	}
 
