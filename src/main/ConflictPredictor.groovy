@@ -66,6 +66,7 @@ public abstract class ConflictPredictor {
 		this.mergeScenarioPath = mergeScenarioPath
 		//this.retrieveFilePath()
 		this.setFilePath(filePath)
+		this.retrieveDependencies(node);
 		this.annotatePredictor()
 		this.setSignature()
 		if(this.gitBlameProblem){
@@ -167,38 +168,23 @@ public abstract class ConflictPredictor {
 		int endIndex = this.mergeScenarioPath.length() - 10;
 		String systemDir = this.mergeScenarioPath.substring(0, endIndex);
 
-		this.filePath = systemDir + this.retrieveFolderPath(this.node);
+		this.filePath = systemDir + this.retrieveDependencies(this.node);
 	}
 
-	public String retrieveFolderPath(FSTNode n){
-		String filePath = "";
+	public String retrieveDependencies(FSTNode n){
 		String nodetype = n.getType();
 
 		if(nodetype.equals("CompilationUnit")){
 			this.setPackageName(n)
 			this.setImportList(n)
 
-		}
-
-		if(nodetype.equals("ClassDeclaration")){
+		}else if(nodetype.equals("ClassOrInterfaceDecl")){
 			this.setConstructor(n)
-
-		}
-
-
-		if(nodetype.equals("Java-File") || nodetype.equals("Folder")){
-
-			filePath = this.retrieveFolderPath(n.getParent()) + File.separator + n.getName();
-
-			return filePath;
-
-		}else if(nodetype.equals("Feature")){
-
-			return "";
+			this.retrieveDependencies(n.getParent())
 
 		}else{
 
-			return this.retrieveFolderPath(n.getParent());
+			return this.retrieveDependencies(n.getParent());
 		}
 	}
 
