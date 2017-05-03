@@ -255,7 +255,7 @@ class MergeScenario implements Observer {
 		if(o instanceof SemistructuredMerge && arg instanceof NodeAndPath){
 
 			FSTTerminal node = (FSTTerminal) arg.getNode();
-			String filePath = arg.getFilePath().replaceFirst("left", this.name)
+			String filePath = this.getFilePath(arg.getFilePath())
 
 			if(!node.getType().contains("-Content")){
 
@@ -274,6 +274,16 @@ class MergeScenario implements Observer {
 		}else if(o instanceof SemistructuredMerge && arg instanceof MergeContext){
 			this.deletedBaseNodes = arg.deletedBaseNodes;
 		}
+	}
+	
+	private String getFilePath(String leftPath){
+		String filePath = "";
+		String left = this.name.substring(4,9);
+		String right = this.name.substring(this.name.length()-5, this.name.length());
+		String revision = "rev_rev_left_" + left + "-rev_right_" + right
+		String leftRev = "rev_left_" + left
+		filePath = leftPath.replaceFirst(leftRev, revision)
+		return filePath;
 	}
 
 	private void collectConflictPredictor(FSTTerminal node, String filePath){
@@ -616,7 +626,7 @@ class MergeScenario implements Observer {
 
 	public static void main(String[] args){
 		Project project = new Project('Teste')
-		MergeScenario ms = new MergeScenario('/Users/paolaaccioly/Desktop/Teste/interfaceParameters/rev.revisions', true)
+		MergeScenario ms = new MergeScenario('/Users/paolaaccioly/Desktop/Teste/jdimeTests2/rev_85dba_f0bb5/rev_85dba-f0bb5.revisions', true)
 		ms.analyzeConflicts()
 		String ms_summary = ms.computeMSSummary()
 		ConflictPredictorPrinter.printMergeScenarioReport(project, ms,ms_summary)
