@@ -212,8 +212,8 @@ class MergeScenario implements Observer {
 	}
 	
 	private void updateEditSameMCTypeSummary(String type){
-		this.editSameMCTypeSummary = ConflictSummary.
-		updateEditSameMCTypeSummary(this.editSameMCTypeSummary, type)
+		/*this.editSameMCTypeSummary = ConflictSummary.
+		updateEditSameMCTypeSummary(this.editSameMCTypeSummary, type)*/
 	}
 	
 	private void matchConflictWithFile(Conflict conflict){
@@ -308,7 +308,7 @@ class MergeScenario implements Observer {
 
 	public static void main(String[] args){
 		ExtractorResult er = new ExtractorResult()
-		er.revisionFile = '/Users/paolaaccioly/Desktop/Teste/interfaceParameters/rev.revisions'
+		er.revisionFile = '/Users/paolaaccioly/Desktop/Teste/jdimeTests/rev.revisions'
 		MergeScenario ms = new MergeScenario(er)
 		ms.analyzeConflicts()
 		println 'hello'

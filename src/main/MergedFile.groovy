@@ -81,7 +81,7 @@ class MergedFile {
 		}
 		
 		if(c.getType().equals(SSMergeConflicts.EditSameMC.toString())){
-			this.updateEditSameMCTypeSummary(c.editSameMCType)
+			//this.updateEditSameMCTypeSummary(c.editSameMCType)
 		}
 		
 	}

@@ -49,18 +49,18 @@ public  class Conflict {
 
 	private String nodeName;
 	
-	private String editSameMCType;
+	private String editSameMCType = "";
 
 
 	public Conflict(FSTTerminal node, String path){
 		this.body = node.getBody();
 		this.nodeName = node.getName();
 		this.nodeType = node.getType();
-		if(this.isMethodOrConstructor()){
+		/*if(this.isMethodOrConstructor()){
 			this.setEditSameMCType();
 		}else{
 			this.editSameMCType = "";
-		}
+		}*/
 		this.conflicts = splitConflictsInsideMethods();
 		this.countConflictsInsideMethods();
 		this.matchPattern();

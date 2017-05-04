@@ -106,7 +106,7 @@ class Project {
 		if(ms.hasConflicts){
 			updateProjectSummary(ms)
 			updateSameSignatureCMSummary(ms)
-			this.updateEditSameMCTypeSummary(ms)
+			//this.updateEditSameMCTypeSummary(ms)
 		}
 		printResults(ms)
 	}
@@ -144,7 +144,7 @@ class Project {
 	}
 	
 	private void updateEditSameMCTypeSummary(MergeScenario ms){
-		for(EditSameMCTypes e : EditSameMCTypes.values){
+		for(EditSameMCTypes e : EditSameMCTypes.values()){
 			String type = e.toString()
 			int quantity = ms.editSameMCTypeSummary.get(type)
 			quantity = quantity + this.editSameMCTypeSummary.get(type)
