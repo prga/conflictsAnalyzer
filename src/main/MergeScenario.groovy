@@ -308,7 +308,7 @@ class MergeScenario implements Observer {
 
 	public static void main(String[] args){
 		ExtractorResult er = new ExtractorResult()
-		er.revisionFile = '/Users/paolaaccioly/Desktop/Teste/jdimeTests/rev.revisions'
+		er.revisionFile = '/Users/paolaaccioly/Desktop/Teste/interfaceParameters/rev.revisions'
 		MergeScenario ms = new MergeScenario(er)
 		ms.analyzeConflicts()
 		println 'hello'

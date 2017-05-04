@@ -392,6 +392,8 @@ public  class Conflict {
 		}else if(nodeType.equals("EnumConstant")){
 			
 			conflictType = SSMergeConflicts.EditSameEnumConst.toString();
+		}else if(nodeType.equals("TypeParameters")){
+			conflictType = SSMergeConflicts.TypeParametersList.toString();
 		}
 
 		if (conflictType.equals("")){
