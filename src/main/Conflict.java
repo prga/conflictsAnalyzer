@@ -149,7 +149,7 @@ public  class Conflict {
 			similarity = 1;
 		}else{
 			String [] input = this.removeInvisibleChars(splitConflict);
-			similarity = StringSimilarity.similarity(input[0], input[2]);
+			similarity = StringSimilarity.computeStringSimilarity(input[0], input[2]);
 		}
 		return similarity;
 	}
@@ -161,7 +161,7 @@ public  class Conflict {
 		while(!found && i < baseNodes.size()){
 			FSTTerminal temp =  (FSTTerminal) baseNodes.get(i);
 			String base = temp.getBody().replaceAll("\\s+","");
-			double similarity = StringSimilarity.similarity(base, right);
+			double similarity = StringSimilarity.computeStringSimilarity(base, right);
 			if(similarity >= this.similarityThreshold){
 				found = true;
 				baseNodes.remove(i);
