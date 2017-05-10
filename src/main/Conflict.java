@@ -14,7 +14,8 @@ import util.StringSimilarity;
 
 
 enum PatternSameSignatureCM {
-	smallMethod, renamedMethod, copiedMethod, copiedFile, noPattern
+	smallMethod, renamedMethod, renamedMethod60, renamedmethod80, copiedMethod, 
+	copiedMethod60, copiedMethod80, copiedFile, noPattern
 }
 
 public  class Conflict {
@@ -45,7 +46,7 @@ public  class Conflict {
 
 	private ArrayList<String> conflicts;
 
-	private double similarityThreshold;
+	private double[] similarityThreshold = {0.6, 0.7, 0.8};
 
 	private String nodeName;
 	
@@ -67,7 +68,6 @@ public  class Conflict {
 		this.retrieveFilePath(node, path);
 		this.checkFalsePositives();
 		this.causeSameSignatureCM = "";
-		this.similarityThreshold = 0.7;
 
 	}
 	
@@ -135,10 +135,17 @@ public  class Conflict {
 
 		double similarity = this.getSimilarity(splitConflict);
 
-		if(similarity >= this.similarityThreshold){
+		if(similarity >= this.similarityThreshold[0]){
 			boolean foundOnBaseNodes = this.checkBaseNodes(baseNodes, splitConflict[2]);
 			if(!foundOnBaseNodes){
-				this.causeSameSignatureCM = PatternSameSignatureCM.copiedMethod.toString();
+				if(similarity < this.similarityThreshold[1]){
+					this.causeSameSignatureCM = PatternSameSignatureCM.copiedMethod60.toString();
+				}
+				else if(similarity >= this.similarityThreshold[1] && similarity < this.similarityThreshold[2]){
+					this.causeSameSignatureCM = PatternSameSignatureCM.copiedMethod.toString();
+				}else{
+					this.causeSameSignatureCM = PatternSameSignatureCM.copiedMethod80.toString();
+				}
 			}
 		}
 	}
@@ -162,17 +169,24 @@ public  class Conflict {
 			FSTTerminal temp =  (FSTTerminal) baseNodes.get(i);
 			String base = temp.getBody().replaceAll("\\s+","");
 			double similarity = StringSimilarity.computeStringSimilarity(base, right);
-			if(similarity >= this.similarityThreshold){
+			if(similarity >= this.similarityThreshold[0]){
 				found = true;
 				baseNodes.remove(i);
-				this.causeSameSignatureCM = PatternSameSignatureCM.renamedMethod.toString();
+				if(similarity < this.similarityThreshold[1]){
+					this.causeSameSignatureCM = PatternSameSignatureCM.renamedMethod60.toString();
+				}
+				else if(similarity >= this.similarityThreshold[1] && similarity < this.similarityThreshold[2]){
+					this.causeSameSignatureCM = PatternSameSignatureCM.renamedMethod.toString();
+				}else{
+					this.causeSameSignatureCM = PatternSameSignatureCM.renamedmethod80.toString();
+				}
 			}
 			i++;
 		}
 
 		return found;
 	}
-
+	
 	public int getFalsePositivesIntersection() {
 		return falsePositivesIntersection;
 	}
