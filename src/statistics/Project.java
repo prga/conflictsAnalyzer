@@ -19,6 +19,8 @@ public class Project {
 	private ArrayList<MergeCommit> conflictingMergeCommits;
 	
 	private String downloadPath;
+	
+	private HashMap<String, int[]> authorsSummary;
 
 	public Project(String repo, String resultData, String downloadPath){
 		String[] temp = repo.split("/");
@@ -27,6 +29,37 @@ public class Project {
 		this.resultData = resultData;
 		this.conflictingMergeCommits = new ArrayList<>();
 		this.downloadPath = downloadPath;
+		this.initializeAuthorSummary();
+	}
+	
+	public void initializeAuthorSummary(){
+		this.authorsSummary = new HashMap<String, int[]>();
+		for(NumDevCategories c : NumDevCategories.values()){
+			String cat = c.toString();
+			int[] numbers = new int[4];
+			this.authorsSummary.put(cat, numbers);
+		}
+	}
+	
+	public void updateAuthorSummary(String category, int[] mcConflicts){
+		int[] values = this.authorsSummary.get(category);
+		for(int i = 0; i < values.length; i++){
+			values[i] = values[i] + mcConflicts[i];
+		}
+		this.authorsSummary.put(category, values);
+	}
+	
+	public String toString(){
+		String result = this.name + ";";
+		for(NumDevCategories c : NumDevCategories.values()){
+			String cat = c.toString();
+			int[] values = this.authorsSummary.get(cat);
+			for(int i = 0; i < values.length; i++){
+				result = result + ";" + values[i];
+			}
+			
+		}
+		return result;
 	}
 	
 	public void analyzeMergeCommits(){
@@ -146,5 +179,23 @@ public class Project {
 	public void setResultData(String resultData) {
 		this.resultData = resultData;
 	}
+
+	public String getDownloadPath() {
+		return downloadPath;
+	}
+
+	public void setDownloadPath(String downloadPath) {
+		this.downloadPath = downloadPath;
+	}
+
+	public HashMap<String, int[]> getAuthorsSummary() {
+		return authorsSummary;
+	}
+
+	public void setAuthorsSummary(HashMap<String, int[]> authorsSummary) {
+		this.authorsSummary = authorsSummary;
+	}
+	
+	
 
 }
