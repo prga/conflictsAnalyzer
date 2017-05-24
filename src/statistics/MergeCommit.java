@@ -23,12 +23,26 @@ public class MergeCommit {
 	
 	private HashMap<String, Integer> authors;
 	
+	private int[] confSummary;
+	
 	public MergeCommit(String sha, String p1, String p2){
 		this.SHA = sha;
 		this.parent1 = p1;
 		this.parent2 = p2;
 		this.name = "rev_" + this.parent1.substring(0, 5) + "-"  + this.parent2.substring(0, 5);
 		this.authors = new HashMap<String, Integer>();
+		
+	}
+	
+	public void computeConfSummary(String[] data){
+		this.confSummary = new int[4];
+		int c = 7;
+		while(c < 47){
+			for(int i = 0; i < this.confSummary.length; i++){	
+				this.confSummary[i] = this.confSummary[i] + Integer.parseInt(data[c].trim());
+				c++;
+			}
+		}
 	}
 	
 	public void analyzeNumberOfDevelopers(String clonePath){
@@ -171,6 +185,22 @@ public class MergeCommit {
 
 	public void setAuthors(HashMap<String, Integer> authors) {
 		this.authors = authors;
+	}
+
+	public int[] getConfSummary() {
+		return confSummary;
+	}
+
+	public void setConfSummary(int[] confSummary) {
+		this.confSummary = confSummary;
+	}
+	
+	public String toString(){
+		String result = this.name + ";" + this.NumDevCategory + ";" + this.authors.size();
+		for(int i = 0; i < this.confSummary.length; i++){
+			result = result + ";" + this.confSummary[i];
+		}
+		return result;
 	}
 
 	public static void main(String[] args) {

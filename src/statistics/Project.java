@@ -133,6 +133,7 @@ public class Project {
 					if(!data[6].equals(" 0")){
 						String name = data[0];
 						MergeCommit mc = mcList.get(name);
+						mc.computeConfSummary(data);
 						if(mc!=null){
 							this.conflictingMergeCommits.add(mc);
 						}
@@ -196,6 +197,10 @@ public class Project {
 		this.authorsSummary = authorsSummary;
 	}
 	
-	
+	public static void main(String[] args) {
+		Project p = new Project("AndlyticsProject/andlytics", 
+				"/Users/paolaaccioly/Dropbox/workspace_emse/ResultData", "downloads2");
+		p.analyzeMergeCommits();
+	}
 
 }
