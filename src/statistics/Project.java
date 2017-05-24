@@ -32,9 +32,15 @@ public class Project {
 	public void analyzeMergeCommits(){
 		HashMap<String, MergeCommit> mc = this.loadMC();
 		this.filterConflictingMC(mc);
-		String project = this.resultData + File.separator + this.name;
-		this.loadMergedFiles(project);
 		this.cloneProject();
+		this.getNumberOfDevs();
+	}
+	
+	public void getNumberOfDevs(){
+		for(MergeCommit mc : this.conflictingMergeCommits){
+			String clone = this.downloadPath + File.separator + this.name;
+			mc.analyzeNumberOfDevelopers(clone);
+		}
 	}
 	
 	public void cloneProject(){
@@ -43,19 +49,12 @@ public class Project {
 		try {
 			p = Runtime.getRuntime().exec(cmd, null, new File(this.downloadPath));
 			int result = p.waitFor();
+			System.out.println("Process result = " + result);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}	
-	}
-	
-	public void loadMergedFiles(String projectPath){
-		for(MergeCommit mc : this.conflictingMergeCommits){
-			mc.loadConflictingFiles(projectPath);
-		}
 	}
 
 	public HashMap<String, MergeCommit> loadMC(){
@@ -78,10 +77,8 @@ public class Project {
 				}
 			}
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -110,10 +107,8 @@ public class Project {
 				}
 			}
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		

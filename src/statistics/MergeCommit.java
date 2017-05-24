@@ -1,9 +1,9 @@
 package statistics;
 
+import java.io.BufferedReader;
 import java.io.File;
-import java.util.HashMap;
-
-import main.MergedFile;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
 public class MergeCommit {
 	
@@ -15,9 +15,8 @@ public class MergeCommit {
 	
 	private String parent2;
 	
-	private HashMap<MergedFile, Integer> conflictingMergedFiles;
+	private String base;
 	
-	private int totalDevs;
 	
 	private String NumDevCategory;
 	
@@ -28,14 +27,44 @@ public class MergeCommit {
 		this.name = "rev_" + this.parent1.substring(0, 5) + "-"  + this.parent2.substring(0, 5);
 	}
 	
-	public void loadConflictingFiles(String projectPath){
-		File files = new File(projectPath + File.separator + 
-				"Merge_Scenarios" + File.separator + this.name + ".csv");
-		if(files.exists()){
-			
+	public void analyzeNumberOfDevelopers(String clonePath){
+		//git merge-base
+		this.setMergeBase(clonePath);
+		//get commit authors between base and mergecommit
+		
+	}
+	
+	public void setMergeBase(String clonePath){
+		String cmd = "git merge-base " + this.parent1 + " " + this.parent2;
+		Process p;
+		try {
+			p = Runtime.getRuntime().exec(cmd, null, new File(clonePath));
+			BufferedReader buf = new BufferedReader(new InputStreamReader(p.getInputStream()));
+			String line = "";
+			while ((line=buf.readLine())!=null) {
+				this.base = line;
+			}
+			p.getInputStream().close();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 	
+	public void getCommitAuthors(String clonePath){
+		String cmd = "git merge-base " + this.parent1 + " " + this.parent2;
+		Process p;
+		try {
+			p = Runtime.getRuntime().exec(cmd, null, new File(clonePath));
+			BufferedReader buf = new BufferedReader(new InputStreamReader(p.getInputStream()));
+			String line = "";
+			while ((line=buf.readLine())!=null) {
+				
+			}
+			p.getInputStream().close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 	
 	public String getName() {
 		return name;
@@ -69,22 +98,6 @@ public class MergeCommit {
 		this.parent2 = parent2;
 	}
 
-	public HashMap<MergedFile, Integer> getConflictingMergedFiles() {
-		return conflictingMergedFiles;
-	}
-
-	public void setConflictingMergedFiles(HashMap<MergedFile, Integer> conflictingMergedFiles) {
-		this.conflictingMergedFiles = conflictingMergedFiles;
-	}
-
-	public int getTotalDevs() {
-		return totalDevs;
-	}
-
-	public void setTotalDevs(int totalDevs) {
-		this.totalDevs = totalDevs;
-	}
-
 	public String getNumDevCategory() {
 		return NumDevCategory;
 	}
@@ -93,7 +106,19 @@ public class MergeCommit {
 		NumDevCategory = numDevCategory;
 	}
 	
-	
+	public String getBase() {
+		return base;
+	}
+
+	public void setBase(String base) {
+		this.base = base;
+	}
+
+	public static void main(String[] args) {
+		MergeCommit mc = new MergeCommit("31defd3ef60e09d15faa9ec0e1f8ccbac98e2b07", "4cc6915", "e3439f5");
+		mc.setMergeBase("/Users/paolaaccioly/Documents/Doutorado/workspace_empirical/conflictsAnalyzer/downloads2/andlytics");
+		System.out.println(mc.getBase());
+	}
 	
 	
 	
