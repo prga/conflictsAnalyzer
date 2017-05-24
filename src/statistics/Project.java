@@ -50,7 +50,7 @@ public class Project {
 	}
 	
 	public String toString(){
-		String result = this.name + ";";
+		String result = this.name;
 		for(NumDevCategories c : NumDevCategories.values()){
 			String cat = c.toString();
 			int[] values = this.authorsSummary.get(cat);
@@ -65,7 +65,7 @@ public class Project {
 	public void analyzeMergeCommits(){
 		HashMap<String, MergeCommit> mc = this.loadMC();
 		this.filterConflictingMC(mc);
-		this.cloneProject();
+		//this.cloneProject();
 		this.getNumberOfDevs();
 	}
 	
@@ -73,6 +73,7 @@ public class Project {
 		for(MergeCommit mc : this.conflictingMergeCommits){
 			String clone = this.downloadPath + File.separator + this.name;
 			mc.analyzeNumberOfDevelopers(clone);
+			this.updateAuthorSummary(mc.getNumDevCategory(), mc.getConfSummary());
 		}
 	}
 	
@@ -201,6 +202,7 @@ public class Project {
 		Project p = new Project("AndlyticsProject/andlytics", 
 				"/Users/paolaaccioly/Dropbox/workspace_emse/ResultData", "downloads2");
 		p.analyzeMergeCommits();
+		System.out.println(p);
 	}
 
 }
