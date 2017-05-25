@@ -63,19 +63,37 @@ public class Project {
 	}
 	
 	public void analyzeMergeCommits(){
+		System.out.println("Loading merge commit data");
 		HashMap<String, MergeCommit> mc = this.loadMC();
 		this.filterConflictingMC(mc);
-		//this.cloneProject();
+		System.out.println("Merge commit data loaded");
+		if(!cloneExists()){
+			System.out.println("Cloning project " + this.name);
+			this.cloneProject();
+			System.out.println("Project cloned successfully");
+		}
+		System.out.println("Starting to get the number of developers");
 		this.getNumberOfDevs();
+		System.out.println("Finished to analyze the number of developers");
 	}
 	
 	public void getNumberOfDevs(){
 		for(MergeCommit mc : this.conflictingMergeCommits){
+			System.out.println("Analyzing merge " + mc.getName());
 			String clone = this.downloadPath + File.separator + this.name;
 			mc.analyzeNumberOfDevelopers(clone);
 			DevNumberPrinter.printMergeCommitReport(this.name, mc.toString());
 			this.updateAuthorSummary(mc.getNumDevCategory(), mc.getConfSummary());
 		}
+	}
+	
+	public boolean cloneExists(){
+		boolean cloneExists = false;
+		File file = new File(this.downloadPath + File.separator + this.name);
+		if(file.exists()){
+			cloneExists = true;
+		}
+		return cloneExists;
 	}
 	
 	public void cloneProject(){

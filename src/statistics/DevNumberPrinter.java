@@ -9,13 +9,15 @@ import java.io.PrintWriter;
 public class DevNumberPrinter {
 
 	public static void printProjectReport(String projectSummary){
-		String filePath = "ResultData" + File.separator + "mc_numDevs.csv";
+		String filePath = "NumDevs.csv";
 		File file = new File(filePath);
 		String content = "";
 		if(!file.exists()){
 			content = "name";
 			for(NumDevCategories c : NumDevCategories.values()){
-				content = content + ";" + c.toString();
+				String cat = c.toString();
+				content = content + ";" + cat + ";" + cat + "DS;" +
+				cat + "CL;" + cat + "IFP";
 			}
 			content = content + "\n";
 		}
@@ -25,7 +27,12 @@ public class DevNumberPrinter {
 	}
 
 	public static void printMergeCommitReport(String projectName, String mergeSummary){
-		String filePath = "ResultData" + File.separator + projectName + "mc_numDevs.csv";
+		String dirPath = "ResultData" + File.separator + projectName;
+		File dir = new File(dirPath);
+		if(!dir.exists()){
+			dir.mkdir();
+		}
+		String filePath =  dirPath + File.separator + "mc_numDevs.csv";
 		File file = new File(filePath);
 		String content = "";
 		if(!file.exists()){

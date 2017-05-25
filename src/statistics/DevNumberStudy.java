@@ -23,9 +23,11 @@ public class DevNumberStudy {
 		try {
 			br = new BufferedReader(new FileReader(projects));
 			 while ((line = br.readLine()) != null) {
+				 System.out.println("Starting to analyze project " + line);
 				 Project p = new Project(line, resultData, downloads.getAbsolutePath());
 				 p.analyzeMergeCommits();
 				 DevNumberPrinter.printProjectReport(p.toString());
+				 System.out.println("Finished to analyze project " + line);
 				 
 			 }
 		} catch (FileNotFoundException e) {
@@ -38,7 +40,7 @@ public class DevNumberStudy {
 
 	public static void main(String[] args) {
 		DevNumberStudy.run("/Users/paolaaccioly/Dropbox/workspace_emse/ResultData", 
-				"/Users/paolaaccioly/Dropbox/workspace_emse/projectsList");
+				"projectsList");
 	}
 
 }
