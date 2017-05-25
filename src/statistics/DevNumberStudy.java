@@ -25,13 +25,12 @@ public class DevNumberStudy {
 			 while ((line = br.readLine()) != null) {
 				 Project p = new Project(line, resultData, downloads.getAbsolutePath());
 				 p.analyzeMergeCommits();
+				 DevNumberPrinter.printProjectReport(p.toString());
 				 
 			 }
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 

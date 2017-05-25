@@ -73,6 +73,7 @@ public class Project {
 		for(MergeCommit mc : this.conflictingMergeCommits){
 			String clone = this.downloadPath + File.separator + this.name;
 			mc.analyzeNumberOfDevelopers(clone);
+			DevNumberPrinter.printMergeCommitReport(this.name, mc.toString());
 			this.updateAuthorSummary(mc.getNumDevCategory(), mc.getConfSummary());
 		}
 	}
