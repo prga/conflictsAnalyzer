@@ -64,7 +64,7 @@ public class Project {
 	
 	public void analyzeMergeCommits(){
 		System.out.println("Loading merge commit data");
-		HashMap<String, MergeCommit> mc = this.loadMC();
+		HashMap<String, ArrayList<MergeCommit>> mc = this.loadMC();
 		this.filterConflictingMC(mc);
 		System.out.println("Merge commit data loaded");
 		if(!cloneExists()){
@@ -110,8 +110,8 @@ public class Project {
 		}	
 	}
 
-	public HashMap<String, MergeCommit> loadMC(){
-		HashMap<String, MergeCommit> result = new HashMap<String, MergeCommit>();
+	public HashMap<String, ArrayList<MergeCommit>> loadMC(){
+		HashMap<String, ArrayList<MergeCommit>> result = new HashMap<String, ArrayList<MergeCommit>>();
 		File merges = new File(this.resultData + File.separator + this.name +
 				File.separator + "mergeCommits.csv");
 		BufferedReader br = null;
@@ -126,7 +126,15 @@ public class Project {
 					String parent1 = data[1];
 					String parent2 = data[2];
 					MergeCommit mc = new MergeCommit(sha, parent1, parent2);
-					result.put(mc.getName(), mc);
+					String rev_name = mc.getName();
+					ArrayList<MergeCommit> mcs = null;
+					if(result.containsKey(rev_name)){
+						mcs = result.get(rev_name);
+					}else{
+						mcs = new ArrayList<MergeCommit>();
+					}
+					mcs.add(mc);
+					result.put(rev_name, mcs);
 				}
 			}
 		} catch (FileNotFoundException e) {
@@ -138,7 +146,7 @@ public class Project {
 		return result;
 	}
 
-	public void filterConflictingMC(HashMap<String, MergeCommit> mcList){
+	public void filterConflictingMC(HashMap<String, ArrayList<MergeCommit>> mcList){
 		File report = new File(this.resultData + File.separator + this.name +
 				File.separator + "MergeScenariosReport.csv");
 		
@@ -152,11 +160,11 @@ public class Project {
 					String [] data = line.split(",");
 					if(!data[6].equals(" 0")){
 						String name = data[0];
-						MergeCommit mc = mcList.get(name);
+						ArrayList<MergeCommit> mcs = mcList.get(name);
+						MergeCommit mc = mcs.get(0);
 						mc.computeConfSummary(data);
-						if(mc!=null){
-							this.conflictingMergeCommits.add(mc);
-						}
+						this.conflictingMergeCommits.add(mc);
+						mcs.remove(0);
 					}
 				}
 			}
