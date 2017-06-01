@@ -37,7 +37,7 @@ public class MergeCommit {
 	public void computeConfSummary(String[] data){
 		this.confSummary = new int[4];
 		int c = 7;
-		while(c < 47){
+		while(c < 43){
 			for(int i = 0; i < this.confSummary.length; i++){	
 				this.confSummary[i] = this.confSummary[i] + Integer.parseInt(data[c].trim());
 				c++;
@@ -86,7 +86,9 @@ public class MergeCommit {
 			BufferedReader buf = new BufferedReader(new InputStreamReader(p.getInputStream()));
 			String line = "";
 			while ((line=buf.readLine())!=null) {
-				email = line;
+				if(!line.equals("")){
+					email = line;
+				}
 			}
 			p.getInputStream().close();
 		} catch (IOException e) {

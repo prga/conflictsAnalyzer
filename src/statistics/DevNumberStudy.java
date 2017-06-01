@@ -39,7 +39,7 @@ public class DevNumberStudy {
 	}
 
 	public static void main(String[] args) {
-		DevNumberStudy.run("/Users/paolaaccioly/Dropbox/workspace_emse/ResultData", 
+		DevNumberStudy.run("resultData1stround_emse/ResultData", 
 				"projectsList");
 	}
 

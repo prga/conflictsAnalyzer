@@ -161,10 +161,12 @@ public class Project {
 					if(!data[6].equals(" 0")){
 						String name = data[0];
 						ArrayList<MergeCommit> mcs = mcList.get(name);
-						MergeCommit mc = mcs.get(0);
-						mc.computeConfSummary(data);
-						this.conflictingMergeCommits.add(mc);
-						mcs.remove(0);
+						if(mcs!=null){
+							MergeCommit mc = mcs.get(0);
+							mc.computeConfSummary(data);
+							this.conflictingMergeCommits.add(mc);
+							mcs.remove(0);
+						}
 					}
 				}
 			}
