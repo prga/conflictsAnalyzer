@@ -27,6 +27,7 @@ public class DevNumberStudy {
 				 Project p = new Project(line, resultData, downloads.getAbsolutePath());
 				 p.analyzeMergeCommits();
 				 DevNumberPrinter.printProjectReport(p.toString());
+				 DevNumberPrinter.printProjectReportPerMerges(p.mergesSummary());
 				 System.out.println("Finished to analyze project " + line);
 				 
 			 }

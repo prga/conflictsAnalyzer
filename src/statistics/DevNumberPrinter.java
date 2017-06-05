@@ -36,9 +36,27 @@ public class DevNumberPrinter {
 		File file = new File(filePath);
 		String content = "";
 		if(!file.exists()){
-			content = "name;category;numDev;conflict;conflictDS;conflictCL;conflictsIFP\n";
+			content = "name;category;numDev;conflict;conflictDS;conflictCL;"
+					+ "conflictsIFP;hasConflictsJava;hasConflictsNonJava\n";
 		}
 		content = content + mergeSummary + "\n";
+		DevNumberPrinter.writeContent(filePath, content);
+	}
+	
+	public static void printProjectReportPerMerges(String mergesSummary){
+		String filePath = "Project_devs.csv";
+		File file = new File(filePath);
+		String content = "";
+		if(!file.exists()){
+			content = "name";
+			for(NumDevCategories c : NumDevCategories.values()){
+				String cat = c.toString();
+				content = content + ";" + cat + "_with_Conflict;" + cat 
+						+ "_without_Conflict";
+			}	
+			content = content + "\n";
+		}
+		content = content + mergesSummary + "\n";
 		DevNumberPrinter.writeContent(filePath, content);
 	}
 

@@ -9,6 +9,10 @@ import java.util.HashMap;
 
 public class MergeCommit {
 	
+	private boolean hasConflictsJava;
+	
+	private boolean hasConflictsNonJava;
+	
 	private String name;
 	
 	private String SHA;
@@ -31,6 +35,8 @@ public class MergeCommit {
 		this.parent2 = p2;
 		this.name = "rev_" + this.parent1.substring(0, 5) + "-"  + this.parent2.substring(0, 5);
 		this.authors = new HashMap<String, Integer>();
+		this.hasConflictsJava = false;
+		this.hasConflictsNonJava = false;
 		
 	}
 	
@@ -197,11 +203,28 @@ public class MergeCommit {
 		this.confSummary = confSummary;
 	}
 	
+	public boolean getHasConflictsJava() {
+		return hasConflictsJava;
+	}
+
+	public void setHasConflictsJava(boolean hasConflicts) {
+		this.hasConflictsJava = hasConflicts;
+	}
+
+	public boolean getHasConflictsNonJava() {
+		return hasConflictsNonJava;
+	}
+
+	public void setHasConflictsNonJava(boolean hasConflictsNonJava) {
+		this.hasConflictsNonJava = hasConflictsNonJava;
+	}
+
 	public String toString(){
-		String result = this.name + ";" + this.NumDevCategory + ";" + this.authors.size();
+		String result = this.name + ";" + this.NumDevCategory + ";" + this.authors.size() ;
 		for(int i = 0; i < this.confSummary.length; i++){
 			result = result + ";" + this.confSummary[i];
 		}
+		result = result + ";" + this.hasConflictsJava + ";" + this.hasConflictsNonJava;
 		return result;
 	}
 
