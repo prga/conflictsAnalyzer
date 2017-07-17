@@ -670,7 +670,7 @@ public abstract class ConflictPredictor {
 	private String[] fillSources(ConflictPredictor predictor){
 		String[] sources = []
 		ArrayList<String>folders = new ArrayList<String>()
-		String rootPath = this.mergeScenarioPath.substring(0, this.mergeScenarioPath.length()-10)
+		String rootPath = this.getRootPath()
 		File rootDir = new File(rootPath)
 		File [] fileList = rootDir.listFiles()
 		for(File file : fileList){
@@ -691,6 +691,17 @@ public abstract class ConflictPredictor {
 		}
 
 		return sources
+	}
+	
+	private String getRootPath() {
+		String result = ''
+		File f = new File(this.mergeScenarioPath);
+		String rev_name = f.getName().split('\\.')[0]
+		String[] tokens = rev_name.split('_')
+		String mergeDir = 'rev_rev_left_' + tokens[1] + '-rev_right_' + tokens[2]
+		result = f.getParent() + File.separator + mergeDir
+		
+		return result
 	}
 
 	private String[] fillEncodings(int amount){
