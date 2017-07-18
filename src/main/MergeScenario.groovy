@@ -36,7 +36,7 @@ class MergeScenario implements Observer {
 	private Map<String,Conflict> mergeScenarioSummary
 
 	private boolean hasConflicts
-	
+
 	private boolean hasPredictors
 
 	private CompareFiles compareFiles
@@ -54,15 +54,15 @@ class MergeScenario implements Observer {
 	private Map<String, ArrayList<ConflictPredictor>> filesWithConflictPredictors
 
 	private ConflictPredictorFactory predictorFactory
-	
+
 	private int methodsWithConflicts
-	
+
 	private Map<String, Integer> editSameMCTypeSummary
-	
+
 	private MergeCommit mc;
-	
+
 	private String replayedMergeSha;
-	
+
 	public List<FSTNode> deletedBaseNodes;
 
 	public MergeScenario(String path, boolean resultGitMerge){
@@ -84,7 +84,7 @@ class MergeScenario implements Observer {
 	public void createSameSignatureCMSummary(){
 		this.sameSignatureCMSummary = ConflictSummary.initializeSameSignatureCMSummary()
 	}
-	
+
 	public void createEditSameMCTypeSummary(){
 		this.editSameMCTypeSummary = ConflictSummary.initializeEditSameMCTypeSummary()
 	}
@@ -122,8 +122,8 @@ class MergeScenario implements Observer {
 		//this.compareFiles.restoreFilesWeDontMerge()
 
 	}
-	
-	
+
+
 	/**
 	 * this methods compute the number of methods 
 	 * edited by both revisions that ended up 
@@ -133,11 +133,11 @@ class MergeScenario implements Observer {
 		this.methodsWithConflicts = 0
 		for(MergedFile file : this.mergedFiles){
 			this.methodsWithConflicts = this.methodsWithConflicts +
-			file.methodsWithConflicts
+					file.methodsWithConflicts
 		}
-		
+
 	}
-	
+
 	public void assignLeftAndRight(){
 		for(String filePath : this.filesWithConflictPredictors.keySet()){
 			ArrayList<ConflictPredictor> methods = this.filesWithConflictPredictors.get(filePath)
@@ -149,18 +149,13 @@ class MergeScenario implements Observer {
 	}
 
 	public void checkForMethodsReferences(){
-
-		ArrayList<String> filesWithNoPredictors = new ArrayList<String>()
 		/*for each file containing conflict predictors*/
 		for(String filePath : this.filesWithConflictPredictors.keySet()){
 			ArrayList<ConflictPredictor> predictors = this.filesWithConflictPredictors.get(filePath)
 
-			/*this arraylist saves the list of editdiffmc without any call references on edited methods*/
-			ArrayList<ConflictPredictor> noReference = new ArrayList<ConflictPredictor>()
-
 			/*for each conflict predictor on that file*/
 			for(ConflictPredictor predictor : predictors ){
-				
+
 				/*if the predictor is an edited method
 				 * (not considering the different spacing predictors*/
 				if((predictor instanceof EditDiffMC || predictor instanceof EditSameMC) &&
@@ -170,24 +165,27 @@ class MergeScenario implements Observer {
 					predictor.lookForReferencesOnConflictPredictors(this.filesWithConflictPredictors)
 
 				}
+			}
+		}
+		this.removeFilesWithoutPredictors()
+	}
 
-				/*in case this method is an EditDiffMC predictor and
-				 * has no other reference on the other edited methods,
-				 * add this predictor to the noReference list*/
+	public void removeFilesWithoutPredictors() {
+		ArrayList<String> filesWithNoPredictors = new ArrayList<String>()
+		for(String filePath : this.filesWithConflictPredictors.keySet()){
+			ArrayList<ConflictPredictor> predictors = this.filesWithConflictPredictors.get(filePath)
+			/*this arraylist saves the list of editdiffmc without any call references on edited methods*/
+			ArrayList<ConflictPredictor> noReference = new ArrayList<ConflictPredictor>()
+			for(ConflictPredictor predictor : predictors ){
 				if((predictor instanceof EditDiffMC) && predictor.predictors.isEmpty()){
-
 					noReference.add(predictor)
 				}
 			}
-
-			/*Remove all edited methods without reference on any other edited method*/
 			predictors.removeAll(noReference)
-
 			if(this.filesWithConflictPredictors.get(filePath).isEmpty()){
 				filesWithNoPredictors.add(filePath)
 			}
 		}
-
 		/*Remove files without predictors*/
 		for(String file : filesWithNoPredictors){
 			this.filesWithConflictPredictors.remove(file)
@@ -211,8 +209,8 @@ class MergeScenario implements Observer {
 
 	public void runSSMerge(){
 		/*fstGenMerge.getMergeVisitor().addObserver(this)
-		String[] files = ["--expression", this.path]
-		fstGenMerge.run(files)*/
+		 String[] files = ["--expression", this.path]
+		 fstGenMerge.run(files)*/
 		this.fstGenMerge = new JFSTMerge()
 		this.fstGenMerge.getSemistructuredMerge().addObserver(this)
 		this.fstGenMerge.mergeRevisions(this.path)
@@ -275,7 +273,7 @@ class MergeScenario implements Observer {
 			this.deletedBaseNodes = arg.deletedBaseNodes;
 		}
 	}
-	
+
 	private String getFilePath(String leftPath){
 		String filePath = "";
 		String left = this.name.substring(4,9);
@@ -288,7 +286,7 @@ class MergeScenario implements Observer {
 
 	private void collectConflictPredictor(FSTTerminal node, String filePath){
 		//if(!this.isABadParsedNode(node)){
-			identifyConflictPredictor(node, this.path, filePath)
+		identifyConflictPredictor(node, this.path, filePath)
 		//}
 	}
 
@@ -308,10 +306,10 @@ class MergeScenario implements Observer {
 	}
 
 	private String getClassName(FSTNode node){
-		
+
 		String type = node.getType()
 		if(type.equals('ClassDeclaration') || type.equals('EnumDecl') ||
-			type.equals('AnnotationTypeDeclaration') || type.equals('ClassOrInterfaceDecl')){
+		type.equals('AnnotationTypeDeclaration') || type.equals('ClassOrInterfaceDecl')){
 			return node.getName()
 		}else{
 			this.getClassName(node.getParent())
@@ -326,31 +324,31 @@ class MergeScenario implements Observer {
 		 * of conflict predictors*/	
 		if(predictor != null){
 			if(!(predictor instanceof EditDiffMC && predictor.diffSpacing)){
-				
-							String predictorFilePath = predictor.getFilePath()
-							ArrayList<ConflictPredictor> file = this.filesWithConflictPredictors.get(predictorFilePath)
-				
-							if(file == null){
-								file = new ArrayList<ConflictPredictor>()
-				
-							}
-				
-							file.add(predictor)
-							this.filesWithConflictPredictors.put(predictorFilePath, file)
-						}
+
+				String predictorFilePath = predictor.getFilePath()
+				ArrayList<ConflictPredictor> file = this.filesWithConflictPredictors.get(predictorFilePath)
+
+				if(file == null){
+					file = new ArrayList<ConflictPredictor>()
+
+				}
+
+				file.add(predictor)
+				this.filesWithConflictPredictors.put(predictorFilePath, file)
+			}
 		}
 
 	}
 
 	public void createConflict(FSTTerminal node, String filePath){
 		//if(!this.isABadParsedNode(node)){
-			Conflict conflict = new Conflict(node, filePath);
-			this.matchConflictWithFile(conflict)
-			this.updateMergeScenarioSummary(conflict)
-			if(!this.hasConflicts){
-				this.hasConflicts = true
-				this.removeNonMCBaseNodes(this.deletedBaseNodes)
-			}
+		Conflict conflict = new Conflict(node, filePath);
+		this.matchConflictWithFile(conflict)
+		this.updateMergeScenarioSummary(conflict)
+		if(!this.hasConflicts){
+			this.hasConflicts = true
+			this.removeNonMCBaseNodes(this.deletedBaseNodes)
+		}
 		//}
 	}
 
@@ -358,7 +356,7 @@ class MergeScenario implements Observer {
 		this.sameSignatureCMSummary = ConflictSummary.
 				updateSameSignatureCMSummary(this.sameSignatureCMSummary, cause, ds)
 	}
-	
+
 	private void updateEditSameMCTypeSummary(Map<String, Integer> confSummary){
 		this.editSameMCTypeSummary = ConflictSummary.
 				updateEditSameMCTypeSummary(this.editSameMCTypeSummary, confSummary)
@@ -395,14 +393,14 @@ class MergeScenario implements Observer {
 		if(conflict.getType().equals(SSMergeConflicts.SameSignatureCM.toString())){
 
 			conflict.setCauseSameSignatureCM(this.deletedBaseNodes, matched)
-			 String cause = conflict.getCauseSameSignatureCM()
-			 this.updateSameSignatureCMSummary(cause, conflict.getDifferentSpacing())
+			String cause = conflict.getCauseSameSignatureCM()
+			this.updateSameSignatureCMSummary(cause, conflict.getDifferentSpacing())
 
 			//use the code below to skip the samesignaturemc analysis
 			/*this.updateSameSignatureCMSummary(PatternSameSignatureCM.noPattern.toString(),
-					conflict.getDifferentSpacing())*/
+			 conflict.getDifferentSpacing())*/
 		}
-		
+
 		if(conflict.getType().equals(SSMergeConflicts.EditSameMC.toString())){
 			this.updateEditSameMCTypeSummary(conflict.editSameMCTypeSummary)
 		}
@@ -441,9 +439,9 @@ class MergeScenario implements Observer {
 				', ' + this.getNumberOfFilesWithConflicts() + ', ' +
 				ConflictSummary.printConflictsSummary(this.mergeScenarioSummary) + ', ' +
 				ConflictSummary.printSameSignatureCMSummary(this.sameSignatureCMSummary) + ', ' +
-				this.possibleRenamings + ', ' + 
+				this.possibleRenamings + ', ' +
 				ConflictSummary.printEditSameMCTypeSummary(this.editSameMCTypeSummary)
-  
+
 
 		return report
 	}
@@ -463,7 +461,7 @@ class MergeScenario implements Observer {
 		}else{
 			summary = summary + ',' + 0
 		}
-		
+
 		/*set has predictor*/
 		if(this.hasPredictors){
 			summary = summary + ',' + 1
@@ -606,8 +604,8 @@ class MergeScenario implements Observer {
 
 		return result
 	}
-	
-	
+
+
 	public MergeCommit getMc() {
 		return mc;
 	}
@@ -626,7 +624,7 @@ class MergeScenario implements Observer {
 
 	public static void main(String[] args){
 		Project project = new Project('Teste')
-		MergeScenario ms = new MergeScenario('/Users/paolaaccioly/Desktop/Teste/jdimeTests2/rev_85dba_f0bb5/rev_85dba-f0bb5.revisions', true)
+		MergeScenario ms = new MergeScenario('/Users/paolarodrigues/Documents/Doutorado/workspace_icse/test_cases/rev_ab123_cd456/rev_ab123_cd456.revisions', true)
 		ms.analyzeConflicts()
 		String ms_summary = ms.computeMSSummary()
 		ConflictPredictorPrinter.printMergeScenarioReport(project, ms,ms_summary)
