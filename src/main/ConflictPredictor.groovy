@@ -697,8 +697,8 @@ public abstract class ConflictPredictor {
 		String result = ''
 		File f = new File(this.mergeScenarioPath);
 		String rev_name = f.getName().split('\\.')[0]
-		String[] tokens = rev_name.split('_')
-		String mergeDir = 'rev_rev_left_' + tokens[1] + '-rev_right_' + tokens[2]
+		String[] tokens = rev_name.split('_')[1].split('-')
+		String mergeDir = 'rev_rev_left_' + tokens[0] + '-rev_right_' + tokens[1]
 		result = f.getParent() + File.separator + mergeDir
 		
 		return result
