@@ -48,9 +48,10 @@ class CompareFiles {
 		this.rightRevName = revs[2]
 		this.mergeDir = this.revDir + File.separator + 'rev_merged_git'
 		try{
-			this.fstmergeDir = this.revDir + File.separator + 'rev_' +
-			this.leftRevName.substring(this.leftRevName.length()-5, this.leftRevName.length()) +
-			'-' + this.rightRevName.substring(this.rightRevName.length() - 5, this.rightRevName.length())
+			String rev = new File(this.revDir).getName()
+			String[] tokens = rev.split('_')
+			this.fstmergeDir = this.revDir + File.separator + 'rev_rev_left_' + 
+			tokens[1] + '-rev_right_' + tokens[2] 
 		}catch (StringIndexOutOfBoundsException e){
 			this.fstmergeDir = "rev"
 		}
@@ -301,8 +302,7 @@ class CompareFiles {
 				this.replaceFilesAfterFSTMerge(file.getAbsolutePath())
 			} else if (file.isFile() && !file.getAbsolutePath().contains('.java.merge')){
 				Path toBeMoved = file.toPath()
-				String fstmerge = 'rev_' + this.leftRevName.substring(this.leftRevName.length()-5, this.leftRevName.length()) +
-						'-' + this.rightRevName.substring(this.rightRevName.length() - 5, this.rightRevName.length())
+				String fstmerge = new File(this.fstmergeDir).getName()
 				String temp = file.getAbsolutePath().replaceFirst(fstmerge, 'rev_merged_git')
 				File temp2 = new File(temp)
 				Path toBeReplaced = temp2.toPath()
