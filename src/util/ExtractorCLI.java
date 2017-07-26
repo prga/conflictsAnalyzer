@@ -117,11 +117,13 @@ public class ExtractorCLI {
 	
 	private void pushBranchToRemote(String branchName){
 		int result = -1;
-		
+		String cmd = "git config credential.helper store";
 		String pushBranch = "git push origin " + branchName;
 		
 		Process p;
 		try {
+			p = Runtime.getRuntime().exec(cmd, null, new File(this.forkDir));
+			result = p.waitFor();
 			p = Runtime.getRuntime().exec(pushBranch, null, new File(this.forkDir));
 			result = p.waitFor();
 		} catch (IOException e) {
@@ -489,6 +491,23 @@ public class ExtractorCLI {
 			e.printStackTrace();
 		}
 
+	}
+	
+	public static void main(String[] args) {
+		int result = -1;
+		String pushBranch = "git push";
+		
+		Process p;
+		try {
+			p = Runtime.getRuntime().exec(pushBranch, null, new File("/home/dell/Documents/doutorado/icse/download/TGM"));
+			result = p.waitFor();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 }
