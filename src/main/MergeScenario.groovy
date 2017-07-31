@@ -368,7 +368,8 @@ class MergeScenario implements Observer {
 		boolean matchedFile = false
 		int i = 0
 		while(!matchedFile && i < this.mergedFiles.size){
-			String mergedFilePath = this.mergedFiles.elementData(i).path.replaceFirst(rev_base, this.name)
+			String dir = this.getRevDir()
+			String mergedFilePath = this.mergedFiles.elementData(i).path.replaceFirst(rev_base, dir)
 			if(conflictPath.equals(mergedFilePath)){
 				matchedFile = true
 				boolean addedByOneDev = this.mergedFiles.get(i).isAddedByOneDev()
@@ -386,6 +387,15 @@ class MergeScenario implements Observer {
 			this.addConflictToFile(conflict, this.mergedFiles.size-1, true)
 		}
 
+	}
+	
+	private String getRevDir() {
+		String result = ''
+		String [] t = this.name.split('_')
+		String [] tokens = t[1].split('-')
+		
+		result = 'rev_rev_left_' + tokens[0]+ '-rev_right_' + tokens[1]
+		return result
 	}
 
 	private void addConflictToFile(Conflict conflict, int index, boolean matched){
