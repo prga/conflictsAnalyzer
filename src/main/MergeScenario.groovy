@@ -7,9 +7,6 @@ import java.util.List;
 import java.util.Map
 import java.util.Observable
 
-
-
-
 import util.CompareFiles
 import util.ConflictPredictorPrinter;
 import br.ufpe.cin.app.JFSTMerge
@@ -381,9 +378,10 @@ class MergeScenario implements Observer {
 		String conflictPath = conflict.filePath
 		boolean matchedFile = false
 		int i = 0
+		String revLeft = "rev_left_" + this.name.substring(4, 9)
 		while(!matchedFile && i < this.mergedFiles.size){
-			String dir = this.getRevDir()
-			String mergedFilePath = this.mergedFiles.elementData(i).path.replaceFirst(rev_base, dir)
+			
+			String mergedFilePath = this.mergedFiles.elementData(i).path.replaceFirst(rev_base, revLeft)
 			if(conflictPath.equals(mergedFilePath)){
 				matchedFile = true
 				boolean addedByOneDev = this.mergedFiles.get(i).isAddedByOneDev()
