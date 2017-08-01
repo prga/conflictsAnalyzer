@@ -64,12 +64,15 @@ class MergeScenario implements Observer {
 	private String replayedMergeSha;
 
 	public List<FSTNode> deletedBaseNodes;
+	
+	private String baseName;
 
 	public MergeScenario(String path, boolean resultGitMerge){
 
 		this.path = path
 		this.gitMergeHasNoConflicts = resultGitMerge
 		this.setName()
+		this.setBaseName()
 		//this.removeVarArgs()
 		this.hasConflicts = false
 		this.hasPredictors = false
@@ -79,6 +82,13 @@ class MergeScenario implements Observer {
 		this.setMergedFiles()
 		this.filesWithConflictPredictors = new HashMap<String, ArrayList<ConflictPredictor>>()
 		this.predictorFactory = new ConflictPredictorFactory()
+	}
+	
+	public void setBaseName() {
+		File f = new File(this.path)
+		String text = f.getText()
+		String[] lines = text.split('\n')
+		this.baseName = lines[1].split('_')[2]
 	}
 
 	public void createSameSignatureCMSummary(){
@@ -280,7 +290,11 @@ class MergeScenario implements Observer {
 		String right = this.name.substring(this.name.length()-5, this.name.length());
 		String revision = "rev_rev_left_" + left + "-rev_right_" + right
 		String leftRev = "rev_left_" + left
+		String baseRev = "rev_base_" + ''
+		String rightRev = "rev_right_" + right
 		filePath = leftPath.replaceFirst(leftRev, revision)
+		filePath = leftPath.replaceFirst(baseRev, revision)
+		filePath = leftPath.replaceFirst(rightRev, revision)
 		return filePath;
 	}
 
@@ -634,7 +648,7 @@ class MergeScenario implements Observer {
 
 	public static void main(String[] args){
 		Project project = new Project('Teste')
-		MergeScenario ms = new MergeScenario('/Users/paolarodrigues/Documents/Doutorado/workspace_icse/test_cases/rev_ab123_cd456/rev_ab123_cd456.revisions', true)
+		MergeScenario ms = new MergeScenario('/home/dell/Documents/doutorado/icse/rev_123ab_456cd/rev_123ab-456cd.revisions', true)
 		ms.analyzeConflicts()
 		String ms_summary = ms.computeMSSummary()
 		ConflictPredictorPrinter.printMergeScenarioReport(project, ms,ms_summary)

@@ -160,8 +160,11 @@ class MergeCommitsRetriever {
 	public static void main(String[] args){
 		/*date is optional, if you want to get all commits pass the date parameter as an empty string
 		 * otherwise pass the date parameter as an string with the format "yyyy-MM-dd" */
-		MergeCommitsRetriever merges = new MergeCommitsRetriever("/Users/paolaaccioly/Documents/Doutorado/workspace_travis/downloads/Singularity")
-		ArrayList<MergeCommit> m = merges.retrieveMergeCommits()
+		/*MergeCommitsRetriever merges = new MergeCommitsRetriever("/Users/paolaaccioly/Documents/Doutorado/workspace_travis/downloads/Singularity")
+		ArrayList<MergeCommit> m = merges.retrieveMergeCommits()*/
+		SimpleDateFormat formatter = new SimpleDateFormat("dd/MMM/yyyy")
+		String dateInString = '4/May/2017'
+		Date result = formatter.parse(dateInString)
 
 	}
 }

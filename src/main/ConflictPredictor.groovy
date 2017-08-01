@@ -19,7 +19,6 @@ import br.ufpe.cin.mergers.SemistructuredMerge;
 import de.ovgu.cide.fstgen.ast.FSTNode;
 import de.ovgu.cide.fstgen.ast.FSTNonTerminal
 import de.ovgu.cide.fstgen.ast.FSTTerminal
-import jdk.internal.instrumentation.MethodCallInliner.CatchBlock;
 import util.ConflictPredictorPrinter;
 import util.Util
 
