@@ -63,9 +63,10 @@ class MergeScenario implements Observer {
 	public List<FSTNode> deletedBaseNodes;
 	
 	private String baseName;
+	
+	private ArrayList<String> fileNotFoundConflicts;
 
 	public MergeScenario(String path, boolean resultGitMerge){
-
 		this.path = path
 		this.gitMergeHasNoConflicts = resultGitMerge
 		this.setName()
@@ -81,6 +82,18 @@ class MergeScenario implements Observer {
 		this.predictorFactory = new ConflictPredictorFactory()
 	}
 	
+	public ArrayList<String> getFileNotFoundConflicts() {
+		return this.fileNotFoundConflicts;
+	}
+
+
+
+	public void setFileNotFoundConflicts(ArrayList<String> fileNotFoundConflicts) {
+		this.fileNotFoundConflicts = fileNotFoundConflicts;
+	}
+
+
+
 	public void setBaseName() {
 		File f = new File(this.path)
 		String text = f.getText()
@@ -278,6 +291,11 @@ class MergeScenario implements Observer {
 			}
 		}else if(o instanceof SemistructuredMerge && arg instanceof MergeContext){
 			this.deletedBaseNodes = arg.deletedBaseNodes;
+		}else if(o instanceof SemistructuredMerge && arg instanceof String) {
+			if(this.fileNotFoundConflicts == null) {
+				this.fileNotFoundConflicts = new ArrayList<String>()
+			}
+			this.fileNotFoundConflicts.add(arg)
 		}
 	}
 
@@ -572,7 +590,7 @@ class MergeScenario implements Observer {
 	public boolean hasConflictsThatWereNotSolved(){
 		boolean result = false
 
-		if(this.gitMergeHasNoConflicts){
+		if(this.gitMergeHasNoConflicts && (this.fileNotFoundConflicts == null)){
 			result = this.hasNonDSConflicts()
 		}else{
 			result = true
