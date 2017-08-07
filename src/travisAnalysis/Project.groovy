@@ -34,7 +34,7 @@ class Project {
 	}
 
 	public void setName(){
-		String[] temp = this.repo.split('/')
+		String[] temp = this.repo.split(Pattern.quote(File.separator))
 		this.name = temp[1]
 	}
 

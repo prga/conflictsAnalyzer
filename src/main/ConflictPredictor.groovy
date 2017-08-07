@@ -265,7 +265,7 @@ public abstract class ConflictPredictor {
 	}
 
 	public void setSignature(){
-		String [] tokens = this.filePath.split(File.separator)
+		String [] tokens = this.filePath.split(Pattern.quote(File.separator))
 		String className = tokens[tokens.length-1]
 		className = className.substring(0, className.length()-5)
 		String methodName = Util.simplifyMethodSignature(this.node.getName())
@@ -733,7 +733,7 @@ public abstract class ConflictPredictor {
 		if( methodInvocation!=null && methodInvocation.getKey()!=null){
 			String methodInvocationClass = this.simplifyClassName(methodInvocation)
 			String methodInvocationSignature = this.simplifyMethodSignature(methodInvocation)
-			String [] temp = this.filePath.split('/')
+			String [] temp = this.filePath.split(Pattern.quote(File.separator))
 			String thisMethodClass = ''
 			if(!this.packageName.equals('')){
 				thisMethodClass = this.packageName + '.'

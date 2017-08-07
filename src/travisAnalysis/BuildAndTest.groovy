@@ -12,7 +12,7 @@ class BuildAndTest {
 		projectList.eachLine {
 			/*set parameters to instantiate a project object*/
 			String repo = it
-			String name = repo.split('/')[1]
+			String name = repo.split(Pattern.quote(File.separator))[1]
 			String merge = this.mergeCommits + File.separator + name +
 			File.separator + 'mergeCommits.csv'
 			String conflictPredictor = this.conflictPredictors + File.separator +

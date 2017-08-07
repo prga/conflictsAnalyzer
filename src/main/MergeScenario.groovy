@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map
 import java.util.Observable
+import java.util.regex.Pattern
 
 import util.CompareFiles
 import util.ConflictPredictorPrinter;
@@ -124,7 +125,7 @@ class MergeScenario implements Observer {
 	}
 
 	public void setName(){
-		String [] temp = this.path.split('/')
+		String [] temp = this.path.split(Pattern.quote(File.separator))
 		String revFile = temp[temp.length -1]
 		this.name = revFile.substring(0, revFile.length()-10)
 	}
@@ -664,7 +665,7 @@ class MergeScenario implements Observer {
 
 	public static void main(String[] args){
 		Project project = new Project('Teste')
-		MergeScenario ms = new MergeScenario('/home/dell/Documents/doutorado/icse/rev_123ab_456cd/rev_123ab-456cd.revisions', true)
+		MergeScenario ms = new MergeScenario('C:\\Users\\155 IRON\\Documents\\files\\testes\\rev_123ab_456cd\\rev_123ab_456cd.revisions', true)
 		ms.analyzeConflicts()
 		String ms_summary = ms.computeMSSummary()
 		ConflictPredictorPrinter.printMergeScenarioReport(project, ms,ms_summary)

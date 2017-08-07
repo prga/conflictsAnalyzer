@@ -463,7 +463,7 @@ class RunStudy {
 	}
 
 	public void setProjectNameAndRepo(String project){
-		String[] projectData = project.split('/')
+		String[] projectData = project.split(Pattern.quote(File.separator))
 		this.projectName = projectData[1].trim()
 		this.projectRepo = project
 		println "Starting project " + this.projectName
