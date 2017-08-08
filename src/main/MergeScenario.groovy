@@ -275,9 +275,9 @@ class MergeScenario implements Observer {
 
 			FSTTerminal node = (FSTTerminal) arg.getNode();
 			String filePath = this.getFilePath(arg.getFilePath())
-			String[] tokens = this.name.split("_")
-			String mergeDir = "rev_rev_left_" +  tokens[1] + "-rev_right_" + tokens[2]
-			String revLeft = "rev_left_" + tokens[1]
+			String[] tokens = this.name.split("_")[1].split('-')
+			String mergeDir = "rev_rev_left_" +  tokens[0] + "-rev_right_" + tokens[1]
+			String revLeft = "rev_left_" + tokens[0]
 			filePath = filePath.replaceFirst(revLeft, mergeDir)
 			if(!node.getType().contains("-Content")){
 
@@ -667,7 +667,7 @@ class MergeScenario implements Observer {
 
 	public static void main(String[] args){
 		Project project = new Project('Teste')
-		MergeScenario ms = new MergeScenario('C:\\Users\\155 IRON\\Documents\\files\\testes\\rev_123ab_456cd\\rev_123ab_456cd.revisions', true)
+		MergeScenario ms = new MergeScenario('C:\\Users\\155 IRON\\Documents\\files\\testes\\rev_123ab_456ef\\rev_123ab_456ef.revisions', true)
 		ms.analyzeConflicts()
 		String ms_summary = ms.computeMSSummary()
 		ConflictPredictorPrinter.printMergeScenarioReport(project, ms,ms_summary)
