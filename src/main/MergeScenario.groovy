@@ -275,7 +275,10 @@ class MergeScenario implements Observer {
 
 			FSTTerminal node = (FSTTerminal) arg.getNode();
 			String filePath = this.getFilePath(arg.getFilePath())
-
+			String[] tokens = this.name.split("_")
+			String mergeDir = "rev_rev_left_" +  tokens[1] + "-rev_right_" + tokens[2]
+			String revLeft = "rev_left_" + tokens[1]
+			filePath = filePath.replaceFirst(revLeft, mergeDir)
 			if(!node.getType().contains("-Content")){
 
 				if(this.isAConflictPredictor(node)){
@@ -283,8 +286,8 @@ class MergeScenario implements Observer {
 					this.collectConflictPredictor(node, filePath)
 
 				}else{
-
-					this.createConflict(node, filePath)
+					
+					this.createConflict(node, filePath, mergeDir)
 
 				}
 
@@ -370,10 +373,10 @@ class MergeScenario implements Observer {
 
 	}
 
-	public void createConflict(FSTTerminal node, String filePath){
+	public void createConflict(FSTTerminal node, String filePath, String mergeDir){
 		//if(!this.isABadParsedNode(node)){
 		Conflict conflict = new Conflict(node, filePath);
-		this.matchConflictWithFile(conflict)
+		this.matchConflictWithFile(conflict, mergeDir)
 		this.updateMergeScenarioSummary(conflict)
 		if(!this.hasConflicts){
 			this.hasConflicts = true
@@ -392,15 +395,14 @@ class MergeScenario implements Observer {
 				updateEditSameMCTypeSummary(this.editSameMCTypeSummary, confSummary)
 	}
 
-	private void matchConflictWithFile(Conflict conflict){
+	private void matchConflictWithFile(Conflict conflict, String mergeDir){
 		String rev_base = this.compareFiles.baseRevName
 		String conflictPath = conflict.filePath
 		boolean matchedFile = false
 		int i = 0
-		String revLeft = "rev_left_" + this.name.substring(4, 9)
 		while(!matchedFile && i < this.mergedFiles.size){
 			
-			String mergedFilePath = this.mergedFiles.elementData(i).path.replaceFirst(rev_base, revLeft)
+			String mergedFilePath = this.mergedFiles.elementData(i).path.replaceFirst(rev_base, mergeDir)
 			if(conflictPath.equals(mergedFilePath)){
 				matchedFile = true
 				boolean addedByOneDev = this.mergedFiles.get(i).isAddedByOneDev()
