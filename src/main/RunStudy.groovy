@@ -2,6 +2,7 @@ package main
 import java.text.SimpleDateFormat
 import java.util.HashMap;
 import java.util.Hashtable
+import java.util.regex.Pattern
 
 import util.CSVAnalyzer
 import util.CompareFiles;
