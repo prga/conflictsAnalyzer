@@ -42,7 +42,13 @@ class CompareFiles {
 	private void setDirNames(String revFile){
 		File file = new File(revFile)
 		this.revDir = new File(revFile).getParent()
-		String[] revs = new File(revFile).text.split('\n')
+		String split = ''
+		if(System.getProperty("os.name").contains("Windows")) {
+			split = '\r\n'
+		}else {
+			split = '\n'
+		}
+		String[] revs = new File(revFile).text.split(split)
 		this.leftRevName = revs[0]
 		this.baseRevName = revs[1]
 		this.rightRevName = revs[2]
