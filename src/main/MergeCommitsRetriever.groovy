@@ -146,7 +146,7 @@ class MergeCommitsRetriever {
 	}
 
 	public Date getCommitDate(String d){
-		SimpleDateFormat formatter = new SimpleDateFormat("dd/MMM/yyyy")
+		SimpleDateFormat formatter = new SimpleDateFormat("dd/MMM/yyyy", Locale.US)
 		Date result = null
 		String[] data = d.split(' ')
 		String day = data[5]
@@ -162,9 +162,10 @@ class MergeCommitsRetriever {
 		 * otherwise pass the date parameter as an string with the format "yyyy-MM-dd" */
 		/*MergeCommitsRetriever merges = new MergeCommitsRetriever("/Users/paolaaccioly/Documents/Doutorado/workspace_travis/downloads/Singularity")
 		ArrayList<MergeCommit> m = merges.retrieveMergeCommits()*/
-		SimpleDateFormat formatter = new SimpleDateFormat("dd/MMM/yyyy")
+		SimpleDateFormat formatter = new SimpleDateFormat("dd/MMM/yyyy", Locale.US)
 		String dateInString = '4/May/2017'
 		Date result = formatter.parse(dateInString)
+		println 'hello'
 
 	}
 }
