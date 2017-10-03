@@ -107,6 +107,8 @@ public abstract class ConflictPredictor {
 			}
 			
 			this.deleteTempFiles(files)
+		}else {
+			
 		}
 	}
 
@@ -135,11 +137,27 @@ public abstract class ConflictPredictor {
 		if(nodeBodyWithoutSpacing[0].equals(nodeBodyWithoutSpacing[1]) ||
 		nodeBodyWithoutSpacing[2].equals(nodeBodyWithoutSpacing[1])){
 			this.diffSpacing = true
+			this.node.body = this.solveSpacingConflict(nodeBodyWithoutSpacing)
 		}else{
 			this.diffSpacing = false
 		}
 	}
-
+	
+	public String solveSpacingConflict(String [] nodeBodyWithoutSpacing) {
+		String result = null
+		String [] splitNodeBody = this.splitNodeBody().clone()
+		if(!nodeBodyWithoutSpacing[0].equals(nodeBodyWithoutSpacing[1])){
+			result = splitNodeBody[0]
+		}else if(!nodeBodyWithoutSpacing[2].equals(nodeBodyWithoutSpacing[1])) {
+			result = splitNodeBody[2]
+		}else {
+			result = splitNodeBody[1]
+		}
+		
+		return result
+		
+	}
+	
 	public String[] getNodeWithoutSpacing() {
 		String [] splitNodeBody = this.splitNodeBody().clone()
 		String [] nodeBodyWithoutSpacing = this.removeInvisibleChars(splitNodeBody)
@@ -657,13 +675,15 @@ public abstract class ConflictPredictor {
 								return super.visit(node)
 							}
 						})
-			}catch(Exception e){
+			parser = null;
+				}catch(Exception e){
 				e.printStackTrace()
 			}
 
 
 		}
 		println 'Finished to parse and analyse class ' + predictor.filePath
+		
 		return invocationLines
 	}
 

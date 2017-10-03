@@ -19,10 +19,13 @@ class EditDiffMC extends ConflictPredictor{
 	public void setDiffSpacing(){
 		this.diffSpacing = false
 		String [] nodeBodyWithoutSpacing = this.getNodeWithoutSpacing()
+		String [] splitNodeBody = this.splitNodeBody().clone()
 		if(this.leftOrRight.equals('left') && nodeBodyWithoutSpacing[0].equals(nodeBodyWithoutSpacing[1])){
 			this.diffSpacing = true
+			this.node.body = splitNodeBody[2]
 		}else if(this.leftOrRight.equals('right') && nodeBodyWithoutSpacing[2].equals(nodeBodyWithoutSpacing[1])){
 			this.diffSpacing = true
+			this.node.body = splitNodeBody[0]
 		}
 
 	}
