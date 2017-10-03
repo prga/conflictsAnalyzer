@@ -8,6 +8,8 @@ import java.util.Map
 import java.util.Observable
 import java.util.regex.Pattern
 
+import org.apache.commons.io.FileUtils
+
 import util.CompareFiles
 import util.ConflictPredictorPrinter;
 import br.ufpe.cin.app.JFSTMerge
@@ -219,13 +221,19 @@ class MergeScenario implements Observer {
 	public void deleteMSDir(){
 		String msPath = this.path.substring(0, (this.path.length()-26))
 		File dir = new File(msPath)
-		boolean deleted = dir.deleteDir()
+		try {
+			FileUtils.forceDelete(dir)
+		}catch(Exception e) {
+			//e.printStackTrace()
+		}
+		
+		/*boolean deleted = dir.deleteDir()
 		if(deleted){
 			println 'Merge scenario ' + this.path + ' deleted!'
 		}else{
 
 			println 'Merge scenario ' + this.path + ' not deleted!'
-		}
+		}*/
 	}
 
 	public void runSSMerge(){
@@ -667,8 +675,9 @@ class MergeScenario implements Observer {
 
 	public static void main(String[] args){
 		Project project = new Project('Teste')
-		MergeScenario ms = new MergeScenario('C:\\Users\\155 IRON\\Documents\\files\\testes\\rev_123ab_456ef\\rev_123ab_456ef.revisions', true)
+		MergeScenario ms = new MergeScenario('C:\\Users\\155 X-MX\\Documents\\dev\\second_study\\testes\\rev_123ab_456cd\\rev_123ab-456cd.revisions', true)
 		ms.analyzeConflicts()
+		ms.deleteMSDir()
 		String ms_summary = ms.computeMSSummary()
 		ConflictPredictorPrinter.printMergeScenarioReport(project, ms,ms_summary)
 
