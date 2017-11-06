@@ -31,6 +31,7 @@ class RunStudy {
 	private String password
 	private String token
 	private String travisLocation
+	private String curlLocation
 	
 	private Hashtable<String, Conflict> projectsSummary
 
@@ -119,6 +120,7 @@ class RunStudy {
 		this.password = configProps.getProperty('github.password')
 		this.token = configProps.getProperty('github.token')
 		this.travisLocation = configProps.getProperty('travis.location')
+		this.curlLocation = configProps.getProperty('curl.location')
 		
 		String cmd = "git config --global user.name " + this.username
 		Runtime run = Runtime.getRuntime()
@@ -137,6 +139,7 @@ class RunStudy {
 		println 'Retrieving merge commits since Travis first build'
 		MergeCommitsRetriever m = new MergeCommitsRetriever(projectClonePath, this.travisLocation)
 		result = m.retrieveMergeCommits()
+		println result.size + ' merge commits retrieved'
 		return result
 	}
 	
@@ -260,7 +263,7 @@ class RunStudy {
 					//creates new instance of extractorcli
 					if(extractorCLI == null){
 						extractorCLI = new ExtractorCLI(this.username, this.password,
-							this.token, this.travisLocation, this.travisDownloadPath, this.projectRepo);
+							this.token, this.travisLocation, this.travisDownloadPath, this.projectRepo, this.curlLocation);
 					}
 					
 					//runs travis build routine

@@ -26,14 +26,16 @@ public class ExtractorCLI {
 	private String password;
 	private String token;
 	private String travisLocation;
+	private String curlLocation;
 	private Map<String, MergeCommit> originalToReplayedMerge;
 	
 	public ExtractorCLI(String username, String password, String token, String travis, 
-			String download, String originalRepo){
+			String download, String originalRepo, String curl){
 		this.username = username;
 		this.password = password;
 		this.token = token;
 		this.travisLocation = travis;
+		this.curlLocation = curl;
 		this.downloadDir = download;
 		File d = new File(this.downloadDir);
 		d.mkdir();
@@ -370,26 +372,24 @@ public class ExtractorCLI {
 		this.originalRepo = originalRepo;
 	}
 	
-	public void createFork(){
-		int result = -1;
-		String cmd = "curl -u " + this.username + ":" + this.password + 
-		" -X POST https://api.github.com/repos/" + this.originalRepo + "/forks";
-		Runtime run = Runtime.getRuntime();
-		Process pr;
+	public void createFork() {
+		String user = this.username + ":" + this.password;
+		String fork = "https://api.github.com/repos/" + this.originalRepo + "/forks";
+		ProcessBuilder pb = new ProcessBuilder(this.curlLocation, "-u", user, "-X", "POST", fork);
+		pb.redirectErrorStream(true);
+		Process process;
 		try {
-			pr = run.exec(cmd);
-			result = pr.waitFor();
+			process = pb.start();
+			BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
 			String line;
-			BufferedReader input = new BufferedReader(new InputStreamReader(pr.getInputStream()));
-			while ((line = input.readLine()) != null) {
-			  System.out.println(line);
-			}
-			input.close();
+			while ((line = reader.readLine()) != null)
+			    System.out.println(line);
+			process.waitFor();
 		} catch (IOException e) {
-			
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (InterruptedException e) {
-			
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
