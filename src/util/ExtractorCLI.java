@@ -41,8 +41,8 @@ public class ExtractorCLI {
 		this.setName();
 		this.setFork();
 		this.setForkDir();
-		//this.createFork();
-		//this.activateTravis();
+		this.createFork();
+		this.activateTravis();
 		this.cloneForkLocally();
 		this.createBranches();
 		this.originalToReplayedMerge = new HashMap<String, MergeCommit>();

@@ -677,7 +677,7 @@ class MergeScenario implements Observer {
 		Project project = new Project('Teste')
 		MergeScenario ms = new MergeScenario('C:\\Users\\155 X-MX\\Documents\\dev\\second_study\\testes\\rev_123ab_456cd\\rev_123ab-456cd.revisions', true)
 		ms.analyzeConflicts()
-		ms.deleteMSDir()
+		//ms.deleteMSDir()
 		String ms_summary = ms.computeMSSummary()
 		ConflictPredictorPrinter.printMergeScenarioReport(project, ms,ms_summary)
 

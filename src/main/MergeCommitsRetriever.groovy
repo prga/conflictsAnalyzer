@@ -12,40 +12,46 @@ class MergeCommitsRetriever {
 
 	String clonePath
 	String startAnalysisDate
+	String travisLocation
 
-	public MergeCommitsRetriever(String clonePath, String date){
+	/*public MergeCommitsRetriever(String clonePath, String date){
 		this.clonePath = clonePath
 		this.startAnalysisDate = date
-	}
+	}*/
 
-	public MergeCommitsRetriever(String clonePath){
+	public MergeCommitsRetriever(String clonePath, String travisLocation){
 		this.clonePath = clonePath
+		this.travisLocation = travisLocation
 		this.setStartAnalysisDate()
 	}
 
 	public void setStartAnalysisDate(){
 
 		/*runs the command*/
-		ProcessBuilder pb = new ProcessBuilder("git", "log", "--format=%aD", ".travis.yml")
+		ProcessBuilder pb = new ProcessBuilder(this.travisLocation, "show", "1")
 		pb.directory(new File(this.clonePath))
 		Process p = pb.start()
 
 		/*gets the command result*/
 		BufferedReader buf = new BufferedReader(new InputStreamReader(p.getInputStream()))
 		String line=''
-		ArrayList<String> output = new ArrayList<String>()
-		while ((line = buf.readLine()) != null) {
-			output.add(line)
+		boolean finishDate = false;
+		while ((line = buf.readLine()) != null && !finishDate) {
+			if(line.startsWith("Finished")) {
+				finishDate = true;
+				this.getFirstBuildDate(line)
+			}
 		}
 
-		/*sets the date*/
-		if(output.size() > 0){
-			String d = output.get(output.size() -1)
-			this.startAnalysisDate = this.chooseRightDate(d)
-		}
 
 	}
-
+	
+	public void getFirstBuildDate(String d){
+		String[] tokens = d.split(' ')
+		this.startAnalysisDate = tokens[tokens.length - 2]
+		//2017-08-02
+	}
+	
 	public String chooseRightDate(String d){
 		
 		String result = ''
@@ -138,7 +144,7 @@ class MergeCommitsRetriever {
 				}
 			}
 			p.getInputStream().close()
-			Collections.reverse(merges)
+			//Collections.reverse(merges)
 		}catch(Exception e){
 			e.printStackTrace()
 		}
