@@ -254,7 +254,7 @@ class RunStudy {
 				boolean hasConflicts = ssMergeResult.getHasConflicts()
 				boolean hasPredictors = ssMergeResult.getHasPredictors()
 				//if the merge scenario has no conflicts and has at least one predictor
-				if(!hasConflicts && hasPredictors){
+				/*if(!hasConflicts && hasPredictors){
 					
 					//merge directories -- git merge and fstmerge
 					CompareFiles cp = new CompareFiles(revisionFile)
@@ -270,7 +270,7 @@ class RunStudy {
 					File m = new File(cp.getFstmergeDir())
 					String ssmergeDir = m.getParent() + File.separator + 'rev_merged_git'
 					extractorCLI.replayBuildsOnTravis(project.name, mc, ssmergeDir);										
-				}
+				}*/
 			}else{
 				String cause = (revisionFile.equals(''))?'problems_with_extraction':'conflicts_non_java_files'
 				String name = mc.parent1.substring(0, 5) + "_" + mc.parent2.substring(0, 5)
