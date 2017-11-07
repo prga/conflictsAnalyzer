@@ -144,7 +144,7 @@ class MergeCommitsRetriever {
 				}
 			}
 			p.getInputStream().close()
-			//Collections.reverse(merges)
+			Collections.reverse(merges)
 		}catch(Exception e){
 			e.printStackTrace()
 		}
