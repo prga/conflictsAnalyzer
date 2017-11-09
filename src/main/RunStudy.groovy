@@ -77,7 +77,7 @@ class RunStudy {
 			
 			/*3 read mergeCommits.csv sheets*/ 
 			String graphBase = this.gitminerLocation + File.separator + this.projectName + 'graph.db'
-			//ArrayList<MergeCommit> listMergeCommits = this.readMergeCommitsSheets(projectsDatesFolder)
+			ArrayList<MergeCommit> listMergeCommits = this.readMergeCommitsSheets(projectsDatesFolder)
 	
 			/*4 set listMergeCommits with commits that i want to analyze separately*/
 			/*MergeCommit mc = new MergeCommit()
@@ -96,7 +96,7 @@ class RunStudy {
 			Project project = new Project(this.projectName,null)
 
 			//for each merge scenario, clone and run SSMerge on it
-			ArrayList<MergeCommit> listMergeCommits = this.getListMergeCommit(this.projectName)
+			//ArrayList<MergeCommit> listMergeCommits = this.getListMergeCommit(this.projectName)
 			ConflictPrinter.printMergeCommitsList(this.projectName, listMergeCommits)
 			analyseMergeScenario(listMergeCommits, extractor, project)
 
@@ -254,7 +254,7 @@ class RunStudy {
 				boolean hasConflicts = ssMergeResult.getHasConflicts()
 				boolean hasPredictors = ssMergeResult.getHasPredictors()
 				//if the merge scenario has no conflicts and has at least one predictor
-				/*if(!hasConflicts && hasPredictors){
+				if(!hasConflicts && hasPredictors){
 					
 					//merge directories -- git merge and fstmerge
 					CompareFiles cp = new CompareFiles(revisionFile)
@@ -263,14 +263,15 @@ class RunStudy {
 					//creates new instance of extractorcli
 					if(extractorCLI == null){
 						extractorCLI = new ExtractorCLI(this.username, this.password,
-							this.token, this.travisLocation, this.travisDownloadPath, this.projectRepo, this.curlLocation);
+							this.token, this.travisLocation, this.travisDownloadPath, 
+							this.projectRepo, this.curlLocation, extractor.getMasterBranch());
 					}
 					
 					//runs travis build routine
 					File m = new File(cp.getFstmergeDir())
 					String ssmergeDir = m.getParent() + File.separator + 'rev_merged_git'
 					extractorCLI.replayBuildsOnTravis(project.name, mc, ssmergeDir);										
-				}*/
+				}
 			}else{
 				String cause = (revisionFile.equals(''))?'problems_with_extraction':'conflicts_non_java_files'
 				String name = mc.parent1.substring(0, 5) + "_" + mc.parent2.substring(0, 5)
@@ -561,7 +562,7 @@ class RunStudy {
 			'/home/ines/Dropbox/experiment/ResultData']
 		*/	
 		String[] files= ['projectsList', 'configuration.properties',
-			'C:\\Users\\155 X-MX\\Documents\\dev\\second_study\\resultData1stround_emse\\ResultData']
+			'C:\\Users\\155 X-MX\\Documents\\dev\\second_study\\conflictsAnalyzer\\ResultData']
 			
 		study.run(files)
 		//println study.build("/usr/local/bin/ant", "/Users/Roberto/Documents/UFPE/Msc/Projeto/projects/temp/voldemort", new File("/Users/Roberto/Documents/UFPE/Msc/Projeto/projects/temp/report.txt"))

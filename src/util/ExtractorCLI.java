@@ -28,39 +28,41 @@ public class ExtractorCLI {
 	private String travisLocation;
 	private String curlLocation;
 	private Map<String, MergeCommit> originalToReplayedMerge;
-	
+	private String masterBranch;
+
 	public ExtractorCLI(String username, String password, String token, String travis, 
-			String download, String originalRepo, String curl){
+			String download, String originalRepo, String curl, String master){
 		this.username = username;
 		this.password = password;
 		this.token = token;
 		this.travisLocation = travis;
 		this.curlLocation = curl;
 		this.downloadDir = download;
+		this.masterBranch = master;
 		File d = new File(this.downloadDir);
 		d.mkdir();
 		this.originalRepo = originalRepo;
 		this.setName();
 		this.setFork();
 		this.setForkDir();
-		this.createFork();
-		this.activateTravis();
+		//this.createFork();
+		//this.activateTravis();
 		this.cloneForkLocally();
 		this.createBranches();
 		this.originalToReplayedMerge = new HashMap<String, MergeCommit>();
-		
-	}
-	
 
-	
+	}
+
+
+
 	public void replayBuildsOnTravis(String projectName, MergeCommit mc, String mergeDir){
-		System.out.println("Reseting to parent 1 and pushing to master");
+		System.out.println("Reseting to parent 1 and pushing to " + this.masterBranch);
 		this.resetToOldCommitAndPush(mc.getParent1());
 		this.mergeBranches("origHist");
-		System.out.println("Reseting to parent 2 and pushing to master");
+		System.out.println("Reseting to parent 2 and pushing to " + this.masterBranch);
 		this.resetToOldCommitAndPush(mc.getParent2());
 		this.mergeBranches("origHist");
-		System.out.println("Reseting to merge commit and pushing to master");
+		System.out.println("Reseting to merge commit and pushing to " + this.masterBranch);
 		this.resetToOldCommitAndPush(mc.getSha());
 		System.out.println("Replacing files from original merge to "
 				+ "replayed merge and pushing to merges");
@@ -69,44 +71,46 @@ public class ExtractorCLI {
 		System.out.println("printing results");
 		this.printMergeSHAS(projectName, newsha);
 	}
-	
+
+
+
 	public void cloneForkLocally(){
 		int result = -1;
-		
+
 		//clone fork
 		String cloneFork = "git clone https://github.com/" + this.fork + ".git";
 		try {
 			Process p = Runtime.getRuntime().exec(cloneFork, null, new File(this.downloadDir));
 			result = p.waitFor();
 		} catch (IOException e) {
-			
+
 			e.printStackTrace();
 		} catch (InterruptedException e) {
-			
+
 			e.printStackTrace();
 		}
-		
+
 	}
 
 
 
 	private void createBranches() {
 		this.createbranch("origHist");
-		this.checkoutBranch("master");
+		this.checkoutBranch(this.masterBranch);
 		this.createbranch("merges");
 		this.pushBranchToRemote("merges");
-		this.checkoutBranch("master");
+		this.checkoutBranch(this.masterBranch);
 	}
-	
+
 	private void createbranch(String branchName){
 		int result = -1;
 		String createBranch = "git checkout -b " + branchName;
-		
+
 		Process p;
 		try {
 			p = Runtime.getRuntime().exec(createBranch, null, new File(this.forkDir));
 			result = p.waitFor();
-			
+
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -114,14 +118,14 @@ public class ExtractorCLI {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 	}
-	
+
 	private void pushBranchToRemote(String branchName){
 		int result = -1;
 		String cmd = "git config credential.helper store";
 		String pushBranch = "git push origin " + branchName;
-		
+
 		Process p;
 		try {
 			p = Runtime.getRuntime().exec(cmd, null, new File(this.forkDir));
@@ -135,34 +139,35 @@ public class ExtractorCLI {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 	}
-	
+
 	private void mergeBranches(String branchName){
-		int result = -1;
-		String pull = "git merge " + branchName;
+		ProcessBuilder pb = new ProcessBuilder("git", "merge", branchName);
+		pb.directory(new File(this.forkDir));
 		try {
-			Process p = Runtime.getRuntime().exec(pull, null, new File(this.forkDir));
-			result = p.waitFor();
+			Process p = pb.start();
+			BufferedReader buf = new BufferedReader(new InputStreamReader(p.getInputStream()));
+			String line = "";
+			while ((line=buf.readLine())!=null) {
+				System.out.println(line);
+			}
+
 		} catch (IOException e) {
-			
+			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (InterruptedException e) {
-			
-			e.printStackTrace();
-		}
-		
+		}	
 	}
-	
+
 	private String commitEditedMergeAndPush(MergeCommit mc, String mergeDir){
 		String newSha = "";
 		this.checkoutBranch("merges");
 		this.replaceFiles(mergeDir);
 		newSha = this.commitAndPushMerge(mc);
-		this.checkoutBranch("master");
+		this.checkoutBranch(this.masterBranch);
 		return newSha;
 	}
-	
+
 	private void checkoutBranch(String branch){
 		int result = -1;
 		String checkout = "git checkout " + branch;
@@ -170,20 +175,20 @@ public class ExtractorCLI {
 			Process p = Runtime.getRuntime().exec(checkout, null, new File(this.forkDir));
 			result = p.waitFor();
 		} catch (IOException e) {
-			
+
 			e.printStackTrace();
 		} catch (InterruptedException e) {
-			
+
 			e.printStackTrace();
 		}
 	}
-	
+
 	private void replaceFiles(String mergeDir){
 		this.removeFilesFromOriginalRepo();
-		this.copyFilesFromSSMerge(mergeDir, mergeDir);
-		
+		this.copyFilesFromSSMerge(mergeDir, this.forkDir);
+
 	}
-	
+
 	private void removeFilesFromOriginalRepo(){
 		File fork = new File(this.forkDir);
 		File[] files = fork.listFiles();
@@ -202,31 +207,15 @@ public class ExtractorCLI {
 	}
 	
 	private void copyFilesFromSSMerge(String mergeDir, String newPath){
-		File temp = new File(newPath);
-		File [] list = temp.listFiles();
-		for(File file : list){
-			if(file.isDirectory()){
-				this.copyFilesFromSSMerge(mergeDir, file.getAbsolutePath());
-			}else if(file.isFile()){
-				moveFile(mergeDir, file);
-			}
-		}
-	}
-
-
-
-	private void moveFile(String mergeDir, File file) {
-		String path = file.getAbsolutePath().replaceFirst(mergeDir, this.forkDir);
-		File temp2 = new File(path);
-		Path toBeReplaced = temp2.toPath();
+		File source = new File(mergeDir);
+		File dest = new File(newPath);
 		try {
-			Files.move(file.toPath(), toBeReplaced, StandardCopyOption.REPLACE_EXISTING);
+		    FileUtils.copyDirectory(source, dest);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		    e.printStackTrace();
 		}
 	}
-	
+
 	private String commitAndPushMerge(MergeCommit mc){
 		String newSha = "";
 		int result = -1;
@@ -240,21 +229,21 @@ public class ExtractorCLI {
 			result = p.waitFor();
 			p = Runtime.getRuntime().exec(push, null, new File(this.forkDir));
 			result = p.waitFor();
-			
+
 			newSha = this.getHead();
 			this.originalToReplayedMerge.put(newSha, mc);
 		} catch (IOException e) {
-			
+
 			e.printStackTrace();
 		} catch (InterruptedException e) {
-			
+
 			e.printStackTrace();
 		}
-		
+
 		return newSha;
-	
+
 	}
-	
+
 	private String getHead(){
 		String sha = "";
 		ProcessBuilder pb = new ProcessBuilder("git", "rev-parse", "HEAD");
@@ -273,11 +262,11 @@ public class ExtractorCLI {
 		}
 		return sha;
 	}
-	
+
 	private void resetToOldCommitAndPush(String sha){
 		int result = -1;
 		String reset = "git reset --hard " + sha;
-		String forcePush = "git push -f origin HEAD:master";
+		String forcePush = "git push -f origin HEAD:" + this.masterBranch;
 		Runtime run = Runtime.getRuntime();
 		Process pr;
 		try {
@@ -300,7 +289,7 @@ public class ExtractorCLI {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public String getName() {
 		return name;
 	}
@@ -308,30 +297,30 @@ public class ExtractorCLI {
 	public void setName(String name) {
 		this.name = name;
 	}
-	
+
 	public void setName() {
 		String[] parts = this.originalRepo.split("/");
 		this.name = parts[1];
 	}
-	
+
 	public String getDownloadPath() {
 		return downloadDir;
 	}
-	
+
 	public void setDownloadPath(String downloadPath) {
 		this.downloadDir = downloadPath;
 	}
-	
+
 	public String getRepo() {
 		return fork;
 	}
-	
+
 	public void setRepo(String repo) {
 		this.fork = repo;
 	}
-	
-	
-	
+
+
+
 	public String getDownloadDir() {
 		return downloadDir;
 	}
@@ -347,7 +336,7 @@ public class ExtractorCLI {
 	public void setFork(String fork) {
 		this.fork = fork;
 	}
-	
+
 	public void setFork(){
 		this.fork = this.username + "/" + this.name;
 	}
@@ -359,7 +348,7 @@ public class ExtractorCLI {
 	public void setForkDir(String forkDir) {
 		this.forkDir = forkDir;
 	}
-	
+
 	public void setForkDir(){
 		this.forkDir = this.downloadDir + File.separator  + this.name;
 	}
@@ -371,7 +360,7 @@ public class ExtractorCLI {
 	public void setOriginalRepo(String originalRepo) {
 		this.originalRepo = originalRepo;
 	}
-	
+
 	public void createFork() {
 		String user = this.username + ":" + this.password;
 		String fork = "https://api.github.com/repos/" + this.originalRepo + "/forks";
@@ -383,7 +372,7 @@ public class ExtractorCLI {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
 			String line;
 			while ((line = reader.readLine()) != null)
-			    System.out.println(line);
+				System.out.println(line);
 			process.waitFor();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -392,9 +381,9 @@ public class ExtractorCLI {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 	}
-	
+
 	private void activateTravis(){	
 
 		String cmd = this.travisLocation + " login --github-token " + this.token;
@@ -420,7 +409,7 @@ public class ExtractorCLI {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public String getUsername() {
 		return username;
 	}
@@ -443,7 +432,7 @@ public class ExtractorCLI {
 		this.password = password;
 	}
 
-	
+
 
 	public String getToken() {
 		return token;
@@ -492,22 +481,19 @@ public class ExtractorCLI {
 		}
 
 	}
-	
+
 	public static void main(String[] args) {
-		int result = -1;
-		String pushBranch = "git push";
+		MergeCommit mc = new MergeCommit();
+		mc.setSha("ccd4ddd3eeb6f219ed2e7a184fceeb4e11df7f80");
+		mc.setParent1("1bca94af");
+		mc.setParent2("d415ba83");
+		ExtractorCLI cli = new ExtractorCLI("conflictpredictor", "conflict1407", 
+				"2c373b4405e61827eb069d4cbf22fc812bbb11e4", "C:\\Ruby24-x64\\bin\\travis.bat", 
+				"C:\\Users\\155 X-MX\\Documents\\dev\\second_study\\downloads\\travis", 
+				"brettwooldridge/HikariCP", "C:\\Curl\\curl.exe", "dev");
+		cli.replayBuildsOnTravis("HikariCP", mc, "C:\\Users\\155 X-MX\\Documents\\dev\\second_study\\downloads\\ssmerge\\HikariCP\\revisions\\rev_1bca9_d415b\\rev_merged_git");
+
 		
-		Process p;
-		try {
-			p = Runtime.getRuntime().exec(pushBranch, null, new File("/home/dell/Documents/doutorado/icse/download/TGM"));
-			result = p.waitFor();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}
-	
+
 }
