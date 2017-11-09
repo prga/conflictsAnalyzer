@@ -112,10 +112,10 @@ public class ExtractorCLI {
 			result = p.waitFor();
 
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		}
 
@@ -133,10 +133,10 @@ public class ExtractorCLI {
 			p = Runtime.getRuntime().exec(pushBranch, null, new File(this.forkDir));
 			result = p.waitFor();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
+		
 			e.printStackTrace();
 		}
 
@@ -154,7 +154,7 @@ public class ExtractorCLI {
 			}
 
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		}	
 	}
@@ -199,7 +199,7 @@ public class ExtractorCLI {
 				try {
 					FileUtils.deleteDirectory(f);
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
+					
 					e.printStackTrace();
 				}
 			}
@@ -218,30 +218,66 @@ public class ExtractorCLI {
 
 	private String commitAndPushMerge(MergeCommit mc){
 		String newSha = "";
-		int result = -1;
-		String add = "git add .";
-		String commit = "git commit -m \"merge\" ";
-		String push = "git push origin merges";
-		try {
-			Process p = Runtime.getRuntime().exec(add, null, new File(this.forkDir));
-			result = p.waitFor();
-			p = Runtime.getRuntime().exec(commit, null, new File(this.forkDir));
-			result = p.waitFor();
-			p = Runtime.getRuntime().exec(push, null, new File(this.forkDir));
-			result = p.waitFor();
-
-			newSha = this.getHead();
-			this.originalToReplayedMerge.put(newSha, mc);
-		} catch (IOException e) {
-
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-
-			e.printStackTrace();
-		}
-
+		this.addChangesToStagedArea();
+		this.commitChanges();
+		this.pushToMergeBranch();
+		newSha = this.getHead();
+		this.originalToReplayedMerge.put(newSha, mc);
 		return newSha;
 
+	}
+	
+	private void addChangesToStagedArea() {
+		ProcessBuilder pb = new ProcessBuilder("git", "add", ".");
+		pb.redirectErrorStream(true);
+		pb.directory(new File(this.forkDir));
+		try {
+			Process p = pb.start();
+			/*BufferedReader buf = new BufferedReader(new InputStreamReader(p.getInputStream()));
+			String line = "";
+			while ((line=buf.readLine())!=null) {
+				System.out.println(line);
+			}*/
+
+		} catch (IOException e) {
+		
+			e.printStackTrace();
+		}
+	}
+	
+	private void commitChanges() {
+		ProcessBuilder pb = new ProcessBuilder("git", "commit", "-m", "\"merge\"");
+		pb.directory(new File(this.forkDir));
+		try {
+			Process p = pb.start();
+			BufferedReader buf = new BufferedReader(new InputStreamReader(p.getInputStream()));
+			String line = "";
+			while ((line=buf.readLine())!=null) {
+				System.out.println(line);
+			}
+
+		} catch (IOException e) {
+		
+			e.printStackTrace();
+		}
+	}
+	
+	private void pushToMergeBranch() {
+		ProcessBuilder pb = new ProcessBuilder("git", "push", "origin", "merges");
+		pb.redirectErrorStream(true);
+		pb.directory(new File(this.forkDir));
+		try {
+			Process p = pb.start();
+			BufferedReader buf = new BufferedReader(new InputStreamReader(p.getInputStream()));
+			String line = "";
+			while ((line=buf.readLine())!=null) {
+				System.out.println(line);
+			}
+
+		} catch (IOException e) {
+			
+			e.printStackTrace();
+		}
 	}
 
 	private String getHead(){
@@ -257,7 +293,7 @@ public class ExtractorCLI {
 			}
 
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		}
 		return sha;
@@ -282,10 +318,10 @@ public class ExtractorCLI {
 			}
 			input.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		}
 	}
@@ -375,10 +411,10 @@ public class ExtractorCLI {
 				System.out.println(line);
 			process.waitFor();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		}
 
@@ -402,10 +438,10 @@ public class ExtractorCLI {
 			}
 			input.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		}
 	}
@@ -476,7 +512,7 @@ public class ExtractorCLI {
 			bw.close();
 			fw.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		}
 
