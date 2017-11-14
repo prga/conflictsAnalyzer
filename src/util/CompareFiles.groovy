@@ -148,7 +148,7 @@ class CompareFiles {
 		boolean leftEqualRight = FileUtils.contentEquals(left, right)
 		
 		//use the code bellow to remove only equal files
-		if(leftEqualRight){
+		if(/*leftEqualRight*/ leftEqualsBase && rightEqualsBase){
 			//this.moveAndDeleteFiles(this.baseRevName, base, left, right)
 			FileUtils.forceDelete(left)
 			FileUtils.forceDelete(base)
