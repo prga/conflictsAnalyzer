@@ -45,8 +45,8 @@ public class ExtractorCLI {
 		this.setName();
 		this.setFork();
 		this.setForkDir();
-		//this.createFork();
-		//this.activateTravis();
+		this.createFork();
+		this.activateTravis();
 		this.cloneForkLocally();
 		this.createBranches();
 		this.originalToReplayedMerge = new HashMap<String, MergeCommit>();
@@ -429,14 +429,21 @@ public class ExtractorCLI {
 		try {
 			pr = run.exec(cmd);
 			pr.waitFor();
-			pr = run.exec(cmd2);
-			pr.waitFor();
-			String line;
-			BufferedReader input = new BufferedReader(new InputStreamReader(pr.getInputStream()));
-			while ((line = input.readLine()) != null) {
-				System.out.println(line);
+			String status = "not run yet";
+			while(!status.equalsIgnoreCase("enabled")) {
+				Thread.sleep(5000);
+				pr = run.exec(cmd2);
+				pr.waitFor();
+				String line;
+				BufferedReader input = new BufferedReader(new InputStreamReader(pr.getInputStream()));
+				while ((line = input.readLine()) != null) {
+					System.out.println(line);
+					status = line;
+				}
+				
+				input.close();
 			}
-			input.close();
+			
 		} catch (IOException e) {
 			
 			e.printStackTrace();
