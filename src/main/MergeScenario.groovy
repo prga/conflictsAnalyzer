@@ -602,7 +602,8 @@ class MergeScenario implements Observer {
 		boolean result = false
 
 		if(this.gitMergeHasNoConflicts && (this.fileNotFoundConflicts == null)){
-			result = this.hasNonDSConflicts()
+			//result = this.hasNonDSConflicts()
+			result = this.hasConflicts
 		}else{
 			result = true
 		}
