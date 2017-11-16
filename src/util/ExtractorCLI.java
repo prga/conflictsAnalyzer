@@ -14,7 +14,9 @@ import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 
+import main.BuildScenario;
 import main.MergeCommit;
+import main.TravisCommit;
 
 public class ExtractorCLI {
 	private String downloadDir;
@@ -56,21 +58,100 @@ public class ExtractorCLI {
 
 
 	public void replayBuildsOnTravis(String projectName, MergeCommit mc, String mergeDir){
+		BuildScenario build = new BuildScenario(mc.getParent1(), mc.getParent2(), mc.getSha());
 		System.out.println("Reseting to parent 1 and pushing to " + this.masterBranch);
 		this.resetToOldCommitAndPush(mc.getParent1());
 		this.mergeBranches("origHist");
-		System.out.println("Reseting to parent 2 and pushing to " + this.masterBranch);
-		this.resetToOldCommitAndPush(mc.getParent2());
-		this.mergeBranches("origHist");
-		System.out.println("Reseting to merge commit and pushing to " + this.masterBranch);
-		this.resetToOldCommitAndPush(mc.getSha());
-		System.out.println("Replacing files from original merge to "
-				+ "replayed merge and pushing to merges");
-		String newsha = this.commitEditedMergeAndPush(mc, mergeDir);
-		this.mergeBranches("origHist");
+		System.out.println("Waiting for parent 1 build to end");
+		String parent1Build = this.checkBuildStatus(build.getParent1());
+		if(parent1Build.equalsIgnoreCase("passed")) {
+			System.out.println("Reseting to parent 2 and pushing to " + this.masterBranch);
+			this.resetToOldCommitAndPush(mc.getParent2());
+			this.mergeBranches("origHist");
+			System.out.println("Waiting for parent 2 build to end");
+			String parent2Build = this.checkBuildStatus(build.getParent2());
+			if(parent2Build.equalsIgnoreCase("passed")) {
+				System.out.println("Reseting to merge commit and pushing to " + this.masterBranch);
+				this.resetToOldCommitAndPush(mc.getSha());
+				this.mergeBranches("origHist");
+				System.out.println("Waiting for original merge commit build to end");
+				this.checkBuildStatus(build.getMergeCommit());
+				System.out.println("Replacing files from original merge to "
+						+ "replayed merge and pushing to merges");
+				String newsha = this.commitEditedMergeAndPush(mc, mergeDir);
+				TravisCommit replayedMerge = new TravisCommit(newsha);
+				build.setReplayedMergeCommit(replayedMerge);
+				System.out.println("Waiting for replayed merge commit build to end");
+				this.checkBuildStatus(build.getReplayedMergeCommit());
+			}	
+		}
 		System.out.println("printing results");
-		this.printMergeSHAS(projectName, newsha);
+		//this.printMergeSHAS(projectName, newsha);
+
 	}
+
+	public String checkBuildStatus(TravisCommit commit) {
+		String result = "";
+		String buildId = this.getLatestBuildID();
+		commit.setBuildID(buildId);
+		String buildStatus = "started";
+			try {
+				while(buildStatus.equalsIgnoreCase("started")) {
+					Thread.sleep(5000);
+					buildStatus = this.auxCheckBuildStatus(buildId);
+				}		
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		return result;
+	}
+	
+	private String auxCheckBuildStatus(String buildID) {
+		String status = "";
+		ProcessBuilder pb = new ProcessBuilder("travis", "show", buildID);
+		pb.directory(new File(this.forkDir));
+		try {
+			Process p = pb.start();
+			BufferedReader buf = new BufferedReader(new InputStreamReader(p.getInputStream()));
+			String line = "";
+			while ((line=buf.readLine())!=null) {
+				System.out.println(line);
+				if(line.startsWith("State:")) {
+					String[] tokens = line.split(" ");
+					status = tokens[1];
+				}
+			}
+
+		} catch (IOException e) {
+
+			e.printStackTrace();
+		}
+		return status;
+	}
+
+	public String getLatestBuildID() {
+		String id = "";
+		ProcessBuilder pb = new ProcessBuilder("travis", "show");
+		pb.directory(new File(this.forkDir));
+		try {
+			Process p = pb.start();
+			BufferedReader buf = new BufferedReader(new InputStreamReader(p.getInputStream()));
+			String line = "";
+			while ((line=buf.readLine())!=null) {
+				System.out.println(line);
+				if(line.startsWith("Build #")) {
+					String[] tokens = line.split(" ");
+					id = tokens[1].substring(1);
+				}
+			}
+
+		} catch (IOException e) {
+
+			e.printStackTrace();
+		}
+		return id;
+	}
+
 
 
 
@@ -112,10 +193,10 @@ public class ExtractorCLI {
 			result = p.waitFor();
 
 		} catch (IOException e) {
-			
+
 			e.printStackTrace();
 		} catch (InterruptedException e) {
-			
+
 			e.printStackTrace();
 		}
 
@@ -133,10 +214,10 @@ public class ExtractorCLI {
 			p = Runtime.getRuntime().exec(pushBranch, null, new File(this.forkDir));
 			result = p.waitFor();
 		} catch (IOException e) {
-			
+
 			e.printStackTrace();
 		} catch (InterruptedException e) {
-		
+
 			e.printStackTrace();
 		}
 
@@ -154,7 +235,7 @@ public class ExtractorCLI {
 			}
 
 		} catch (IOException e) {
-			
+
 			e.printStackTrace();
 		}	
 	}
@@ -199,20 +280,20 @@ public class ExtractorCLI {
 				try {
 					FileUtils.deleteDirectory(f);
 				} catch (IOException e) {
-					
+
 					e.printStackTrace();
 				}
 			}
 		}
 	}
-	
+
 	private void copyFilesFromSSMerge(String mergeDir, String newPath){
 		File source = new File(mergeDir);
 		File dest = new File(newPath);
 		try {
-		    FileUtils.copyDirectory(source, dest);
+			FileUtils.copyDirectory(source, dest);
 		} catch (IOException e) {
-		    e.printStackTrace();
+			e.printStackTrace();
 		}
 	}
 
@@ -226,7 +307,7 @@ public class ExtractorCLI {
 		return newSha;
 
 	}
-	
+
 	private void addChangesToStagedArea() {
 		ProcessBuilder pb = new ProcessBuilder("git", "add", ".");
 		pb.redirectErrorStream(true);
@@ -240,11 +321,11 @@ public class ExtractorCLI {
 			}*/
 
 		} catch (IOException e) {
-		
+
 			e.printStackTrace();
 		}
 	}
-	
+
 	private void commitChanges() {
 		ProcessBuilder pb = new ProcessBuilder("git", "commit", "-m", "\"merge\"");
 		pb.directory(new File(this.forkDir));
@@ -257,11 +338,11 @@ public class ExtractorCLI {
 			}
 
 		} catch (IOException e) {
-		
+
 			e.printStackTrace();
 		}
 	}
-	
+
 	private void pushToMergeBranch() {
 		ProcessBuilder pb = new ProcessBuilder("git", "push", "origin", "merges");
 		pb.redirectErrorStream(true);
@@ -275,7 +356,7 @@ public class ExtractorCLI {
 			}
 
 		} catch (IOException e) {
-			
+
 			e.printStackTrace();
 		}
 	}
@@ -293,7 +374,7 @@ public class ExtractorCLI {
 			}
 
 		} catch (IOException e) {
-			
+
 			e.printStackTrace();
 		}
 		return sha;
@@ -318,10 +399,10 @@ public class ExtractorCLI {
 			}
 			input.close();
 		} catch (IOException e) {
-			
+
 			e.printStackTrace();
 		} catch (InterruptedException e) {
-			
+
 			e.printStackTrace();
 		}
 	}
@@ -411,10 +492,10 @@ public class ExtractorCLI {
 				System.out.println(line);
 			process.waitFor();
 		} catch (IOException e) {
-			
+
 			e.printStackTrace();
 		} catch (InterruptedException e) {
-			
+
 			e.printStackTrace();
 		}
 
@@ -440,15 +521,15 @@ public class ExtractorCLI {
 					System.out.println(line);
 					status = line;
 				}
-				
+
 				input.close();
 			}
-			
+
 		} catch (IOException e) {
-			
+
 			e.printStackTrace();
 		} catch (InterruptedException e) {
-			
+
 			e.printStackTrace();
 		}
 	}
@@ -519,7 +600,7 @@ public class ExtractorCLI {
 			bw.close();
 			fw.close();
 		} catch (IOException e) {
-			
+
 			e.printStackTrace();
 		}
 
@@ -536,7 +617,7 @@ public class ExtractorCLI {
 				"brettwooldridge/HikariCP", "C:\\Curl\\curl.exe", "dev");
 		cli.replayBuildsOnTravis("HikariCP", mc, "C:\\Users\\155 X-MX\\Documents\\dev\\second_study\\downloads\\ssmerge\\HikariCP\\revisions\\rev_1bca9_d415b\\rev_merged_git");
 
-		
+
 	}
 
 }
