@@ -77,7 +77,7 @@ class RunStudy {
 			
 			/*3 read mergeCommits.csv sheets*/ 
 			String graphBase = this.gitminerLocation + File.separator + this.projectName + 'graph.db'
-			ArrayList<MergeCommit> listMergeCommits = this.readMergeCommitsSheets(projectsDatesFolder)
+			//ArrayList<MergeCommit> listMergeCommits = this.readMergeCommitsSheets(projectsDatesFolder)
 	
 			/*4 set listMergeCommits with commits that i want to analyze separately*/
 			/*MergeCommit mc = new MergeCommit()
@@ -96,7 +96,7 @@ class RunStudy {
 			Project project = new Project(this.projectName,null)
 
 			//for each merge scenario, clone and run SSMerge on it
-			//ArrayList<MergeCommit> listMergeCommits = this.getListMergeCommit(this.projectName)
+			ArrayList<MergeCommit> listMergeCommits = this.getListMergeCommit(this.projectName)
 			ConflictPrinter.printMergeCommitsList(this.projectName, listMergeCommits)
 			analyseMergeScenario(listMergeCommits, extractor, project)
 
@@ -270,7 +270,7 @@ class RunStudy {
 					//runs travis build routine
 					File m = new File(cp.getFstmergeDir())
 					String ssmergeDir = m.getParent() + File.separator + 'rev_merged_git'
-					extractorCLI.replayBuildsOnTravis(project.name, mc, ssmergeDir);										
+					extractorCLI.replayBuildsOnTravis(mc, ssmergeDir);										
 				}
 			}else{
 				String cause = (revisionFile.equals(''))?'problems_with_extraction':'conflicts_non_java_files'

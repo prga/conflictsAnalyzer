@@ -57,7 +57,7 @@ public class ExtractorCLI {
 
 
 
-	public void replayBuildsOnTravis(String projectName, MergeCommit mc, String mergeDir){
+	public void replayBuildsOnTravis(MergeCommit mc, String mergeDir){
 		BuildScenario build = new BuildScenario(mc.getParent1(), mc.getParent2(), mc.getSha());
 		System.out.println("Reseting to parent 1 and pushing to " + this.masterBranch);
 		this.resetToOldCommitAndPush(mc.getParent1());
@@ -86,7 +86,7 @@ public class ExtractorCLI {
 			}	
 		}
 		System.out.println("printing results");
-		//this.printMergeSHAS(projectName, newsha);
+		this.printMergeSHAS(build);
 
 	}
 
@@ -95,17 +95,17 @@ public class ExtractorCLI {
 		String buildId = this.getLatestBuildID();
 		commit.setBuildID(buildId);
 		String buildStatus = "started";
-			try {
-				while(buildStatus.equalsIgnoreCase("started")) {
-					Thread.sleep(5000);
-					buildStatus = this.auxCheckBuildStatus(buildId);
-				}		
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+		try {
+			while(buildStatus.equalsIgnoreCase("started")) {
+				Thread.sleep(5000);
+				buildStatus = this.auxCheckBuildStatus(buildId);
+			}		
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 		return result;
 	}
-	
+
 	private String auxCheckBuildStatus(String buildID) {
 		String status = "";
 		ProcessBuilder pb = new ProcessBuilder("travis", "show", buildID);
@@ -580,20 +580,22 @@ public class ExtractorCLI {
 		this.travisLocation = travisLocation;
 	}
 
-	private void printMergeSHAS(String projectName, String sha){
-		String path = "ResultData" + File.separator + projectName + File.separator + "mergesOnTravis.csv";
+	private void printMergeSHAS(BuildScenario build){
+		String path = "ResultData" + File.separator + this.name + File.separator + "mergesOnTravis.csv";
 		File f = new File(path);
-		MergeCommit mc = this.originalToReplayedMerge.get(sha);
 		String content = "";
 		try {
 			if(!f.exists()){
 
 				f.createNewFile();
-				String header = "sha;parent1;parent2;new_sha\n";
+				String header = "parent1SHA;parent1BuildId;parent1BuildStatus;" + 
+						"parent2SHA;parent2BuildId;parent2BuildStatus;" +
+						"mergeCommitSHA;mergeCommitBuildId;mergeCommitBuildStatus;" +
+						"repMergeCommitSHA;repMergeCommitBuildId;repMergeCommitBuildStatus" + "\n";
 				content = header;
 
 			}
-			content = content + mc.getSha() + ";" + mc.getParent1() + ";" + mc.getParent2() + ";" + sha + "\n";
+			content = build.toString() + "\n";
 			FileWriter fw= new FileWriter(f.getAbsoluteFile(), true);
 			BufferedWriter bw  = new BufferedWriter(fw);
 			bw.write(content);
@@ -615,7 +617,7 @@ public class ExtractorCLI {
 				"2c373b4405e61827eb069d4cbf22fc812bbb11e4", "C:\\Ruby24-x64\\bin\\travis.bat", 
 				"C:\\Users\\155 X-MX\\Documents\\dev\\second_study\\downloads\\travis", 
 				"brettwooldridge/HikariCP", "C:\\Curl\\curl.exe", "dev");
-		cli.replayBuildsOnTravis("HikariCP", mc, "C:\\Users\\155 X-MX\\Documents\\dev\\second_study\\downloads\\ssmerge\\HikariCP\\revisions\\rev_1bca9_d415b\\rev_merged_git");
+		cli.replayBuildsOnTravis(mc, "C:\\Users\\155 X-MX\\Documents\\dev\\second_study\\downloads\\ssmerge\\HikariCP\\revisions\\rev_1bca9_d415b\\rev_merged_git");
 
 
 	}

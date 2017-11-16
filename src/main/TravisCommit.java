@@ -38,7 +38,11 @@ public class TravisCommit {
 		this.buildStatus = buildStatus;
 	}
 	
-	
+	/*"sha; buildId; buildStatus"*/
+	public String toString() {
+		String result = this.sha + ";" + this.buildID + ";" + this.buildStatus;
+		return result;
+	}
 	
 
 }

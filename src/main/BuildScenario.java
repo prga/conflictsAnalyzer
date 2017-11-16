@@ -1,15 +1,15 @@
 package main;
 
 public class BuildScenario {
-	
+
 	private TravisCommit parent1;
-	
+
 	private TravisCommit parent2;
-	
+
 	private TravisCommit mergeCommit;
-	
+
 	private TravisCommit replayedMergeCommit;
-	
+
 	public BuildScenario(String p1, String p2, String sha) {
 		this.parent1 = new TravisCommit(p1);
 		this.parent2 = new TravisCommit(p2);
@@ -48,7 +48,12 @@ public class BuildScenario {
 	public void setReplayedMergeCommit(TravisCommit replayedMergeCommit) {
 		this.replayedMergeCommit = replayedMergeCommit;
 	}
-	
-	
+
+	/*parent1;parent2;mergeCommit;replayedMergeCommit*/
+	public String toString() {
+		String result = this.parent1.toString() + ";" + this.parent2.toString() + ";" +
+				this.mergeCommit.toString() + ";" + this.replayedMergeCommit.toString();
+		return result;
+	}
 
 }
