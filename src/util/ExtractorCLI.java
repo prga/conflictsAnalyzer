@@ -64,12 +64,14 @@ public class ExtractorCLI {
 		this.mergeBranches("origHist");
 		System.out.println("Waiting for parent 1 build to end");
 		String parent1Build = this.checkBuildStatus(build.getParent1());
-		if(parent1Build.equalsIgnoreCase("passed")) {
+		build.getParent1().setBuildStatus(parent1Build);
+		if(build.getParent1().getBuildStatus().equalsIgnoreCase("passed")) {
 			System.out.println("Reseting to parent 2 and pushing to " + this.masterBranch);
 			this.resetToOldCommitAndPush(mc.getParent2());
 			this.mergeBranches("origHist");
 			System.out.println("Waiting for parent 2 build to end");
 			String parent2Build = this.checkBuildStatus(build.getParent2());
+			build.getParent2().setBuildStatus(parent2Build);
 			if(parent2Build.equalsIgnoreCase("passed")) {
 				System.out.println("Reseting to merge commit and pushing to " + this.masterBranch);
 				this.resetToOldCommitAndPush(mc.getSha());
@@ -132,19 +134,20 @@ public class ExtractorCLI {
 
 	public String getLatestBuildID() {
 		String id = "";
-		ProcessBuilder pb = new ProcessBuilder(this.travisLocation, "show");
+		ProcessBuilder pb = new ProcessBuilder(this.travisLocation, "history");
 		pb.directory(new File(this.forkDir));
 		try {
 			Process p = pb.start();
 			BufferedReader buf = new BufferedReader(new InputStreamReader(p.getInputStream()));
 			String line = "";
+			int counter = 0;
 			while ((line=buf.readLine())!=null) {
 				System.out.println(line);
-				if(line.startsWith("Build #")) {
+				if(counter == 0) {
 					String[] tokens = line.split(" ");
-					int size = tokens[1].length();
-					id = tokens[1].substring(1, size - 1);
+					id = tokens[0].substring(1);	
 				}
+				counter++;
 			}
 
 		} catch (IOException e) {
@@ -611,7 +614,7 @@ public class ExtractorCLI {
 	}
 
 	public static void main(String[] args) {
-	/*	MergeCommit mc = new MergeCommit();
+		MergeCommit mc = new MergeCommit();
 		mc.setSha("ccd4ddd3eeb6f219ed2e7a184fceeb4e11df7f80");
 		mc.setParent1("1bca94af");
 		mc.setParent2("d415ba83");
@@ -620,10 +623,6 @@ public class ExtractorCLI {
 				"C:\\Users\\155 X-MX\\Documents\\dev\\second_study\\downloads\\travis", 
 				"brettwooldridge/HikariCP", "C:\\Curl\\curl.exe", "dev");
 		cli.replayBuildsOnTravis(mc, "C:\\Users\\155 X-MX\\Documents\\dev\\second_study\\downloads\\ssmerge\\HikariCP\\revisions\\rev_1bca9_d415b\\rev_merged_git");
-*/
-		String x = "State:         errored";
-		String[] tokens = x.split(" ");
-		System.out.println(tokens[tokens.length - 1]);
 
 	}
 
