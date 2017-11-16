@@ -14,7 +14,7 @@ public class BuildScenario {
 		this.parent1 = new TravisCommit(p1);
 		this.parent2 = new TravisCommit(p2);
 		this.mergeCommit = new TravisCommit(sha);
-		this.replayedMergeCommit = null;
+		this.replayedMergeCommit = new TravisCommit("unknown");
 	}
 
 	public TravisCommit getParent1() {

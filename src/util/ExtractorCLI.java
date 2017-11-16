@@ -99,7 +99,8 @@ public class ExtractorCLI {
 			while(buildStatus.equalsIgnoreCase("started")) {
 				Thread.sleep(5000);
 				buildStatus = this.auxCheckBuildStatus(buildId);
-			}		
+			}
+			result = buildStatus;
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -108,7 +109,7 @@ public class ExtractorCLI {
 
 	private String auxCheckBuildStatus(String buildID) {
 		String status = "";
-		ProcessBuilder pb = new ProcessBuilder("travis", "show", buildID);
+		ProcessBuilder pb = new ProcessBuilder(this.travisLocation, "show", buildID);
 		pb.directory(new File(this.forkDir));
 		try {
 			Process p = pb.start();
@@ -118,7 +119,7 @@ public class ExtractorCLI {
 				System.out.println(line);
 				if(line.startsWith("State:")) {
 					String[] tokens = line.split(" ");
-					status = tokens[1];
+					status = tokens[tokens.length - 1];
 				}
 			}
 
@@ -131,7 +132,7 @@ public class ExtractorCLI {
 
 	public String getLatestBuildID() {
 		String id = "";
-		ProcessBuilder pb = new ProcessBuilder("travis", "show");
+		ProcessBuilder pb = new ProcessBuilder(this.travisLocation, "show");
 		pb.directory(new File(this.forkDir));
 		try {
 			Process p = pb.start();
@@ -141,7 +142,8 @@ public class ExtractorCLI {
 				System.out.println(line);
 				if(line.startsWith("Build #")) {
 					String[] tokens = line.split(" ");
-					id = tokens[1].substring(1);
+					int size = tokens[1].length();
+					id = tokens[1].substring(1, size - 1);
 				}
 			}
 
@@ -595,7 +597,7 @@ public class ExtractorCLI {
 				content = header;
 
 			}
-			content = build.toString() + "\n";
+			content = content + build.toString() + "\n";
 			FileWriter fw= new FileWriter(f.getAbsoluteFile(), true);
 			BufferedWriter bw  = new BufferedWriter(fw);
 			bw.write(content);
@@ -609,7 +611,7 @@ public class ExtractorCLI {
 	}
 
 	public static void main(String[] args) {
-		MergeCommit mc = new MergeCommit();
+	/*	MergeCommit mc = new MergeCommit();
 		mc.setSha("ccd4ddd3eeb6f219ed2e7a184fceeb4e11df7f80");
 		mc.setParent1("1bca94af");
 		mc.setParent2("d415ba83");
@@ -618,7 +620,10 @@ public class ExtractorCLI {
 				"C:\\Users\\155 X-MX\\Documents\\dev\\second_study\\downloads\\travis", 
 				"brettwooldridge/HikariCP", "C:\\Curl\\curl.exe", "dev");
 		cli.replayBuildsOnTravis(mc, "C:\\Users\\155 X-MX\\Documents\\dev\\second_study\\downloads\\ssmerge\\HikariCP\\revisions\\rev_1bca9_d415b\\rev_merged_git");
-
+*/
+		String x = "State:         errored";
+		String[] tokens = x.split(" ");
+		System.out.println(tokens[tokens.length - 1]);
 
 	}
 

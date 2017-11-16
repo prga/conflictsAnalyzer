@@ -32,7 +32,7 @@ class RunStudy {
 	private String token
 	private String travisLocation
 	private String curlLocation
-	
+
 	private Hashtable<String, Conflict> projectsSummary
 
 	public RunStudy(){
@@ -52,7 +52,7 @@ class RunStudy {
 		}catch(Exception e){
 			e.printStackTrace()
 		}
-		
+
 		List<String> lines = projectsList.readLines()
 		this.createResultDir()
 
@@ -66,30 +66,30 @@ class RunStudy {
 			//set projectPeriodsList
 			//List<ProjectPeriod> periods = getProjectPeriods(projectsDatesFolder)
 
-			
+
 
 			/*1run gitminer*/ 
 			//String graphBase = runGitMiner()
-			
+
 			/*2 use bases from gitminer*/ 
 			//String graphBase = this.gitminerLocation + File.separator + this.projectName + 'graph.db'
 			//ArrayList<MergeCommit> listMergeCommits = runGremlinQuery(graphBase)
-			
+
 			/*3 read mergeCommits.csv sheets*/ 
 			String graphBase = this.gitminerLocation + File.separator + this.projectName + 'graph.db'
 			//ArrayList<MergeCommit> listMergeCommits = this.readMergeCommitsSheets(projectsDatesFolder)
-	
+
 			/*4 set listMergeCommits with commits that i want to analyze separately*/
 			/*MergeCommit mc = new MergeCommit()
-			mc.setSha('02e79d6b153d1356bc0323084846be12980a810e')
-			mc.setParent1('1ebc8a2a72528eb6988fca749dfd256df712eb08')
-			mc.setParent2('197878ae7573da108f07abcea8771934ecc45d42')
-			SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy")
-			Date d = sdf.parse("22/10/2014")
-			mc.setDate(d)
-			ArrayList<MergeCommit> listMergeCommits = new ArrayList<MergeCommit>()
-			listMergeCommits.add(mc)*/
-			
+			 mc.setSha('02e79d6b153d1356bc0323084846be12980a810e')
+			 mc.setParent1('1ebc8a2a72528eb6988fca749dfd256df712eb08')
+			 mc.setParent2('197878ae7573da108f07abcea8771934ecc45d42')
+			 SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy")
+			 Date d = sdf.parse("22/10/2014")
+			 mc.setDate(d)
+			 ArrayList<MergeCommit> listMergeCommits = new ArrayList<MergeCommit>()
+			 listMergeCommits.add(mc)*/
+
 			//create project and extractor
 			//String graphBase = this.gitminerLocation + File.separator + this.projectName + 'graph.db'
 			Extractor extractor = this.createExtractor(this.projectName, graphBase)
@@ -108,41 +108,41 @@ class RunStudy {
 		}
 
 	}
-	
+
 	private void setGitUser(String properties){
 		//read username and email and sets it globally
 		Properties configProps = new Properties()
 		File file = new File(properties)
 		configProps.load(file.newDataInputStream())
-		
+
 		this.username = configProps.getProperty('github.login')
 		this.email = configProps.getProperty('github.email')
 		this.password = configProps.getProperty('github.password')
 		this.token = configProps.getProperty('github.token')
 		this.travisLocation = configProps.getProperty('travis.location')
 		this.curlLocation = configProps.getProperty('curl.location')
-		
+
 		String cmd = "git config --global user.name " + this.username
 		Runtime run = Runtime.getRuntime()
 		Process pr = run.exec(cmd)
-		
+
 		cmd = "git config --global user.email " + this.email
 		run = Runtime.getRuntime()
 		pr = run.exec(cmd)
 	}
-	
-	
+
+
 	private ArrayList<MergeCommit> getListMergeCommit(String projectName){
 		ArrayList<MergeCommit> result = new ArrayList<MergeCommit>()
 		String projectClonePath = this.ssmergeDownloadPath + File.separator + this.projectName +
-		File.separator + 'git'
+				File.separator + 'git'
 		println 'Retrieving merge commits since Travis first build'
 		MergeCommitsRetriever m = new MergeCommitsRetriever(projectClonePath, this.travisLocation)
 		result = m.retrieveMergeCommits()
 		println result.size + ' merge commits retrieved'
 		return result
 	}
-	
+
 	private ArrayList<MergeCommit> readMergeCommitsSheets(String resultDataFolder){
 		ArrayList<MergeCommit> result = new ArrayList<MergeCommit>()
 		String filePath = resultDataFolder + File.separator + this.projectName + File.separator + 'mergeCommits.csv'
@@ -158,7 +158,7 @@ class RunStudy {
 
 		return result
 	}
-	
+
 	private MergeCommit readMergeCommit(String mc){
 		MergeCommit result = new MergeCommit()
 		String [] tokens = mc.split(',')
@@ -223,11 +223,11 @@ class RunStudy {
 
 	private void analyseMergeScenario(ArrayList listMergeCommits, Extractor extractor,
 			Project project) {
-		ExtractorCLI extractorCLI = null; 
+		ExtractorCLI extractorCLI = null;
 		//if project execution breaks, update current with next merge scenario number
 		int current = 0;
 		int end = listMergeCommits.size()
-		
+
 		//for each merge scenario analyze it
 		while(current < end){
 
@@ -255,22 +255,25 @@ class RunStudy {
 				boolean hasPredictors = ssMergeResult.getHasPredictors()
 				//if the merge scenario has no conflicts and has at least one predictor
 				if(!hasConflicts && hasPredictors){
-					
+
 					//merge directories -- git merge and fstmerge
 					CompareFiles cp = new CompareFiles(revisionFile)
 					cp.replaceFilesAfterFSTMerge(cp.getFstmergeDir())
-					
+
 					//creates new instance of extractorcli
+					println 'Creating the infrastructure to run travis analysis on project ' + project.name;
 					if(extractorCLI == null){
 						extractorCLI = new ExtractorCLI(this.username, this.password,
-							this.token, this.travisLocation, this.travisDownloadPath, 
-							this.projectRepo, this.curlLocation, extractor.getMasterBranch());
+								this.token, this.travisLocation, this.travisDownloadPath,
+								this.projectRepo, this.curlLocation, extractor.getMasterBranch());
 					}
-					
+
 					//runs travis build routine
+					println 'starting to run travis analysis to mergecommit ' + '[' + index +
+							'] from a total of [' + end + ']'
 					File m = new File(cp.getFstmergeDir())
 					String ssmergeDir = m.getParent() + File.separator + 'rev_merged_git'
-					extractorCLI.replayBuildsOnTravis(mc, ssmergeDir);										
+					extractorCLI.replayBuildsOnTravis(mc, ssmergeDir);
 				}
 			}else{
 				String cause = (revisionFile.equals(''))?'problems_with_extraction':'conflicts_non_java_files'
@@ -279,22 +282,22 @@ class RunStudy {
 				if(!revisionFile.equals('')) {
 					this.deleteMSDir(revisionFile)
 				}
-				
+
 			}
 
 			//increment current
 			current++
 
 		}
-		
+
 		extractorCLI = null;
 
 	}
-	
 
-	
 
-	
+
+
+
 	private void deleteMSDir(String path){
 		String msPath = path.substring(0, (path.length()-26))
 		File dir = new File(msPath)
@@ -306,7 +309,7 @@ class RunStudy {
 			println 'Merge scenario ' + path + ' not deleted!'
 		}
 	}
-	
+
 	private MatchingProjectPeriod getPeriodMatch(List<ProjectPeriod> periods, MergeCommit mc){
 		boolean periodMatch = false
 
@@ -333,31 +336,31 @@ class RunStudy {
 	}
 
 	/*private Map getJoanaMap(File emptyContributions,Map filesWithMethodsToJoana) {
-		Map<String, ModifiedMethod> methods = new HashMap<String, ModifiedMethod>()
-		for(String file : filesWithMethodsToJoana.keySet()) {
-			for(EditSameMC method : filesWithMethodsToJoana.get(file)){
-				if(method.leftLines.size > 0 && method.rightLines.size > 0)
-				{
-					List<String> constArgs;
-					def constructor = method.getConstructor()
-					if(constructor != null)
-					{
-						constArgs = Util.getArgs(Util.simplifyMethodSignature(constructor.getName()));
-					}else {
-						constArgs = new ArrayList<String>()
-					}
-					methods.put(method.getSignature(), new ModifiedMethod(method.getSignature(), constArgs, method.getLeftLines(), method.getRightLines(), method.getImportsList()))
-				}else{
-					println "One or more empty contributions on: "+method.getSignature()
-					emptyContributions.append("One or more empty contributions on: "+method.getSignature()+"\n")
-					emptyContributions.append("   Left Contribution:"+method.leftLines+"\n")
-					emptyContributions.append("   Right Contribution:"+method.rightLines+"\n")
-					emptyContributions.append("\n")
-				}
-			}
-		}
-		return methods
-	}*/
+	 Map<String, ModifiedMethod> methods = new HashMap<String, ModifiedMethod>()
+	 for(String file : filesWithMethodsToJoana.keySet()) {
+	 for(EditSameMC method : filesWithMethodsToJoana.get(file)){
+	 if(method.leftLines.size > 0 && method.rightLines.size > 0)
+	 {
+	 List<String> constArgs;
+	 def constructor = method.getConstructor()
+	 if(constructor != null)
+	 {
+	 constArgs = Util.getArgs(Util.simplifyMethodSignature(constructor.getName()));
+	 }else {
+	 constArgs = new ArrayList<String>()
+	 }
+	 methods.put(method.getSignature(), new ModifiedMethod(method.getSignature(), constArgs, method.getLeftLines(), method.getRightLines(), method.getImportsList()))
+	 }else{
+	 println "One or more empty contributions on: "+method.getSignature()
+	 emptyContributions.append("One or more empty contributions on: "+method.getSignature()+"\n")
+	 emptyContributions.append("   Left Contribution:"+method.leftLines+"\n")
+	 emptyContributions.append("   Right Contribution:"+method.rightLines+"\n")
+	 emptyContributions.append("\n")
+	 }
+	 }
+	 }
+	 return methods
+	 }*/
 
 	private def copyGitFiles(File baseDir, File srcDir, File destDir)
 	{
@@ -397,7 +400,7 @@ class RunStudy {
 		{
 			buildCmd += "ant build -buildfile "+ revGitPath + File.separator +"build.xml"
 		}else if(buildSystem.equals("mvn")){
-		buildCmd += "mvn compile "+ revGitPath + File.separator +"pom.xml"
+			buildCmd += "mvn compile "+ revGitPath + File.separator +"pom.xml"
 		}
 		//start here
 		ProcessBuilder builder = new ProcessBuilder("/bin/bash","-c",buildCmd);
@@ -417,18 +420,18 @@ class RunStudy {
 			if(buildLines.get(i).equals("BUILD SUCCESSFUL")){
 				result[0] = true
 			}
-			
+
 			if(buildLines.get(i).contains("There were failing tests")){
 				result[1] = true
 			}
-			
+
 			i--;
 		}
 		return result
 	}
-	
-	
-	
+
+
+
 	private Extractor createExtractor(String projectName, String graphBase){
 		GremlinProject gProject = new GremlinProject(this.projectName,
 				this.projectRepo, graphBase)
@@ -559,11 +562,11 @@ class RunStudy {
 	public static void main (String[] args){
 		RunStudy study = new RunStudy()
 		/*String[] files= ['projectsList', 'configuration.properties', 
-			'/home/ines/Dropbox/experiment/ResultData']
-		*/	
+		 '/home/ines/Dropbox/experiment/ResultData']
+		 */	
 		String[] files= ['projectsList', 'configuration.properties',
 			'C:\\Users\\155 X-MX\\Documents\\dev\\second_study\\conflictsAnalyzer\\ResultData']
-			
+
 		study.run(files)
 		//println study.build("/usr/local/bin/ant", "/Users/Roberto/Documents/UFPE/Msc/Projeto/projects/temp/voldemort", new File("/Users/Roberto/Documents/UFPE/Msc/Projeto/projects/temp/report.txt"))
 	}
