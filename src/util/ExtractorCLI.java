@@ -77,14 +77,16 @@ public class ExtractorCLI {
 				this.resetToOldCommitAndPush(mc.getSha());
 				this.mergeBranches("origHist");
 				System.out.println("Waiting for original merge commit build to end");
-				this.checkBuildStatus(build.getMergeCommit());
+				String mergeBuild = this.checkBuildStatus(build.getMergeCommit()); 
+				build.getMergeCommit().setBuildStatus(mergeBuild);
 				System.out.println("Replacing files from original merge to "
 						+ "replayed merge and pushing to merges");
 				String newsha = this.commitEditedMergeAndPush(mc, mergeDir);
 				TravisCommit replayedMerge = new TravisCommit(newsha);
 				build.setReplayedMergeCommit(replayedMerge);
 				System.out.println("Waiting for replayed merge commit build to end");
-				this.checkBuildStatus(build.getReplayedMergeCommit());
+				String repMergeBuild = this.checkBuildStatus(build.getReplayedMergeCommit());
+				build.getReplayedMergeCommit().setBuildStatus(repMergeBuild);
 			}	
 		}
 		System.out.println("printing results");
@@ -98,7 +100,8 @@ public class ExtractorCLI {
 		commit.setBuildID(buildId);
 		String buildStatus = "started";
 		try {
-			while(buildStatus.equalsIgnoreCase("started")) {
+			while(buildStatus.equalsIgnoreCase("started") || buildStatus.equalsIgnoreCase("queued")
+					|| buildStatus.equalsIgnoreCase("created") || buildStatus.equalsIgnoreCase("received")) {
 				Thread.sleep(5000);
 				buildStatus = this.auxCheckBuildStatus(buildId);
 			}
@@ -134,9 +137,11 @@ public class ExtractorCLI {
 
 	public String getLatestBuildID() {
 		String id = "";
+		
 		ProcessBuilder pb = new ProcessBuilder(this.travisLocation, "history");
 		pb.directory(new File(this.forkDir));
 		try {
+			Thread.sleep(5000);
 			Process p = pb.start();
 			BufferedReader buf = new BufferedReader(new InputStreamReader(p.getInputStream()));
 			String line = "";
@@ -152,6 +157,9 @@ public class ExtractorCLI {
 
 		} catch (IOException e) {
 
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			
 			e.printStackTrace();
 		}
 		return id;
