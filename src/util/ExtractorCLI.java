@@ -31,6 +31,7 @@ public class ExtractorCLI {
 	private String curlLocation;
 	private Map<String, MergeCommit> originalToReplayedMerge;
 	private String masterBranch;
+	private String latestBuildID;
 
 	public ExtractorCLI(String username, String password, String token, String travis, 
 			String download, String originalRepo, String curl, String master){
@@ -44,18 +45,78 @@ public class ExtractorCLI {
 		File d = new File(this.downloadDir);
 		d.mkdir();
 		this.originalRepo = originalRepo;
+		this.setUpFork();
+		this.originalToReplayedMerge = new HashMap<String, MergeCommit>();
+		this.latestBuildID = this.getLatestBuildID();
+
+	}
+	
+	public void setUpFork() {
 		this.setName();
 		this.setFork();
 		this.setForkDir();
-		this.createFork();
-		this.activateTravis();
-		this.cloneForkLocally();
-		this.createBranches();
-		this.originalToReplayedMerge = new HashMap<String, MergeCommit>();
-
+		/*if the fork already exists, just clone and fetch merges branch,
+		 * otherwise, create fork, activate travis, clone and create merges branch*/
+		if(this.verifyIfForkExists()) {
+			this.cloneForkLocally();
+			this.fetchUpstreamBranches();
+			this.checkoutBranch("merges");
+			this.checkoutBranch(this.masterBranch);
+			this.createbranch("origHist");
+			this.checkoutBranch(this.masterBranch);
+		}else {
+			this.createFork();
+			this.activateTravis();
+			this.cloneForkLocally();
+			this.createBranches();
+		}
 	}
+	
+	public boolean verifyIfForkExists() {
+		boolean forkExists = true;
 
+		String fork = "https://github.com/" + this.fork;
+		ProcessBuilder pb = new ProcessBuilder(this.curlLocation, fork);
+		pb.redirectErrorStream(true);
+		Process process;
+		try {
+			process = pb.start();
+			BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+			String line;
+			while ((line = reader.readLine()) != null) {
+				System.out.println(line);
+				if(line.contains("Not Found")) {
+					forkExists = false;
+				}
+			}
+				
+			process.waitFor();
+		} catch (IOException e) {
 
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+
+			e.printStackTrace();
+		}
+		return forkExists;
+	}
+	
+	public void fetchUpstreamBranches() {
+		ProcessBuilder pb = new ProcessBuilder("git", "fetch");
+		pb.directory(new File(this.forkDir));
+		try {
+			Process p = pb.start();
+			BufferedReader buf = new BufferedReader(new InputStreamReader(p.getInputStream()));
+			String line = "";
+			while ((line=buf.readLine())!=null) {
+				System.out.println(line);
+			}
+
+		} catch (IOException e) {
+
+			e.printStackTrace();
+		}
+	}
 
 	public void replayBuildsOnTravis(MergeCommit mc, String mergeDir){
 		BuildScenario build = new BuildScenario(mc.getParent1(), mc.getParent2(), mc.getSha());
@@ -96,15 +157,30 @@ public class ExtractorCLI {
 
 	public String checkBuildStatus(TravisCommit commit) {
 		String result = "";
-		String buildId = this.getLatestBuildID();
-		commit.setBuildID(buildId);
-		String buildStatus = "started";
+		/*wait while travis API sinchronizes the last build*/
+		String oldBuild = this.latestBuildID;
+		
+		
 		try {
-			while(buildStatus.equalsIgnoreCase("started") || buildStatus.equalsIgnoreCase("queued")
-					|| buildStatus.equalsIgnoreCase("created") || buildStatus.equalsIgnoreCase("received")) {
+			System.out.println("Getting the lastest build id");
+			while(this.latestBuildID.equals(oldBuild)) {
 				Thread.sleep(5000);
-				buildStatus = this.auxCheckBuildStatus(buildId);
+				this.latestBuildID = this.getLatestBuildID();
 			}
+		 
+			commit.setBuildID(this.latestBuildID);
+			String buildStatus = "";
+			
+			while(!buildStatus.equalsIgnoreCase("started")) {
+				System.out.println("build hasn't been started yet");
+				buildStatus = this.auxCheckBuildStatus(this.latestBuildID);
+			}
+			System.out.println("travis has started the build");
+			while(buildStatus.equalsIgnoreCase("started")) {
+				Thread.sleep(5000);
+				buildStatus = this.auxCheckBuildStatus(this.latestBuildID);
+			}
+			System.out.println("The build has finished");
 			result = buildStatus;
 		} catch (InterruptedException e) {
 			e.printStackTrace();
@@ -141,7 +217,6 @@ public class ExtractorCLI {
 		ProcessBuilder pb = new ProcessBuilder(this.travisLocation, "history");
 		pb.directory(new File(this.forkDir));
 		try {
-			Thread.sleep(5000);
 			Process p = pb.start();
 			BufferedReader buf = new BufferedReader(new InputStreamReader(p.getInputStream()));
 			String line = "";
@@ -157,9 +232,6 @@ public class ExtractorCLI {
 
 		} catch (IOException e) {
 
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			
 			e.printStackTrace();
 		}
 		return id;
@@ -312,6 +384,7 @@ public class ExtractorCLI {
 
 	private String commitAndPushMerge(MergeCommit mc){
 		String newSha = "";
+		this.eraseIndex();
 		this.addChangesToStagedArea();
 		this.commitChanges();
 		this.pushToMergeBranch();
@@ -327,11 +400,29 @@ public class ExtractorCLI {
 		pb.directory(new File(this.forkDir));
 		try {
 			Process p = pb.start();
-			/*BufferedReader buf = new BufferedReader(new InputStreamReader(p.getInputStream()));
+			BufferedReader buf = new BufferedReader(new InputStreamReader(p.getInputStream()));
 			String line = "";
 			while ((line=buf.readLine())!=null) {
 				System.out.println(line);
-			}*/
+			}
+
+		} catch (IOException e) {
+
+			e.printStackTrace();
+		}
+	}
+	
+	private void eraseIndex() {
+		ProcessBuilder pb = new ProcessBuilder("del", "index");
+		pb.redirectErrorStream(true);
+		pb.directory(new File(this.forkDir + File.separator + ".git"));
+		try {
+			Process p = pb.start();
+			BufferedReader buf = new BufferedReader(new InputStreamReader(p.getInputStream()));
+			String line = "";
+			while ((line=buf.readLine())!=null) {
+				System.out.println(line);
+			}
 
 		} catch (IOException e) {
 
@@ -587,11 +678,18 @@ public class ExtractorCLI {
 		return travisLocation;
 	}
 
-
+	
 
 	public void setTravisLocation(String travisLocation) {
 		this.travisLocation = travisLocation;
 	}
+
+
+	public void setLatestBuildID(String latestBuildID) {
+		this.latestBuildID = latestBuildID;
+	}
+
+
 
 	private void printMergeSHAS(BuildScenario build){
 		String path = "ResultData" + File.separator + this.name + File.separator + "mergesOnTravis.csv";
@@ -623,14 +721,14 @@ public class ExtractorCLI {
 
 	public static void main(String[] args) {
 		MergeCommit mc = new MergeCommit();
-		mc.setSha("ccd4ddd3eeb6f219ed2e7a184fceeb4e11df7f80");
-		mc.setParent1("1bca94af");
-		mc.setParent2("d415ba83");
+		mc.setSha("dfad68a3a66c0b160951ff34921dc310d9166950");
+		mc.setParent1("42eeb21c");
+		mc.setParent2("1321d385");
 		ExtractorCLI cli = new ExtractorCLI("conflictpredictor", "conflict1407", 
 				"2c373b4405e61827eb069d4cbf22fc812bbb11e4", "C:\\Ruby24-x64\\bin\\travis.bat", 
 				"C:\\Users\\155 X-MX\\Documents\\dev\\second_study\\downloads\\travis", 
 				"brettwooldridge/HikariCP", "C:\\Curl\\curl.exe", "dev");
-		cli.replayBuildsOnTravis(mc, "C:\\Users\\155 X-MX\\Documents\\dev\\second_study\\downloads\\ssmerge\\HikariCP\\revisions\\rev_1bca9_d415b\\rev_merged_git");
+		cli.replayBuildsOnTravis(mc, "C:\\Users\\155 X-MX\\Documents\\dev\\second_study\\downloads\\ssmerge\\HikariCP\\revisions\\rev_42eeb_1321d\\rev_merged_git");
 
 	}
 
