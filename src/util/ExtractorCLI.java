@@ -16,6 +16,7 @@ import org.apache.commons.io.FileUtils;
 
 import main.BuildScenario;
 import main.MergeCommit;
+import main.TravisBuildFinalStatus;
 import main.TravisCommit;
 
 public class ExtractorCLI {
@@ -118,7 +119,7 @@ public class ExtractorCLI {
 		}
 	}
 
-	public void replayBuildsOnTravis(MergeCommit mc, String mergeDir){
+/*	public void replayBuildsOnTravis(MergeCommit mc, String mergeDir){
 		BuildScenario build = new BuildScenario(mc.getParent1(), mc.getParent2(), mc.getSha());
 		System.out.println("Reseting to parent 1 and pushing to " + this.masterBranch);
 		this.resetToOldCommitAndPush(mc.getParent1());
@@ -153,6 +154,45 @@ public class ExtractorCLI {
 		System.out.println("printing results");
 		this.printMergeSHAS(build);
 
+	}*/
+	
+	public void replayBuildsOnTravis(MergeCommit mc, String mergeDir){
+		BuildScenario build = new BuildScenario(mc.getParent1(), mc.getParent2(), mc.getSha());
+		System.out.println("Reseting to merge commit and pushing to remote");
+		this.resetToOldCommitAndPush(mc.getSha());
+		this.mergeBranches("origHist");
+		System.out.println("Waiting for merge commit build to end");
+		String mergeBuild = this.checkBuildStatus(build.getMergeCommit()); 
+		build.getMergeCommit().setBuildStatus(mergeBuild);
+		//if the build does not pass, start building the parents
+		if(!mergeBuild.equalsIgnoreCase("passed")) {
+			System.out.println("Reseting to parent 1 and pushing to remote");
+			this.resetToOldCommitAndPush(mc.getParent1());
+			this.mergeBranches("origHist");
+			System.out.println("Waiting for parent 1 build to end");
+			String parent1Build = this.checkBuildStatus(build.getParent1());
+			build.getParent1().setBuildStatus(parent1Build);
+			if(parent1Build.equalsIgnoreCase("passed")) {
+				System.out.println("Reseting to parent 2 and pushing to remote");
+				this.resetToOldCommitAndPush(mc.getParent2());
+				this.mergeBranches("origHist");
+				System.out.println("Waiting for parent 2 build to end");
+				String parent2Build = this.checkBuildStatus(build.getParent2());
+				build.getParent2().setBuildStatus(parent2Build);
+				if(parent2Build.equalsIgnoreCase("passed")) {
+					System.out.println("Replacing files from original merge to "
+							+ "replayed merge and pushing to merges");
+					String newsha = this.commitEditedMergeAndPush(mc, mergeDir);
+					TravisCommit replayedMerge = new TravisCommit(newsha);
+					build.setReplayedMergeCommit(replayedMerge);
+					System.out.println("Waiting for replayed merge commit build to end");
+					String repMergeBuild = this.checkBuildStatus(build.getReplayedMergeCommit());
+					build.getReplayedMergeCommit().setBuildStatus(repMergeBuild);
+				}
+			}
+		}
+		System.out.println("printing results");
+		this.printMergeSHAS(build);
 	}
 
 	public String checkBuildStatus(TravisCommit commit) {
@@ -170,13 +210,9 @@ public class ExtractorCLI {
 		 
 			commit.setBuildID(this.latestBuildID);
 			String buildStatus = "";
-			
-			while(!buildStatus.equalsIgnoreCase("started")) {
-				System.out.println("build hasn't been started yet");
-				buildStatus = this.auxCheckBuildStatus(this.latestBuildID);
-			}
-			System.out.println("travis has started the build");
-			while(buildStatus.equalsIgnoreCase("started")) {
+
+			while(!this.buildHasFinished(buildStatus)) {
+				System.out.println("The build has not finished yet");
 				Thread.sleep(5000);
 				buildStatus = this.auxCheckBuildStatus(this.latestBuildID);
 			}
@@ -186,6 +222,16 @@ public class ExtractorCLI {
 			e.printStackTrace();
 		}
 		return result;
+	}
+	
+	private boolean buildHasFinished(String status) {
+		boolean finished = false;
+		for(TravisBuildFinalStatus build : TravisBuildFinalStatus.values()) {
+			if(build.toString().equalsIgnoreCase(status)) {
+				finished = true;
+			}
+		}
+		return finished;
 	}
 
 	private String auxCheckBuildStatus(String buildID) {
