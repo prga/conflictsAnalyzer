@@ -43,9 +43,9 @@ class CompareFiles {
 		File file = new File(revFile)
 		this.revDir = new File(revFile).getParent()
 		String[] revs = new File(revFile).text.split('\n')
-		this.leftRevName = revs[0]
-		this.baseRevName = revs[1]
-		this.rightRevName = revs[2]
+		this.leftRevName = revs[0].trim()
+		this.baseRevName = revs[1].trim()
+		this.rightRevName = revs[2].trim()
 		this.mergeDir = this.revDir + File.separator + 'rev_merged_git'
 		try{
 			String rev = new File(this.revDir).getName()
@@ -74,7 +74,8 @@ class CompareFiles {
 		this.removeNonJavaFiles();
 
 		
-		String baseFolder = this.revDir + File.separator + this.baseRevName
+		String baseFolder = this.revDir + File.separator + this.baseRevName.trim()
+		//String baseFolder = "C:\\Users\\155 X-MX\\Documents\\dev\\second_study\\testes\\rev_123ab_456cd\\rev_base_90bvd"
 		//moveFilesOnSingleVersion(baseFolder.replaceFirst(baseRevName, leftRevName),this.leftRevName, this.rightRevName, this.baseRevName)
 		//moveFilesOnSingleVersion(baseFolder.replaceFirst(baseRevName, rightRevName),this.rightRevName, this.leftRevName, this.baseRevName)
 		this.iterateRevFolders(this.leftRevName, this.baseRevName, baseFolder, this.rightRevName)
@@ -112,7 +113,7 @@ class CompareFiles {
 	private void iterateRevFolders(String leftRevName, String baseRevName, String baseFolder, String rightRevName){
 
 		File directory = new File(baseFolder)
-		if(directory.exists()){
+		if(directory.exists()) {
 			File[] fList = directory.listFiles()
 			for (File file : fList){
 				if (file.isDirectory()){
@@ -124,6 +125,8 @@ class CompareFiles {
 				}
 			}
 		}
+
+
 	}
 
 
