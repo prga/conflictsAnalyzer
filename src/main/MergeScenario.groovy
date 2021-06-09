@@ -8,7 +8,6 @@ import java.util.Observable;
 import merger.FSTGenMerger;
 import merger.MergeVisitor
 import modification.traversalLanguageParser.addressManagement.DuplicateFreeLinkedList
-import sun.tools.jar.Main;
 import util.CompareFiles;
 import composer.rules.ImplementsListMerging
 import de.ovgu.cide.fstgen.ast.FSTNode;
@@ -84,7 +83,12 @@ class MergeScenario implements Observer {
 	}
 
 	public void setName(){
-		String [] temp = extractResult.revisionFile.split('/')
+		String separator;
+		if(System.getProperty("os.name").contains("Windows"))
+			separator = '\\\\'
+		else
+			separator = '/'
+		String [] temp = extractResult.revisionFile.split(separator)
 		String revFile = temp[temp.length -1]
 		this.name = revFile.substring(0, revFile.length()-10)
 	}

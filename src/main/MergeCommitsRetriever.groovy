@@ -54,8 +54,8 @@ class MergeCommitsRetriever {
 					merge.setParent2(data[2])
 					line=buf.readLine()
 					line=buf.readLine()
-					Date date = this.getCommitDate(line)
-					merge.setDate(date)		
+					//Date date = this.getCommitDate(line)
+					//merge.setDate(date)		
 					merges.add(merge)
 				}
 			}
@@ -152,7 +152,8 @@ class MergeCommitsRetriever {
 	public static void main(String[] args){
 		/*date is optional, if you want to get all commits pass the date parameter as an empty string
 		 * otherwise pass the date parameter as an string with the format "yyyy-MM-dd" */
-		MergeCommitsRetriever merges = new MergeCommitsRetriever("/Users/paolaaccioly/Documents/Doutorado/workspace_empirical/cloudify", "")
-		ArrayList<MergeCommit> m = merges.retrieveNonMergeCommits('leusonmario/javaToy')
+		MergeCommitsRetriever merges = new MergeCommitsRetriever("", "")
+		ArrayList<MergeCommit> list =  merges.retrieveMergeCommits();
+		
 	}
 }

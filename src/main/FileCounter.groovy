@@ -1,7 +1,6 @@
 package main
 
 
-import javax.swing.colorchooser.DefaultSwatchChooserPanel.MainSwatchKeyListener;
 
 class FileCounter {
 
