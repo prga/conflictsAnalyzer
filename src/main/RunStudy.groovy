@@ -41,7 +41,7 @@ class RunStudy {
 			//ArrayList<MergeCommit> listMergeCommits = runGremlinQuery(graphBase)
 			/*3 read mergeCommits.csv sheets*/ 
 			//String graphBase = this.gitminerLocation + File.separator + this.projectName + 'graph.db'
-			//ArrayList<MergeCommit> listMergeCommits = this.readMergeCommitsSheets(this.gitminerLocation)
+			ArrayList<MergeCommit> listMergeCommits = this.readMergeCommitsSheets(this.gitminerLocation)
 			
 			//set listMergeCommits with commits that i want to analyze separately
 			/*MergeCommit mc = new MergeCommit()
@@ -60,9 +60,10 @@ class RunStudy {
 			Extractor extractor = this.createExtractor(this.projectName, graphBase)
 			Project project = new Project(this.projectName)
 			
+			//4 - gets list o merge commits using the local clone and, 
 			//for each merge scenario, clone and run SSMerge on it
 			
-			ArrayList<MergeCommit> listMergeCommits = this.getListMergeCommit(this.projectName)
+			//ArrayList<MergeCommit> listMergeCommits = this.getListMergeCommit(this.projectName)
 			ConflictPrinter.printMergeCommitsList(this.projectName, listMergeCommits)
 			analyseMergeScenarios(listMergeCommits, extractor, project)
 			
@@ -265,7 +266,7 @@ class RunStudy {
 	
 	public static void main (String[] args){
 		RunStudy study = new RunStudy()
-		String[] files= ['projectsList', 'configuration.properties', 'C:\\Users\\paola\\Documents\\pesquisa\\ufac\\result']
+		String[] files= ['projectsList', 'configuration.properties', '']
 		//'/home/ines/Dropbox/experiment/oldResultData'
 		study.run(files)
 		
