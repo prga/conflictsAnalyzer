@@ -225,8 +225,8 @@ class MergeScenario implements Observer {
 		String conflictPath = conflict.filePath
 		boolean matchedFile = false
 		int i = 0
-		while(!matchedFile && i < this.mergedFiles.size){
-			String mergedFilePath = this.mergedFiles.elementData(i).path.replaceFirst(rev_base, this.name)
+		while(!matchedFile && i < this.mergedFiles.size()){
+			String mergedFilePath = this.mergedFiles.get(i).path.replaceFirst(rev_base, this.name)
 			if(conflictPath.equals(mergedFilePath)){
 				matchedFile = true
 				boolean addedByOneDev = this.mergedFiles.get(i).isAddedByOneDev()
@@ -255,15 +255,15 @@ class MergeScenario implements Observer {
 			this.updateSameSignatureCMSummary(cause, conflict.getDifferentSpacing())
 		}
 		
-		this.mergedFiles.elementData(index).conflicts.add(conflict)
-		this.mergedFiles.elementData(index).updateMetrics(conflict)
+		this.mergedFiles.get(index).conflicts.add(conflict)
+		this.mergedFiles.get(index).updateMetrics(conflict)
 
 	}
 
 	public String printMetrics(){
 		String result = ''
 		for(MergedFile m : this.mergedFiles){
-			if(m.conflicts.size != 0){
+			if(m.conflicts.size() != 0){
 				result = result + m.toString()
 			}
 		}

@@ -106,7 +106,7 @@ class MergedFile {
 
 	public boolean hasConflicts(){
 		boolean hasConflicts = false
-		if(this.conflicts.size != 0){
+		if(this.conflicts.size() != 0){
 			hasConflicts = true
 		}
 		return hasConflicts
